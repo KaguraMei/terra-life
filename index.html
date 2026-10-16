@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>泰拉人生模拟 · 明日方舟</title>
+<meta name="description" content="在明日方舟的泰拉世界随机出生：21 个国家、26 个种族、26 个萨卡兹王庭、一份按阶层分层的社会预期寿命模型，以及一场无法选择的矿石病。把一次的人生活到最后。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ====================================================================== -->
+<!-- 顶栏：品牌 · 年龄 · 年份/姓名/秒数 · 速度 · 工具                        -->
+<!-- ====================================================================== -->
+<header id="topbar">
+  <div id="brand">泰拉人生<small id="brandSub">TERRA LIFE</small></div>
+
+  <div id="ageBox">
+    <div id="ageBig">0</div><div id="ageUnit">岁</div>
+  </div>
+
+  <div id="tbMeta">
+    <div class="l1" id="metaL1">准备中</div>
+    <div class="l2" id="metaL2">—</div>
+    <div id="progWrap"><div id="progBar"></div></div>
+  </div>
+
+  <div id="speeds">
+    <button class="spd" data-s="0">暂停</button>
+    <button class="spd on" data-s="1">1×</button>
+    <button class="spd" data-s="2">2×</button>
+    <button class="spd" data-s="4">4×</button>
+    <button class="spd" data-s="8">8×</button>
+    <button class="spd" data-s="12">12×</button>
+    <button class="spd" data-s="16">16×</button>
+  </div>
+
+  <div id="tbTools">
+    <button class="tbtn primary" id="nextBtn">快转到下一个抉择 »</button>
+    <button class="tbtn" id="autoBtn">自动快转</button>
+    <button class="tbtn" id="musicBtn">音乐</button>
+    <button class="tbtn" id="noteBtn">写下想法</button>
+    <button class="tbtn" id="setBtn">设置</button>
+    <button class="tbtn" id="fbBtn">提供意见</button>
+    <button class="tbtn" id="closeBtn">关闭</button>
+  </div>
+</header>
+
+<!-- ====================================================================== -->
+<!-- 三栏主体                                                                -->
+<!-- ====================================================================== -->
+<main id="game" hidden>
+
+  <!-- ---------- 左栏 ---------- -->
+  <aside id="left" class="col">
+
+    <div class="box">
+      <h3><span id="idTitle">身份记录</span><span class="hint" id="idCode">—</span></h3>
+      <div class="body">
+        <div id="idHead">
+          <div id="avatarWrap"><canvas id="avatar" width="62" height="62"></canvas></div>
+          <div style="flex:1;min-width:0">
+            <div id="idName">—</div>
+            <div id="idSub">—</div>
+            <div id="idTags"></div>
+          </div>
+        </div>
+        <table class="itable" id="idTable" style="margin-top:8px"></table>
+        <div id="mrz"><div id="mrzText">—</div><div id="mrzBars"></div></div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3><span id="statTitle">状态</span><span class="hint">0-100</span></h3>
+      <div class="body" id="statBody"></div>
+    </div>
+
+    <div class="box">
+      <h3 id="wealthTitle">财产</h3>
+      <div class="body">
+        <div class="money2">
+          <div><div class="mk" id="nwLabel">净资产</div><div class="mv" id="nwVal">—</div></div>
+          <div><div class="mk" id="incLabel">年收入</div><div class="mv" id="incVal">—</div></div>
+        </div>
+        <div id="factList" style="margin-top:7px"></div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ---------- 中栏 ---------- -->
+  <section id="center" class="col">
+
+    <div class="box" id="sceneBox">
+      <canvas id="sceneCanvas" width="160" height="64"></canvas>
+      <div id="sceneCap">—</div>
+    </div>
+
+    <div class="box">
+      <h3><span id="focusTitle">今年的重心</span><span class="hint" id="stageHint">—</span></h3>
+      <div class="body">
+        <div id="focusDesc" style="color:var(--fg3);font-size:11.5px;margin-bottom:8px"></div>
+        <div id="focusList"></div>
+      </div>
+    </div>
+
+    <div class="box" id="feedBox">
+      <h3><span id="logTitle">人生记录</span><span class="hint" id="logHint">最新的在前</span></h3>
+      <div id="feed"></div>
+    </div>
+
+  </section>
+
+  <!-- ---------- 右栏 ---------- -->
+  <aside id="right" class="col">
+
+    <div class="box">
+      <h3 id="famTitle">家人与生活</h3>
+      <div class="body" id="famList"></div>
+    </div>
+
+    <div class="box">
+      <h3 id="peerTitle">在同一秒出生的人们</h3>
+      <div class="body">
+        <div id="peers"></div>
+        <div id="peerSum">—</div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3><span id="mapTitle">人生地图</span><span class="hint" id="mapHint">一格一年</span></h3>
+      <div class="body">
+        <div id="lifeMap"></div>
+        <div id="mapLegend">
+          <span class="sw" id="sw0"></span><span class="sw" id="sw1"></span><span class="sw" id="sw2"></span>
+          <span class="sw" id="sw3"></span><span class="sw" id="sw4"></span>
+          <span style="margin-left:4px" id="mapLegendTxt">越深越幸福</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3><span id="survTitle">存活曲线</span><span class="hint" id="survHint">同批出生</span></h3>
+      <div class="body">
+        <div id="survWrap"><canvas id="survCanvas" width="600" height="184"></canvas></div>
+        <div id="survStat"><span>—</span><span>—</span><span>—</span></div>
+      </div>
+    </div>
+
+  </aside>
+</main>
+
+<!-- ====================================================================== -->
+<!-- 抉择弹层                                                                -->
+<!-- ====================================================================== -->
+<div id="modal" hidden>
+  <div id="modalBox">
+    <div id="modalHead">
+      <div class="t" id="modalTitle">—</div>
+      <div class="s" id="modalSub">—</div>
+    </div>
+    <div id="modalText"></div>
+    <div id="modalOpts"></div>
+  </div>
+</div>
+
+<!-- ====================================================================== -->
+<!-- 浮层：设置 / 写下想法 / 提供意见                                        -->
+<!-- ====================================================================== -->
+<div id="sheet" hidden>
+  <div id="sheetBox">
+    <div id="sheetHead"><span id="sheetTitle">—</span><button class="tbtn" id="sheetClose">关闭</button></div>
+    <div id="sheetBody"></div>
+    <div class="sheetFoot" id="sheetFoot"></div>
+  </div>
+</div>
+
+<!-- ====================================================================== -->
+<!-- 开局界面                                                                -->
+<!-- ====================================================================== -->
+<div class="screen" id="start">
+  <div class="wrap">
+    <h1 id="startTitle">泰拉人生模拟</h1>
+    <div class="tagline">在这片被源石贯穿的大地上，随机出生，把一次的人生活到最后。</div>
+    <div class="hint">21 个国家 · 26 个种族 · 11 支萨卡兹王庭 · 四层出身阶层 · 一份真实的死亡率模型</div>
+
+    <div class="fieldset">
+      <label>你的地区（决定界面语言与货币口径）</label>
+      <div class="opts" id="regionChips"></div>
+      <div style="color:var(--fg3);font-size:11.5px;margin-top:7px" id="regionNote"></div>
+    </div>
+
+    <div class="fieldset">
+      <label>抽签口径</label>
+      <div class="opts" id="modeChips">
+        <div class="chip" data-v="birth">此刻出生的婴儿<small class="sub">按年出生人数加权</small></div>
+        <div class="chip" data-v="pop">此刻活着的所有人<small class="sub">按人口加权</small></div>
+      </div>
+      <div style="color:var(--fg3);font-size:11.5px;margin-top:7px" id="oddsNote"></div>
+      <div id="oddsTable"></div>
+    </div>
+
+    <div class="fieldset">
+      <label>出生地（可选）</label>
+      <div class="opts" id="nationChips"></div>
+    </div>
+
+    <div class="fieldset">
+      <label>种族（可选）</label>
+      <div class="opts" id="raceChips"></div>
+    </div>
+
+    <div class="fieldset">
+      <label>性别（可选）</label>
+      <div class="opts" id="sexChips">
+        <div class="chip on" data-v="">随机</div>
+        <div class="chip" data-v="M">男</div>
+        <div class="chip" data-v="F">女</div>
+      </div>
+    </div>
+
+    <div class="fieldset">
+      <label>播放节奏</label>
+      <div class="opts" id="paceChips">
+        <div class="chip" data-v="short">约 30 分钟<small class="sub">每年停留短</small></div>
+        <div class="chip on" data-v="normal">约 1 小时<small class="sub">推荐</small></div>
+        <div class="chip" data-v="long">约 1.5 小时<small class="sub">每年停留长</small></div>
+      </div>
+      <div style="color:var(--fg3);font-size:11.5px;margin-top:7px">
+        节奏指的是「走到预期寿命」所需的真实时间，不是死亡年龄。
+      </div>
+    </div>
+
+    <div class="fieldset">
+      <label>随机种子（可选，用于复现同一局）</label>
+      <div style="display:flex;gap:8px">
+        <input id="seedInput" placeholder="留空 = 真随机">
+        <button class="tbtn" id="seedBtn">应用</button>
+      </div>
+    </div>
+
+    <button id="startBtn">开 始 出 生</button>
+
+    <div class="fieldset">
+      <label>过去的人生（存在这个浏览器里）</label>
+      <div id="saves"></div>
+    </div>
+
+    <div style="margin-top:26px;color:var(--fg3);font-size:11.5px;line-height:1.8;text-align:center">
+      同人作品。世界观与名词来自《明日方舟》（Hypergryph / Studio Montagne）。<br>
+      模拟逻辑移植自「80億分之1 / 1 in 8 Billion」的人生模拟框架，并针对泰拉重新建模。<br>
+      国家人口参照《大地巡旅》与社区推算；寿命、死亡率、矿石病参数为叙事化推演，非官方设定。
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================================== -->
+<!-- 人生报告                                                                -->
+<!-- ====================================================================== -->
+<div class="screen" id="report" hidden>
+  <div class="wrap">
+    <h1 class="rTitle" id="rTitle">—</h1>
+    <div class="dead" id="rDead">—</div>
+    <div class="rgrid" id="rGrid"></div>
+
+    <div class="sparkWrap">
+      <div class="lbl" id="rChartLbl">一生曲线 · 体质 / 心境 / 学识 / 羁绊 / 结晶率</div>
+      <canvas id="chartLife"></canvas>
+    </div>
+
+    <div class="sparkWrap">
+      <div class="lbl" id="rWealthLbl">净资产</div>
+      <canvas id="chartWealth"></canvas>
+    </div>
+
+    <div class="sparkWrap">
+      <div class="lbl" id="rLogLbl">一生纪要</div>
+      <div id="reportLog"></div>
+    </div>
+
+    <div class="rbtns">
+      <button class="primary" id="againBtn">再随机一次</button>
+      <button id="sameSeedBtn">同种子再来</button>
+      <button id="restartBtn">回到开局设置</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" hidden></div>
+
+<!-- ====================================================================== -->
+<!-- 脚本（普通 script，file:// 直接双击也能跑）                             -->
+<!-- ====================================================================== -->
+<script src="js/engine/rng.js"></script>
+<script src="js/engine/text.js"></script>
+<script src="js/engine/region.js"></script>
+<script src="js/data/nations.js"></script>
+<script src="js/data/races.js"></script>
+<script src="js/data/jobs.js"></script>
+<script src="js/data/names.js"></script>
+<script src="js/data/baseline.js"></script>
+<script src="js/data/focus.js"></script>
+<script src="js/engine/lifetable.js"></script>
+<script src="js/engine/cohort.js"></script>
+<script src="js/engine/oripathy.js"></script>
+<script src="js/engine/state.js"></script>
+<script src="js/engine/decision.js"></script>
+<script src="js/data/timeline.js"></script>
+<script src="js/data/events.js"></script>
+<script src="js/data/decisions.js"></script>
+<script src="js/engine/year.js"></script>
+<script src="js/ui/pixelart.js"></script>
+<script src="js/ui/render.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

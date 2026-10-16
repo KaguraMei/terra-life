@@ -1,0 +1,35 @@
+MIT License
+
+Copyright (c) 2026  Terra Life Sim contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------------
+第三方权利声明
+
+1. 《明日方舟》(Arknights) 的世界观、国家、种族、组织、专有名词及一切相关
+   知识产权的版权归 Hypergryph / Studio Montagne 所有。本项目中与之相关的
+   内容属于非商业性的同人创作，不在上述 MIT 许可的授权范围内。
+
+2. 人生模拟的框架设计（加权抽签、生命表反解、四维回归、年内事件队列、
+   播放节奏映射等）移植自「80億分之1 / 1 in 8 Billion」
+   (https://1in8b.life/)。本项目对该框架的移植与改写亦属非商业同人性质。
+
+3. 各国人口数据中标注为「推算」的部分来自玩家社区的考据成果，
+   仅供参考，不代表官方设定。
