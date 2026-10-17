@@ -1,0 +1,116 @@
+/* Landing and birth sequence, based on the live 1in8b.life reference (2026-10-17).
+   Scoped to the entrance; the simulation's existing styles remain independent. */
+[hidden] { display: none !important; }
+body:has(#start:not([hidden])), body:has(#birth:not([hidden])) { overflow: hidden; }
+body:has(#start:not([hidden])) #topbar, body:has(#birth:not([hidden])) #topbar { visibility: hidden; }
+.entrance {
+  --paper: #ebf0ed; --card: #f7faf8; --ink: #13212a; --muted: #5f6e72;
+  --rule: #c7d2ce; --accent: #8c1d3c; --stamp: #0f6e68;
+  background: var(--paper); color: var(--ink); font: 15px/1.65 var(--sans), system-ui, 'Microsoft YaHei', sans-serif;
+}
+#start { padding: 0; scroll-behavior: smooth; }
+.landing-wrap { max-width: 1320px; margin: auto; padding: 40px 24px 64px; }
+.landing-nav { position: absolute; top: 14px; right: max(24px, calc((100% - 1272px)/2)); z-index: 2; }
+#start #regionChips { display: flex; flex-wrap: wrap; gap: 2px; padding: 5px; border: 1px solid var(--rule); border-radius: 30px; background: var(--card); box-shadow: 0 4px 15px #13212a08; }
+#start #regionChips .chip { border: 0; background: transparent; border-radius: 22px; padding: 6px 14px; font-size: 13px; color: var(--muted); }
+#start #regionChips .chip.on { color: white; background: var(--ink); }
+#start #regionChips small { display: none; }
+.landing-hero { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); gap: 48px; align-items: start; }
+.landing-kicker { color: var(--stamp); font: 12px/1.6 var(--mono); letter-spacing: .025em; }
+#start h1 { margin: 22px 0 34px; text-align: left; font-family: var(--sans), system-ui, 'Microsoft YaHei', sans-serif; font-size: clamp(76px,12vw,156px); font-weight: 750; line-height: 1.02; letter-spacing: -.055em; color: var(--ink); }
+#start h1 span { display: block; }
+#start h1 em { font-style: normal; color: var(--accent); }
+.landing-lede { max-width: 34em; color: #4a5a61; font-size: 18px; line-height: 1.8; margin: 0; }
+.landing-counts { display: flex; gap: 35px; margin-top: 28px; }
+.landing-counts div { display: flex; flex-direction: column; }
+.landing-counts strong { font-size: 34px; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.landing-counts span, .landing-small { color: var(--muted); font-size: 12px; }
+.landing-theme { display: flex; align-items: baseline; gap: 10px; margin: 23px 0 30px; font-size: 13px; }
+.landing-theme b { background: var(--stamp); color: white; border-radius: 20px; padding: 1px 9px; white-space: nowrap; font-size: 11px; }
+.landing-side { min-width: 0; padding-top: 28px; }
+.terra-map { width: 100%; height: auto; display: block; }
+.map-caption { margin: -10px 0 20px; color: var(--muted); font: 10px/1.5 var(--mono); text-align: right; }
+.odds-card { background: var(--card); border: 1px solid var(--rule); border-radius: 4px; padding: 24px; box-shadow: 0 6px 22px #13212a06; }
+.odds-card h2 { font-size: 18px; font-weight: 650; margin: 0 0 8px; }
+#start #oddsNote { margin: 0 0 18px; color: var(--muted); font-size: 12px; }
+#start #oddsTable { border: 0; margin: 0; padding: 0; max-height: none; overflow: visible; }
+.odds-row { display: grid; grid-template-columns: minmax(84px,1.25fr) minmax(60px,3fr) 51px; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; }
+.odds-track { background: #dce4e1; height: 8px; }
+.odds-fill { height: 100%; background: var(--stamp); transition: width .25s; }
+.odds-row.other .odds-fill { opacity: .5; }
+.odds-pct { text-align: right; color: var(--muted); font: 12px var(--mono); }
+.odds-rest { margin-top: 20px; font-size: 12px; }
+.odds-rest summary { cursor: pointer; border: 1px solid var(--rule); border-radius: 4px; padding: 8px 12px; width: fit-content; }
+.landing-options { margin-top: 35px; }
+#start .fieldset { margin: 22px 0 0; padding: 0; border: 0; }
+#start .fieldset > label, #start .fieldset > .option-label { display: block; border: 0; padding: 0; margin-bottom: 8px; color: var(--muted); font: 600 12px/1.6 system-ui, sans-serif; letter-spacing: .03em; }
+#start .opts { gap: 6px; }
+#start .chip { display: inline-block; padding: 9px 13px; color: var(--ink); background: var(--card); border: 1px solid var(--rule); border-radius: 4px; font-size: 13px; text-align: left; line-height: 1.4; }
+#start .chip.on { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+#start .chip:hover { border-color: var(--ink); }
+#start .chip small.sub { margin-top: 3px; font-size: 11px; }
+.landing-option-hint { margin: 8px 0 0; color: var(--muted); font-size: 12px; max-width: 38em; }
+.landing-advanced { margin-top: 24px; border-top: 1px solid var(--rule); padding-top: 16px; }
+.landing-advanced > summary { color: var(--muted); cursor: pointer; font-size: 13px; }
+#start input { min-width: 0; flex: 1; background: var(--card); color: var(--ink); border: 1px solid var(--rule); border-radius: 4px; padding: 10px 12px; font: inherit; }
+.seed-row { display: flex; gap: 8px; }
+.entrance button:focus-visible, .entrance summary:focus-visible, .entrance input:focus-visible, .entrance a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.entrance .birth-cta, #startBtn { display: inline-block; width: auto; margin: 0; padding: 15px 30px; border: 0; border-radius: 4px; background: var(--accent); color: white; font: 600 18px/1.5 system-ui, sans-serif; letter-spacing: 0; box-shadow: 0 5px 16px #13212a12; }
+.entrance .birth-cta:hover { filter: brightness(1.1); }
+.birth-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 15px; margin-top: 26px; }
+#start .birth-actions p { font-size: 12px; color: var(--muted); margin: 0; }
+.landing-dock { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); padding: 8px; border: 1px solid var(--rule); border-radius: 5px; background: #f7faf8ed; box-shadow: 0 5px 22px #13212a12; z-index: 3; }
+.landing-dock .birth-cta { padding: 12px 42px; font-size: 16px; }
+.landing-archive { margin-top: 34px; padding-top: 22px; border-top: 1px solid var(--rule); }
+.landing-archive h2 { margin: 0 0 12px; font-size: 14px; }
+#start #saves { color: var(--muted); font-size: 13px; }
+#start .svrow { border-color: var(--rule); flex-wrap: wrap; gap: 6px; padding: 10px 0; }
+.landing-notes { border-top: 1px solid var(--rule); margin-top: 48px; padding-top: 24px; display: grid; grid-template-columns: repeat(3,1fr); gap: 32px; }
+.landing-notes h3 { font-size: 14px; margin: 0 0 8px; }
+.landing-notes p { font-size: 13px; color: var(--muted); margin: 0; }
+.landing-footer { margin-top: 36px; color: var(--muted); font-size: 11px; line-height: 1.9; padding-bottom: 50px; }
+.landing-footer a { color: var(--stamp); }
+#birth { z-index: 35; padding: 0; }
+.birth-roller { min-height: 70vh; min-height: 70svh; margin-top: 48px; display: flex; justify-content: center; flex-direction: column; align-items: center; text-align: center; padding: 20px; }
+.roll-label { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+.roll-country { font-size: clamp(44px,9vw,110px); line-height: 1.05; font-weight: 700; letter-spacing: -.02em; min-height: 1.1em; overflow-wrap: anywhere; }
+.roll-meta { margin-top: 16px; font: 13px/1.6 var(--mono); color: var(--muted); }
+.birth-certificate { max-width: 760px; margin: 40px auto; background: var(--card); border: 1px solid var(--rule); border-radius: 4px; box-shadow: 0 8px 25px #13212a0a; overflow: hidden; }
+.cert-heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 15px 24px; background: var(--accent); color: white; }
+.cert-heading strong { font-size: 18px; }
+.cert-heading span { align-self: center; font: 11px/1.4 var(--mono); opacity: .8; }
+.cert-content { padding: 24px; }
+.cert-content h2 { font-size: clamp(28px,5vw,44px); line-height: 1.3; font-weight: 600; margin: 2px 0 12px; }
+.cert-story { color: #4a5a61; margin: 0 0 18px; font-size: 16px; }
+.cert-fields { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px 24px; border-top: 1px dashed var(--rule); margin-top: 20px; padding-top: 20px; }
+.cert-fields dt { color: var(--muted); font-size: 12px; }
+.cert-fields dd { margin: 3px 0 0; font-size: 15px; overflow-wrap: anywhere; }
+.cert-probability { border-block: 1px solid var(--rule); padding: 18px 0; margin: 20px 0; color: #4a5a61; font-size: 14px; }
+.cert-probability b { color: var(--stamp); }
+.cert-peers { padding-left: 18px; font-size: 13px; color: var(--muted); }
+.cert-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; margin-top: 25px; }
+.birth-back { border: 1px solid var(--rule); border-radius: 4px; background: transparent; padding: 10px 16px; font-size: 13px; }
+@media (min-width:1500px) { #start h1 { font-size: 168px; } }
+@media (max-width:900px) {
+  .landing-wrap { padding-top: 85px; }
+  .landing-hero { gap: 28px; }
+  .landing-side { padding-top: 0; }
+  .odds-card { padding: 18px; }
+  .landing-nav { right: 24px; left: 24px; display: flex; justify-content: flex-end; }
+  .landing-lede { font-size: 16px; }
+}
+@media (max-width:680px) {
+  .landing-wrap { padding: 80px 20px 40px; }
+  .landing-hero { display: flex; flex-direction: column; gap: 30px; }
+  .landing-copy, .landing-side { width: 100%; }
+  #start h1 { font-size: clamp(78px,20vw,128px); margin: 20px 0 25px; }
+  .landing-counts { gap: 28px; }
+  .landing-nav { right: 16px; left: 16px; }
+  #start #regionChips .chip { padding: 6px 10px; font-size: 12px; }
+  .landing-theme { margin-bottom: 0; }
+  .landing-notes { grid-template-columns: 1fr; gap: 24px; }
+  .birth-certificate { margin: 16px; }
+  .cert-fields { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px 12px; }
+  .cert-heading, .cert-content { padding: 18px; }
+}
+@media (prefers-reduced-motion:reduce) { #start { scroll-behavior: auto; } .odds-fill { transition: none; } }

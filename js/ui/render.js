@@ -56,7 +56,7 @@
 
   /** 四维 → 颜色（用于人生地图 / 曲线） */
   const C = {
-    hl: '#5f8a3c', h: '#c07a22', sm: '#3f6d94', so: '#b0566f', ori: '#7a4f8c'
+    hl: '#2b7a4e', h: '#9c7020', sm: '#0f6e68', so: '#8c1d3c', ori: '#7a4f8c'
   };
 
   /** 0..1 在两个 hex 之间插值 */
@@ -138,12 +138,9 @@
       [TL.t('sex'), TL.t(S.sex === 'M' ? 'male' : 'female')],
       [TL.t('born'), TL.L`${S.bornYear || (S.year - Math.floor(S.age))}${TL.t('yearWord')}`],
       [TL.t('residence'), esc(S.city)],
-      [TL.t('nation'), esc(TL.nameOf(n))],
       [TL.t('stratum'), esc(TL.nameOf(TL.stratum(S.stratum)))],
-      [TL.t('race'), esc(TL.nameOf(r)) + (court ? ' · ' + esc(court) : '')],
       [TL.t('familyTier'), famDots + ' <span style="color:var(--fg3);font-size:10px">' + fam.toFixed(1) + '/5</span>'],
-      [TL.t('edu'), esc(TL.eduName(S.eduLevel))],
-      [TL.t('stage'), esc(TL.stageName(TL.stage(S)))]
+      [TL.t('edu'), esc(TL.eduName(S.eduLevel))]
     ];
     $('idTable').innerHTML = rows.map(
       r2 => `<tr><td class="k">${r2[0]}</td><td class="v">${r2[1]}</td></tr>`
@@ -203,7 +200,7 @@
 
     // 背景
     R(0, 0, 62, 62, '#f4efe4');
-    R(0, 44, 62, 18, '#e6ddc9');
+    R(0, 44, 62, 18, '#dce4e1');
 
     // 肩
     R(9, 47, 44, 15, cloth);
@@ -262,18 +259,49 @@
     // 嘴
     R(27, 34, 8, 1, mixHex(skin, '#000000', 0.34));
 
-    // 结晶：感染者脸侧有源石
+    // 结晶：感染者脸侧有源石（按分期增加密度与尺寸）
     if (S.ori && S.ori.stage > 0) {
-      const n = Math.min(4, S.ori.stage + 1);
-      for (let i = 0; i < n; i++) {
-        R(20 + ((rnd() * 22) | 0), 14 + ((rnd() * 26) | 0), 3, 3, '#a06ac0');
+      const stage = S.ori.stage;
+      const crystalRate = S.ori.crystal / 100;
+
+      // 基础结晶数量：按分期递增
+      const baseCount = [0, 2, 4, 6][stage];
+      const count = Math.floor(baseCount + crystalRate * 3);
+
+      // 结晶颜色：分期越高越深
+      const colors = [
+        '#a06ac0',  // Ⅰ期：浅紫
+        '#8050a0',  // Ⅱ期：深紫
+        '#6030 80'   // Ⅲ期：暗紫红
+      ];
+      const crystalColor = colors[Math.min(stage - 1, 2)];
+
+      // 生成结晶
+      for (let i = 0; i < count; i++) {
+        const size = stage === 3 ? (rnd() < 0.4 ? 4 : 3) : (rnd() < 0.3 ? 4 : 3);
+        const x = 20 + ((rnd() * 22) | 0);
+        const y = 14 + ((rnd() * 26) | 0);
+
+        // 主结晶
+        R(x, y, size, size, crystalColor);
+
+        // 高光效果（Ⅱ期以上）
+        if (stage >= 2 && rnd() < 0.5) {
+          R(x, y, 1, 1, '#c080d8');
+        }
+
+        // Ⅲ期：额外的暗色边缘扩散效果
+        if (stage === 3 && rnd() < 0.6) {
+          R(x - 1, y, 1, size, mixHex(crystalColor, '#000000', 0.3));
+          R(x + size, y, 1, size, mixHex(crystalColor, '#000000', 0.3));
+        }
       }
     }
     // 冷色调种族
     if (cold) { ctx.fillStyle = 'rgba(120,160,190,.13)'; ctx.fillRect(0, 0, 62, 62); }
 
     // 边框
-    ctx.fillStyle = '#c4b79b';
+    ctx.fillStyle = '#c7d2ce';
     ctx.fillRect(0, 0, 62, 1); ctx.fillRect(0, 61, 62, 1);
     ctx.fillRect(0, 0, 1, 62); ctx.fillRect(61, 0, 1, 62);
   }
@@ -299,6 +327,19 @@
         <span class="v ar">${ar}</span><span class="w">${esc(TL.artRankName(TL.artRank(S)))}</span></div>
       <div class="track"><div class="fill ar" style="width:${ar}%"></div></div>
     </div>`;
+
+    // 矿石病结晶率独立显示（仅感染者）
+    if (S.ori && S.ori.stage > 0) {
+      const crystal = Math.round(S.ori.crystal);
+      const stage = S.ori.stage;
+      const stageName = TL.oriStageName(stage);
+      html += `<div class="statRow oriRow" style="margin-top:8px;padding-top:7px;border-top:1px solid var(--violet)">
+        <div class="statTop"><span class="k" style="color:var(--violet)">${TL.lang === 'zh' ? '结晶率' : 'Crystal'}</span>
+          <span class="v ori">${crystal}%</span><span class="w oriStage">${esc(stageName)}</span></div>
+        <div class="track ori"><div class="fill ori" style="width:${crystal}%"></div></div>
+      </div>`;
+    }
+
     $('statBody').innerHTML = html;
   };
 
@@ -511,9 +552,9 @@
     for (let x = 0; x < top; x++) {
       const y = ys[x];
       if (!y) { html += '<i class="future"></i>'; continue; }
-      // 越深越幸福：h=100 时接近深褐，h=0 时接近底色
+      // 越深越幸福：h=100 时接近深青绿，h=0 时接近底色
       const t = TL.clamp(y.h / 100, 0, 1);
-      const bg = mixHex('#f2ece0', '#6b4a1e', Math.pow(t, 0.85));
+      const bg = mixHex('#e3e8e6', '#0f6e68', Math.pow(t, 0.85));
       const cls = ['ori' in y && y.stage > 0 ? 'ori' : '',
                    x === ys.length - 1 ? 'last' : '',
                    x === le ? 'le' : ''].filter(Boolean).join(' ');
@@ -523,7 +564,7 @@
 
     // 图例
     for (let i = 0; i < 5; i++) {
-      $('sw' + i).style.background = mixHex('#f2ece0', '#6b4a1e', Math.pow(i / 4, 0.85));
+      $('sw' + i).style.background = mixHex('#e3e8e6', '#0f6e68', Math.pow(i / 4, 0.85));
     }
     $('mapLegendTxt').textContent = TL.t('lifeMapHint');
     $('mapHint').textContent = TL.lang === 'zh'
@@ -549,7 +590,7 @@
     const padL = 46, padR = 12, padT = 20, padB = 28;
     const gw = W - padL - padR, gh = H - padT - padB;
 
-    ctx.fillStyle = '#fbf8f1'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#f7faf8'; ctx.fillRect(0, 0, W, H);
 
     const curve = S.cohort.curve;
     const maxAge = curve[curve.length - 1].age;
@@ -561,7 +602,7 @@
     const mag = Math.pow(10, Math.floor(Math.log(rawStep) / Math.LN10));
     const step = Math.max(5, Math.ceil(rawStep / mag) * mag);
 
-    ctx.strokeStyle = '#e6ddc9'; ctx.lineWidth = 2;
+    ctx.strokeStyle = '#dce4e1'; ctx.lineWidth = 2;
     for (let p = 0; p <= 1.0001; p += 0.5) {
       const y = Math.round(Y(p)) + 1;
       ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + gw, y); ctx.stroke();
@@ -571,7 +612,7 @@
       ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + gh); ctx.stroke();
     }
 
-    ctx.fillStyle = '#8d8371';
+    ctx.fillStyle = '#5f6e72';
     ctx.font = '17px ui-monospace, monospace';
     ctx.textAlign = 'right';
     ctx.fillText('100%', padL - 7, Y(1) + 6);
@@ -581,7 +622,7 @@
     for (let a = 0; a <= maxAge; a += step) ctx.fillText(a, X(a), H - 8);
 
     /* 曲线 */
-    ctx.strokeStyle = '#b23a2a'; ctx.lineWidth = 3;
+    ctx.strokeStyle = '#8c1d3c'; ctx.lineWidth = 3;
     ctx.beginPath();
     curve.forEach((pt, i) => {
       const x = X(pt.age), y = Y(pt.alive);
@@ -589,23 +630,23 @@
     });
     ctx.stroke();
     ctx.lineTo(X(maxAge), Y(0)); ctx.lineTo(X(0), Y(0)); ctx.closePath();
-    ctx.fillStyle = 'rgba(178,58,42,.10)'; ctx.fill();
+    ctx.fillStyle = 'rgba(140,29,60,.10)'; ctx.fill();
 
     /* 你在这里 */
     const cur = TL.cohortAliveAt(S, S.age);
     const ca = Math.min(S.age, maxAge);
-    ctx.strokeStyle = '#c07a22'; ctx.lineWidth = 2.5;
+    ctx.strokeStyle = '#9c7020'; ctx.lineWidth = 2.5;
     ctx.beginPath(); ctx.moveTo(Math.round(X(ca)) + 1, padT); ctx.lineTo(Math.round(X(ca)) + 1, padT + gh); ctx.stroke();
-    ctx.fillStyle = '#c07a22';
+    ctx.fillStyle = '#9c7020';
     ctx.beginPath(); ctx.arc(X(ca), Y(cur), 6, 0, Math.PI * 2); ctx.fill();
 
     /* 预期寿命竖线 + 标注 */
     const ea = Math.min(S.lt.e0, maxAge);
     const lx = Math.round(X(ea)) + 1;
-    ctx.strokeStyle = '#3f6d94'; ctx.lineWidth = 2; ctx.setLineDash([7, 7]);
+    ctx.strokeStyle = '#0f6e68'; ctx.lineWidth = 2; ctx.setLineDash([7, 7]);
     ctx.beginPath(); ctx.moveTo(lx, padT); ctx.lineTo(lx, padT + gh); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#3f6d94'; ctx.font = '16px system-ui, sans-serif';
+    ctx.fillStyle = '#0f6e68'; ctx.font = '16px system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('e₀ ' + Math.round(S.lt.e0),
       TL.clamp(lx, padL + 26, W - padR - 26), padT - 5);
@@ -619,21 +660,48 @@
   /* 抉择弹层                                                                */
   /* ---------------------------------------------------------------------- */
   TL.showDecision = function (S, p) {
+    const modal = $('modal');
+    const optsContainer = $('modalOpts');
+
+    // tick() can call this once per animation frame while a decision is
+    // pending. Keep the existing buttons stable so a desktop mouse click
+    // is not lost between mousedown and click when the DOM is re-rendered.
+    if (!modal.hidden && modal._pendingDecision === p) return;
+
+    modal._pendingDecision = p;
     $('modalTitle').textContent = p.title;
     $('modalSub').textContent = TL.L`${Math.floor(S.age)} ${TL.t('ageWord')} · ${TL.nameOf(TL.NATION_BY_ID[S.nation])} · ${TL.jobLabel(S.job)}`;
     $('modalText').textContent = p.text || '';
-    $('modalOpts').innerHTML = p.options.map((o, i) =>
-      `<div class="opt" data-i="${i}"><span class="ol">${esc(o.label)}</span><span class="oh">${esc(o.hint || '')}</span></div>`
+    optsContainer.innerHTML = p.options.map((o, i) =>
+      `<button type="button" class="opt" data-i="${i}"><span class="ol">${esc(o.label)}</span><span class="oh">${esc(o.hint || '')}</span></button>`
     ).join('');
-    Array.prototype.forEach.call($('modalOpts').querySelectorAll('.opt'), el => {
-      el.addEventListener('click', () => {
-        const i = +el.dataset.i;
-        $('modal').hidden = true;
-        TL.choose(S, i);
-        TL.renderAll(S, true);
-      });
-    });
+
+    // 使用事件委托而不是逐个绑定，确保浏览器端点击正常工作
+    // 先移除旧的监听器（如果存在）
+    const oldHandler = optsContainer._clickHandler;
+    if (oldHandler) {
+      optsContainer.removeEventListener('click', oldHandler);
+    }
+
+    // 创建新的点击处理器
+    const clickHandler = function(e) {
+      const opt = e.target.closest('.opt');
+      if (!opt || !optsContainer.contains(opt) || modal.hidden) return;
+      const i = +opt.dataset.i;
+      // Disable the current choice immediately. This protects against a
+      // double click before the next render cycle clears S.pending.
+      optsContainer.querySelectorAll('.opt').forEach(button => { button.disabled = true; });
+      modal.hidden = true;
+      modal._pendingDecision = null;
+      TL.choose(S, i);
+      TL.renderAll(S, true);
+    };
+
+    optsContainer._clickHandler = clickHandler;
+    optsContainer.addEventListener('click', clickHandler);
+
     $('modal').hidden = false;
+    optsContainer.querySelector('.opt')?.focus({ preventScroll: true });
   };
 
   /* ---------------------------------------------------------------------- */
@@ -661,7 +729,7 @@
     const ctx = cv.getContext('2d');
     const w = Math.max(320, cv.clientWidth || 640);
     cv.width = w; cv.height = h;
-    ctx.fillStyle = '#fbf8f1'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#f7faf8'; ctx.fillRect(0, 0, w, h);
     return { ctx, w, h };
   }
 
@@ -670,12 +738,12 @@
     const padL = 36, padR = 12, padT = 12, padB = 22;
     const gw = w - padL - padR, gh = h - padT - padB;
 
-    ctx.strokeStyle = '#e6ddc9'; ctx.lineWidth = 1;
+    ctx.strokeStyle = '#dce4e1'; ctx.lineWidth = 1;
     for (let p = 0; p <= 4; p++) {
       const y = Math.round(padT + gh * p / 4) + 0.5;
       ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + gw, y); ctx.stroke();
     }
-    ctx.fillStyle = '#8d8371'; ctx.font = '13px ui-monospace, monospace';
+    ctx.fillStyle = '#5f6e72'; ctx.font = '13px ui-monospace, monospace';
     ctx.textAlign = 'right';
     for (let p = 0; p <= 4; p++) ctx.fillText(Math.round(100 - p * 25), padL - 5, padT + gh * p / 4 + 4);
 
@@ -709,7 +777,7 @@
     ctx.textAlign = 'left'; ctx.font = '14px system-ui, sans-serif';
     series.forEach(s => {
       ctx.fillStyle = s.c; ctx.fillRect(lx, padT - 8, 14, 3);
-      ctx.fillStyle = '#5a5142'; ctx.fillText(s.n, lx + 18, padT - 3);
+      ctx.fillStyle = '#4a5a61'; ctx.fillText(s.n, lx + 18, padT - 3);
       lx += 22 + ctx.measureText(s.n).width;
     });
   }
@@ -739,17 +807,17 @@
     const X = a => padL + (a / maxA) * gw;
     const Y = v => padT + (1 - (v - lo) / (hi - lo)) * gh;
 
-    ctx.strokeStyle = '#e6ddc9';
+    ctx.strokeStyle = '#dce4e1';
     const zy = Math.round(Y(0)) + 0.5;
     ctx.beginPath(); ctx.moveTo(padL, zy); ctx.lineTo(padL + gw, zy); ctx.stroke();
 
     ctx.beginPath();
     ys.forEach((y, i) => { const x = X(y.age), yy = Y(y.nw); if (!i) ctx.moveTo(x, yy); else ctx.lineTo(x, yy); });
-    ctx.strokeStyle = '#5f8a3c'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.strokeStyle = '#2b7a4e'; ctx.lineWidth = 2; ctx.stroke();
     ctx.lineTo(X(maxA), Y(lo)); ctx.lineTo(X(0), Y(lo)); ctx.closePath();
-    ctx.fillStyle = 'rgba(95,138,60,.11)'; ctx.fill();
+    ctx.fillStyle = 'rgba(43,122,78,.11)'; ctx.fill();
 
-    ctx.fillStyle = '#8d8371'; ctx.font = '13px ui-monospace, monospace';
+    ctx.fillStyle = '#5f6e72'; ctx.font = '13px ui-monospace, monospace';
     ctx.textAlign = 'right';
     ctx.fillText(TL.moneyStr(hi), padL - 5, padT + 8);
     ctx.fillText(TL.moneyStr(lo), padL - 5, padT + gh);

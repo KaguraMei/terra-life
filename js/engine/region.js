@@ -14,7 +14,7 @@
  *   - 界面语言（中文 / English）
  *   - 货币符号与购买力标签（元 / $ / ¥ / €）
  *   - 物价基准：同一笔泰拉收入在不同地区折算成的「本地体感金额」
- *   - 人生报告里的一句比较口径（"以中国大陆物价计"）
+ *   - 人生报告里的一句比较口径（"以中国物价计"）
  *
  * 【这个维度不影响什么】
  *   游戏世界的数值模型（寿命、死亡率、矿石病、天灾）一律与地区无关。
@@ -32,9 +32,9 @@
    */
   TL.LOCALES = {
     CN: {
-      id: 'CN', lang: 'zh', name: '中国大陆', nameEn: 'Mainland China',
+      id: 'CN', lang: 'zh', name: '中国', nameEn: 'China',
       cur: '¥', curCode: 'CNY', unit: '元', unitEn: 'yuan',
-      priceK: 1.00, priceNote: '以中国大陆物价计', priceNoteEn: 'in mainland China prices',
+      priceK: 1.00, priceNote: '以中国物价计', priceNoteEn: 'in China prices',
       tz: ['Asia/Shanghai', 'Asia/Chongqing', 'Asia/Harbin', 'Asia/Urumqi', 'Asia/Chungking']
     },
     US: {

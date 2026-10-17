@@ -614,6 +614,121 @@
     }
   });
 
+  // ========== 整合运动事件链扩展 ==========
+
+  def('reunion_choice', {
+    title: '整合运动 · 抉择', book: '矿石病',
+    when: S => S.flags.reunionTouched && !S.flags.reunionJoined && !S.opClass && S.age - S.flags.reunionTouched <= 3,
+    max: 1,
+    cd: 0,
+    run(S) {
+      const lean = TL.reunionLean(S);
+      if (lean > 0.7 && TL.chance(0.35)) {
+        S.flags.reunionJoined = S.age;
+        S.job = 'mercenary';
+        TL.eff(S, { h: 12, so: 10, hl: -5 });
+        return TL.L`你去了那个营地。他们给你一块面罩，说：在这里，没有人会因为你的脸而赶你走。你留下了。`;
+      }
+      TL.eff(S, { h: -6 });
+      return TL.L`你在营地外站了很久。最后还是转身走了。你不知道这个选择是对是错。`;
+    }
+  });
+
+  def('reunion_life', {
+    title: '整合运动 · 营地生活', book: '矿石病',
+    when: S => S.flags.reunionJoined && !S.flags.reunionLeft,
+    cd: 2,
+    run(S) {
+      TL.eff(S, { so: 5, h: 3, hl: -2 });
+      return TL.pick([
+        TL.L`营地里的人来自各个国家。有人教你他们的语言，你也教他们你的。`,
+        TL.L`训练时有人倒下了。结晶率太高。大家把他抬到帐篷里，但没有药。`,
+        TL.L`篝火旁有人在讲他是怎么被赶出城的。你听着，想起了自己的经历。`,
+        TL.L`队长说：我们不是暴徒，我们只是想活下去。你点了点头。`
+      ]);
+    }
+  });
+
+  def('reunion_conflict', {
+    title: '整合运动 · 冲突', book: '矿石病',
+    when: S => S.flags.reunionJoined && !S.flags.reunionLeft && S.age - S.flags.reunionJoined >= 1,
+    max: 2,
+    cd: 3,
+    run(S) {
+      if (TL.chance(0.15)) {
+        TL.eff(S, { hl: -15, h: -10 });
+        return TL.L`纠察队找到了营地。你们撤得很狼狈，有人没跟上来。`;
+      }
+      TL.eff(S, { h: -5, hl: -3 });
+      return TL.pick([
+        TL.L`有人提议去袭击城市的源石运输车。队长说：那样我们就真的变成他们口中的暴徒了。`,
+        TL.L`营地里有人吵了起来。一派说要反抗，一派说要藏起来。最后不欢而散。`,
+        TL.L`你听说有个营地被军队剿灭了。所有人都被就地处决，包括孩子。`
+      ]);
+    }
+  });
+
+  // ========== 感染者隐藏身份系统 ==========
+
+  def('ori_hide_identity', {
+    title: '隐藏', book: '矿石病',
+    when: S => S.ori && S.ori.stage >= 1 && !S.flags.oriExposed && !S.flags.oriHiding,
+    max: 1,
+    cd: 0,
+    run(S) {
+      const tol = TL.tolOf(S.nation, S.year);
+      if (tol < 40 && TL.chance(0.6)) {
+        S.flags.oriHiding = true;
+        TL.eff(S, { h: -8, so: -5 });
+        return TL.L`你开始穿长袖。结晶主要在手臂上，遮住就看不出来。你告诉自己：只要小心一点，没人会知道。`;
+      }
+      TL.eff(S, { h: -4 });
+      return TL.L`你看着手臂上的结晶，想知道还能瞒多久。`;
+    }
+  });
+
+  def('ori_hiding_stress', {
+    title: '隐藏的代价', book: '矿石病',
+    when: S => S.flags.oriHiding && !S.flags.oriExposed,
+    cd: 2,
+    run(S) {
+      TL.eff(S, { h: -5, so: -3 });
+      return TL.pick([
+        TL.L`有人问你为什么一直戴着手套。你说习惯了。对方笑了笑，没再问。`,
+        TL.L`体检的日子快到了。你开始考虑要不要辞职。`,
+        TL.L`你在公共浴室外站了很久，最后还是回去了。`,
+        TL.L`每次有人盯着你看，你都会紧张。即使他们可能什么都没发现。`
+      ]);
+    }
+  });
+
+  def('ori_identity_exposed', {
+    title: '暴露', book: '矿石病',
+    when: S => S.flags.oriHiding && !S.flags.oriExposed && S.ori.stage >= 2,
+    max: 1,
+    cd: 0,
+    run(S) {
+      if (TL.chance(0.3 + S.ori.stage * 0.15)) {
+        S.flags.oriExposed = true;
+        S.flags.oriHiding = false;
+        const tol = TL.tolOf(S.nation, S.year);
+        TL.eff(S, { h: -15, so: -10 });
+
+        if (tol < 20) {
+          S.job = 'unemployed';
+          return TL.L`你倒在了工作的地方。醒来时周围围了一圈人。有人看到了你手臂上的结晶。第二天你被开除了。没有人跟你说再见。`;
+        } else if (tol < 40) {
+          return TL.L`袖子在工作时被勾住了，撕开了一条口子。结晶暴露在阳光下。同事们后退了一步。你听到有人说：感染者。`;
+        } else {
+          TL.eff(S, { h: 5 });
+          return TL.L`你的秘密被发现了。预想中的驱逐没有发生。主管说：以后记得戴护具，对你对大家都好。`;
+        }
+      }
+      TL.eff(S, { h: -3 });
+      return TL.L`有人盯着你的衣袖看了好一会儿。你不确定他有没有看到什么。`;
+    }
+  });
+
   /* ====================================================================== */
   /* ⑥ 天灾                                                                  */
   /* ====================================================================== */
@@ -1260,6 +1375,89 @@
     }
   });
 
+  // ========== 治疗系统扩展 ==========
+
+  def('ori_drug_sideeffect', {
+    title: '药物副作用', book: '矿石病',
+    when: S => S.ori && S.ori.treated && S.ori.provider === 'rhodes',
+    cd: 3,
+    run(S) {
+      TL.eff(S, { hl: -5, h: -3 });
+      return TL.pick([
+        TL.L`抑制药让你总是感到疲惫。医生说这是正常反应，但你每天都得硬撑着工作。`,
+        TL.L`注射部位红肿了。说明书上写着「偶见」，但现在就发生在你身上。`,
+        TL.L`用药之后你总是做噩梦。醒来时分不清哪个才是真的。`,
+        TL.L`药物让你的食欲变差了。朋友说你瘦了一圈，你说没事。`
+      ]);
+    }
+  });
+
+  def('ori_treatment_cost', {
+    title: '药费', book: '矿石病',
+    when: S => S.ori && S.ori.treated && !S.opClass,
+    cd: 2,
+    run(S) {
+      const n = TL.NATION_BY_ID[S.nation];
+      const cost = n.ppp * (S.ori.provider === 'rhodes' ? 2.5 : 1.8);
+      S.money -= cost;
+      TL.eff(S, { h: -6 });
+
+      if (S.money < -cost * 3) {
+        S.ori.treated = false;
+        TL.eff(S, { h: -12, hl: -8 });
+        return TL.L`你付不起这个月的药费了。医生说停药会让结晶率上升，但你没有选择。`;
+      }
+
+      return TL.pick([
+        TL.L`又到了领药的日子。你把这个月的工资大半都交了出去。`,
+        TL.L`药费涨了。你问为什么，对方说：「进口的，都这个价。」`,
+        TL.L`你算了算，这些药够买一间小房子了。但不买就活不到住进房子的那天。`
+      ]);
+    }
+  });
+
+  def('ori_blackmarket_drug', {
+    title: '黑市药物', book: '矿石病',
+    when: S => S.ori && !S.ori.treated && S.urban && TL.chance(0.3),
+    max: 2,
+    cd: 4,
+    run(S) {
+      const n = TL.NATION_BY_ID[S.nation];
+      if (TL.chance(0.4) && S.money >= n.ppp * 1.2) {
+        S.money -= n.ppp * 1.2;
+        if (TL.chance(0.6)) {
+          // 真药
+          S.ori.treated = true;
+          S.ori.provider = 'black';
+          TL.eff(S, { h: 10, hl: 4 });
+          return TL.L`黑市上买到了抑制药。没有说明书，也没有医生指导，但至少有药了。结晶确实不再长了。`;
+        } else {
+          // 假药
+          TL.eff(S, { h: -10, hl: -12 });
+          return TL.L`你买的药是假的。用了两周后结晶反而长得更快了。你去找那个商人，但他已经换了地方。`;
+        }
+      }
+      TL.eff(S, { h: -4 });
+      return TL.L`黑市上有人说能搞到抑制药，比医院便宜一半。你不确定该不该信。`;
+    }
+  });
+
+  def('ori_folk_remedy', {
+    title: '民间偏方', book: '矿石病',
+    when: S => S.ori && !S.ori.treated && TL.chance(0.25),
+    max: 2,
+    cd: 5,
+    run(S) {
+      TL.eff(S, { h: -3, hl: -5, money: -TL.NATION_BY_ID[S.nation].ppp * 0.8 });
+      return TL.pick([
+        TL.L`有人说某种草药可以抑制结晶。你试了一个月，结晶还在长，钱倒是花了不少。`,
+        TL.L`听说泡温泉能缓解矿石病。你去了，泡完之后结晶还在，倒是风湿好了一点。`,
+        TL.L`街上有人卖「祖传秘方」，说能根治矿石病。你买了，喝下去只是拉了一天肚子。`,
+        TL.L`有人建议你去找术师做「能量平衡」。你去了，对方念了半天咒，收了钱，什么都没变。`
+      ]);
+    }
+  });
+
   def('merc_job', {
     title: '一单活', book: '职业',
     when: S => ['mercenary', 'bounty', 'guard', 'soldier'].indexOf(S.job) >= 0 && S.age >= 16,
@@ -1289,6 +1487,280 @@
     }
   });
 
+  // ========== 国家特色事件 ==========
+
+  /* 炎国 (YAN) */
+  def('yan_street_food', {
+    title: '街边小吃', book: '炎国',
+    when: S => S.nation === 'YAN' && S.age >= 8 && S.urban,
+    cd: 4,
+    run(S) {
+      TL.eff(S, { h: 6, so: 3 });
+      return TL.pick([
+        TL.L`街上有人在卖糖葫芦。你买了一串，边走边吃，糖浆粘在了嘴角上。`,
+        TL.L`巷子口的包子铺早上五点就开了。老板认得你，多给了你一个。`,
+        TL.L`夜市上飘着炒面的香味。你坐在小摊前，听着老板和别人用方言聊天。`,
+        TL.L`有人在路边支了个炉子烤红薯。你买了一个，捧在手心里暖了半条街。`
+      ]);
+    }
+  });
+
+  def('yan_festival', {
+    title: '节庆', book: '炎国',
+    when: S => S.nation === 'YAN' && S.age >= 5,
+    cd: 5,
+    run(S) {
+      TL.eff(S, { h: 9, so: 6 });
+      return TL.pick([
+        TL.L`今天是岁首。街上挂满了灯笼，你听见远处有人在放爆竹。`,
+        TL.L`中元节的夜晚，河里漂满了莲花灯。你放了一盏，看着它慢慢飘远。`,
+        TL.L`端午那天有人在城外划龙舟。你没去现场，但听到了鼓声。`,
+        TL.L`重阳节，你跟着人登上了城墙。站在高处，看得见很远的地方。`
+      ]);
+    }
+  });
+
+  def('yan_tianshi', {
+    title: '天师府', book: '炎国',
+    when: S => S.nation === 'YAN' && S.age >= 10 && S.arts >= 50,
+    max: 2,
+    cd: 6,
+    run(S) {
+      if (TL.chance(0.3) && S.arts >= 70) {
+        TL.eff(S, { sm: 8, arts: 5, h: 10 });
+        return TL.L`天师府的人来过，看了你施术的手法。他们留了一卷书，说：「有缘再见。」你把那卷书读了三遍。`;
+      }
+      TL.eff(S, { sm: 3, h: 5 });
+      return TL.L`听说天师府在招学徒。他们找的是能施术又懂古文的人。你想去试试，但不确定自己够不够格。`;
+    }
+  });
+
+  /* 乌萨斯 (URS) */
+  def('urs_cold', {
+    title: '极寒', book: '乌萨斯',
+    when: S => S.nation === 'URS',
+    cd: 3,
+    run(S) {
+      TL.eff(S, { hl: -4, h: -3 });
+      return TL.pick([
+        TL.L`今天特别冷。你把所有的衣服都穿上了，还是冻得发抖。`,
+        TL.L`暴风雪持续了三天。出门的人有的没回来。你把门窗都堵严实了。`,
+        TL.L`早上醒来，窗户上结了一层冰花。屋里冷得能看见呼出的白气。`,
+        TL.L`你在路上看见有人倒下了。周围的人绕开走。你也走开了。`
+      ]);
+    }
+  });
+
+  def('urs_conscription', {
+    title: '征兵', book: '乌萨斯',
+    when: S => S.nation === 'URS' && S.age >= 18 && S.age <= 35 && S.sex === 'M' && S.job !== 'soldier',
+    max: 2,
+    cd: 6,
+    run(S) {
+      if (TL.chance(0.25)) {
+        S.job = 'soldier';
+        TL.eff(S, { h: -8, hl: -5, so: -4 });
+        return TL.L`征兵令下来了。你的名字在名单上。一周后，你穿上了军服，被送往北方。`;
+      }
+      TL.eff(S, { h: -5 });
+      return TL.L`城里又开始征兵了。你看着那些海报，希望他们不要找到你。`;
+    }
+  });
+
+  def('urs_inspection', {
+    title: '纠察队', book: '乌萨斯',
+    when: S => S.nation === 'URS' && S.age >= 14,
+    cd: 3,
+    run(S) {
+      TL.eff(S, { h: -6, so: -3 });
+      return TL.pick([
+        TL.L`纠察队在街上检查证件。你把证件递过去，手在抖。他看了一眼，扔了回来。`,
+        TL.L`听说隔壁街区昨晚被纠察队封了。有人说是抓感染者，也有人说是抓逃兵。`,
+        TL.L`纠察队的车停在巷子口。所有人都绕远路走。你也一样。`,
+        TL.L`纠察队把一个人带走了。他在喊，但没有人敢看。`
+      ]);
+    }
+  });
+
+  /* 维多利亚 (VIC) */
+  def('vic_fog', {
+    title: '雾都', book: '维多利亚',
+    when: S => S.nation === 'VIC' && S.urban,
+    cd: 4,
+    run(S) {
+      TL.eff(S, { h: -2, hl: -2 });
+      return TL.pick([
+        TL.L`今天的雾特别浓。走在街上，三米外的人都看不清脸。`,
+        TL.L`工厂的烟囱一天到晚都在冒烟。雾里混着煤灰的味道，你已经习惯了。`,
+        TL.L`雾气让所有的声音都变得遥远。街上的马车铃声像是从很远的地方传来的。`,
+        TL.L`有人说雾里藏着东西。你不信，但走夜路的时候还是会加快脚步。`
+      ]);
+    }
+  });
+
+  def('vic_nobility', {
+    title: '贵族', book: '维多利亚',
+    when: S => S.nation === 'VIC' && S.age >= 12,
+    cd: 5,
+    run(S) {
+      if (S.q >= 4) {
+        TL.eff(S, { h: 5, so: 4 });
+        return TL.L`你参加了一场庄园聚会。宾客们谈论政治、艺术，还有谁家的公爵又换了情人。你礼貌地笑着，心里想着别的事。`;
+      }
+      TL.eff(S, { h: -4, so: -2 });
+      return TL.pick([
+        TL.L`贵族的马车从你身边驶过，溅了你一身泥。车里的人连看都没看一眼。`,
+        TL.L`听说某个公爵的私宅占了整整三条街。你算了算，那比你住的整个街区还大。`,
+        TL.L`报纸上在讨论新的继承法案。你看不懂那些词，但知道跟你没关系。`
+      ]);
+    }
+  });
+
+  def('vic_factory', {
+    title: '工厂', book: '维多利亚',
+    when: S => S.nation === 'VIC' && ['factory', 'construct', 'smith'].indexOf(S.job) >= 0,
+    cd: 3,
+    run(S) {
+      TL.eff(S, { hl: -5, h: -4 });
+      return TL.pick([
+        TL.L`工厂里的机器一天十六个小时不停。你的耳朵里总是嗡嗡响，即使回到家也停不下来。`,
+        TL.L`今天又有人被卷进了机器。工头说了句「小心点」，就让大家继续干活。`,
+        TL.L`空气里满是金属粉尘。下班后你咳出来的痰都是黑的。`,
+        TL.L`有人想组织罢工，要求缩短工时。第二天他就「辞职」了。`
+      ]);
+    }
+  });
+
+  /* 萨尔贡 (SRG) */
+  def('srg_desert', {
+    title: '沙漠', book: '萨尔贡',
+    when: S => S.nation === 'SRG',
+    cd: 4,
+    run(S) {
+      TL.eff(S, { hl: -3, h: -2 });
+      return TL.pick([
+        TL.L`今天的沙暴持续了一整天。出门的人都把脸蒙得严严实实。`,
+        TL.L`正午的阳光把地面晒得发烫。你看见远处有东西在晃动，但那只是热浪。`,
+        TL.L`水井快干了。长老说今年的雨季可能不会来了。`,
+        TL.L`你在沙漠里走了一整天。水袋空了，嘴唇干裂。但总算看见了绿洲。`
+      ]);
+    }
+  });
+
+  def('srg_caravan', {
+    title: '商队', book: '萨尔贡',
+    when: S => S.nation === 'SRG' && S.age >= 14,
+    cd: 5,
+    run(S) {
+      TL.eff(S, { so: 4, h: 3, sm: 2 });
+      return TL.pick([
+        TL.L`商队来了。他们带来了远方的货物和新闻。你听说北方的战争还没结束。`,
+        TL.L`你跟商队的人换了些东西。他们见多识广，讲了很多外面的事。`,
+        TL.L`商队在绿洲边上扎营。晚上他们生起篝火，你听到了陌生的歌。`,
+        TL.L`有个商队在招护卫。报酬不错，但要横穿沙漠。你犹豫了。`
+      ]);
+    }
+  });
+
+  /* 卡西米尔 (KAZ) */
+  def('kaz_arena', {
+    title: '竞技场', book: '卡西米尔',
+    when: S => S.nation === 'KAZ' && S.age >= 10,
+    cd: 5,
+    run(S) {
+      TL.eff(S, { h: 7, so: 4 });
+      return TL.pick([
+        TL.L`今天有骑士比赛。全城的人都去看了。你站在人群最后面，只能看见一点影子，但欢呼声震耳欲聋。`,
+        TL.L`听说耀骑士要出场。售票处排了几条街的队。你没去，但在收音机里听了实况。`,
+        TL.L`竞技场的海报贴满了整条街。上面的骑士穿着华丽的铠甲，你想象不出那有多重。`,
+        TL.L`有人在街上模仿骑士决斗。孩子们围成一圈看，欢呼声比真的比赛还响。`
+      ]);
+    }
+  });
+
+  def('kaz_business', {
+    title: '商业联合会', book: '卡西米尔',
+    when: S => S.nation === 'KAZ' && S.age >= 18 && S.urban,
+    cd: 6,
+    run(S) {
+      if (S.q >= 3) {
+        TL.eff(S, { h: 4, money: TL.NATION_BY_ID[S.nation].ppp * 1.5 });
+        return TL.L`商业联合会的人找到你，说有个合作机会。你签了合同，拿了一笔预付款。`;
+      }
+      TL.eff(S, { h: -3 });
+      return TL.pick([
+        TL.L`商业联合会又涨价了。所有人都在抱怨，但没有人敢不交钱。`,
+        TL.L`听说商业联合会控制了全国的骑士赛事。骑士头衔现在是可以买的。`,
+        TL.L`报纸上说商业联合会要改革骑士制度。有人说这是进步，有人说这是亵渎。`
+      ]);
+    }
+  });
+
+  /* 哥伦比亚 (CLB) */
+  def('clb_tech', {
+    title: '科技公司', book: '哥伦比亚',
+    when: S => S.nation === 'CLB' && S.age >= 18 && S.urban,
+    cd: 4,
+    run(S) {
+      if (S.st.sm >= 70) {
+        TL.eff(S, { h: 8, money: TL.NATION_BY_ID[S.nation].ppp * 2 });
+        return TL.L`科技公司在招人。你去面试了，当场就拿到了offer。薪水是你上一份工作的三倍。`;
+      }
+      TL.eff(S, { h: 2, sm: 3 });
+      return TL.pick([
+        TL.L`新开了一家科技公司的展厅。里面展示的东西你大部分都看不懂，但很酷。`,
+        TL.L`听说某个科技巨头又发布了新产品。城里到处都是广告。`,
+        TL.L`科技公司的人在街上发传单，说他们在「改变世界」。你接了一张，回头就扔了。`
+      ]);
+    }
+  });
+
+  def('clb_frontier', {
+    title: '拓荒', book: '哥伦比亚',
+    when: S => S.nation === 'CLB' && !S.urban && S.age >= 16,
+    cd: 5,
+    run(S) {
+      TL.eff(S, { hl: -6, h: -4, so: 3 });
+      return TL.pick([
+        TL.L`拓荒队又往西推进了一段。他们说那边有矿，有地，什么都有。但你知道那边也有天灾。`,
+        TL.L`有人在荒野上建了新的聚落。拓荒法案说，占到的地就是你的。前提是你能守住。`,
+        TL.L`听说拓荒队和原住民起了冲突。军队介入了。最后原住民撤得更远了。`,
+        TL.L`拓荒是个豪赌。赌赢了一夜暴富，赌输了命都没了。你见过两种人。`
+      ]);
+    }
+  });
+
+  /* 莱塔尼亚 (LEI) */
+  def('lei_arts', {
+    title: '术师', book: '莱塔尼亚',
+    when: S => S.nation === 'LEI' && S.arts >= 40,
+    cd: 5,
+    run(S) {
+      TL.eff(S, { sm: 5, arts: 3, h: 6 });
+      return TL.pick([
+        TL.L`你在图书馆找到了一本古老的法术书。上面的文字你只认得一半，但光看图就学到了不少。`,
+        TL.L`有个术师愿意指点你。他说你的天赋不错，但基础太差了。接下来三个月你每天都去找他。`,
+        TL.L`街上有人在表演源石技艺。你看了很久，记住了几个手势。回家后试了试，居然成功了。`,
+        TL.L`莱塔尼亚的音乐学院在招生。他们不只教音乐，还教如何用声音引导源石能量。`
+      ]);
+    }
+  });
+
+  def('lei_witch_hunt', {
+    title: '巫王残党', book: '莱塔尼亚',
+    when: S => S.nation === 'LEI' && S.arts >= 60 && S.age >= 20,
+    max: 2,
+    cd: 8,
+    run(S) {
+      if (TL.chance(0.2)) {
+        TL.eff(S, { h: -8, sm: 6, arts: 8 });
+        return TL.L`有人在深夜找到你，说他们掌握着巫王留下的知识。他们给了你一本笔记，让你自己决定要不要深入。你翻开了第一页。`;
+      }
+      TL.eff(S, { h: -4 });
+      return TL.L`听说又有术师被抓了。罪名是「与巫王残党勾结」。你把家里的几本书藏得更深了。`;
+    }
+  });
+
   def('move_destiny', {
     title: '罗德岛', book: '身份',
     when: S => S.age >= 16 && S.age <= 45 && TL.combatValue(S) >= 60 && !S.opClass,
@@ -1299,6 +1771,124 @@
       }
       TL.eff(S, { h: -5 });
       return TL.L`你去试了。考核没过。考官说你的底子还行，但差一点。`;
+    }
+  });
+
+  // ========== 罗德岛招募扩展路径 ==========
+
+  def('rhodes_scholar', {
+    title: '罗德岛 · 学者路径', book: '身份',
+    when: S => S.age >= 18 && S.age <= 35 && S.st.sm >= 75 && !S.opClass && S.edu >= 3,
+    max: 1,
+    cd: 0,
+    run(S) {
+      const specialties = ['源石病理学', '源石工艺学', '移动城市动力工程', '天灾气象学'];
+      const field = TL.pick(specialties);
+      if (TL.chance(0.6 + (S.st.sm - 75) / 100)) {
+        if (TL.tryJoinRhodes(S)) {
+          TL.eff(S, { h: 14, so: 8, sm: 5 });
+          S.flags.rhodesPath = 'scholar';
+          return TL.L`罗德岛的人力资源部找到你。他们说，你在${field}上的研究成果引起了注意。一周后，你签了研究员的合同。`;
+        }
+      }
+      TL.eff(S, { h: 3, sm: 2 });
+      return TL.L`收到了罗德岛的招募材料。他们似乎在找${field}方面的人才。`;
+    }
+  });
+
+  def('rhodes_rescued', {
+    title: '罗德岛 · 救援', book: '身份',
+    when: S => S.age >= 12 && S.age <= 50 && !S.opClass && (S.flags.postCatastrophe || S.flags.inWarZone || (S.ori && S.ori.stage >= 2)),
+    max: 1,
+    cd: 0,
+    run(S) {
+      if (TL.chance(0.25)) {
+        if (TL.tryJoinRhodes(S)) {
+          TL.eff(S, { h: 16, hl: 8, so: 10 });
+          S.flags.rhodesPath = 'rescued';
+          if (S.flags.postCatastrophe) {
+            return TL.L`天灾过后的废墟里，一艘陆行舰停在城市边缘。船身印着的标志你见过——罗德岛。他们把你从瓦砾下拉出来，给你包扎，然后问：要跟我们走吗？`;
+          } else if (S.ori && S.ori.stage >= 2) {
+            return TL.L`你在街上倒下了。醒来时发现自己在一艘陆行舰的医疗室里。医生说：你的结晶率很高，但还来得及。他们给你两个选择：留在这里治疗并工作，或者下船。你选了前者。`;
+          } else {
+            return TL.L`战火中有人把你拖进了装甲车。车上的徽章是罗德岛的。他们问你叫什么，会做什么。你说不清。他们说：没关系，先活下来。`;
+          }
+        }
+      }
+      TL.eff(S, { h: 2 });
+      return TL.L`听说罗德岛的陆行舰最近在附近活动，在救援受灾的人。`;
+    }
+  });
+
+  def('rhodes_family_paid', {
+    title: '罗德岛 · 家人的选择', book: '身份',
+    when: S => S.age >= 10 && S.age <= 30 && S.ori && S.ori.stage >= 1 && !S.opClass && !S.ori.treated && S.q >= 3,
+    max: 1,
+    cd: 0,
+    run(S) {
+      const n = TL.NATION_BY_ID[S.nation];
+      const canAfford = S.q >= 4 || TL.chance(0.3);
+      if (canAfford && TL.chance(0.4)) {
+        S.ori.treated = true;
+        S.ori.provider = 'rhodes';
+        S.flags.rhodesFamily = true;
+        TL.eff(S, { h: 10, so: 8, hl: 5 });
+        S.money -= n.ppp * 8;
+        return TL.L`家里人凑了一笔钱，把你送上了罗德岛的医疗船。医生说这病能治，但要长期用药。父亲签字的时候手在抖。他说：活着就好。`;
+      }
+      TL.eff(S, { h: -8, so: -3 });
+      return TL.L`母亲打听到罗德岛可以治矿石病，但要很多钱。她在纸上算了一晚上，最后把纸撕了。`;
+    }
+  });
+
+  def('rhodes_specialist_recruit', {
+    title: '罗德岛 · 特殊招募', book: '身份',
+    when: S => S.age >= 16 && S.age <= 40 && !S.opClass && (S.arts >= 80 || S.race === 'draco' || S.race === 'vouivre' || S.courtId != null),
+    max: 1,
+    cd: 0,
+    run(S) {
+      const isRare = S.race === 'draco' || S.race === 'vouivre' || S.courtId != null;
+      const isHighArts = S.arts >= 80;
+
+      if (TL.chance(isRare ? 0.35 : (isHighArts ? 0.28 : 0.15))) {
+        if (TL.tryJoinRhodes(S)) {
+          TL.eff(S, { h: 13, so: 7, sm: 4 });
+          S.flags.rhodesPath = 'specialist';
+          if (isHighArts) {
+            return TL.L`罗德岛的人找到你，说你的源石技艺适应性数据「很有意思」。他们想知道你是怎么做到的。三次面谈后，你签了术师组的合同。`;
+          } else if (S.race === 'draco') {
+            return TL.L`罗德岛的招募专员见到你时愣了一下。德拉克在这个时代已经很少见了。她说：我们需要你这样的人。不是因为血统，是因为你能做到的事。`;
+          } else {
+            return TL.L`罗德岛的人说，他们在找一些「特别的人」。你不确定自己算不算，但他们坚持要你试试。`;
+          }
+        }
+      }
+      TL.eff(S, { h: 1 });
+      return TL.L`听说罗德岛在招人，而且不问出身。`;
+    }
+  });
+
+  def('rhodes_cooperation', {
+    title: '罗德岛 · 合作协议', book: '身份',
+    when: S => S.age >= 20 && S.age <= 45 && !S.opClass && (S.job === 'mercenary' || S.job === 'soldier' || S.job === 'oridoc' || S.job === 'witch'),
+    max: 1,
+    cd: 0,
+    run(S) {
+      if (TL.chance(0.2)) {
+        if (TL.tryJoinRhodes(S)) {
+          TL.eff(S, { h: 11, so: 6 });
+          S.flags.rhodesPath = 'cooperation';
+          const jobMap = {
+            mercenary: TL.L`你接了一单护送任务，雇主是罗德岛。任务结束时，对方的指挥官问：有没有兴趣换个长期雇主？报酬稳定，包医疗。你想了想，同意了。`,
+            soldier: TL.L`你所在的部队与罗德岛有过一次联合行动。行动后，罗德岛的作战主管找到你，说你的战术素养不错。一个月后，你拿到了转职邀请。`,
+            oridoc: TL.L`罗德岛的医疗部门来你们诊所做过技术交流。他们的抑制药剂配方比你见过的任何版本都有效。他们说：要不要来我们这里？你说：可以。`,
+            witch: TL.L`罗德岛的人说他们在组建一个源石技艺研究小组，需要有实战经验的术师。你问：收感染者吗？对方说：我们一半的人都是。`
+          };
+          return jobMap[S.job] || TL.L`你通过工作渠道接触到了罗德岛，他们给了你一个转职机会。`;
+        }
+      }
+      TL.eff(S, { h: 2 });
+      return TL.L`工作中听说过罗德岛这个名字。据说他们什么人都收。`;
     }
   });
 

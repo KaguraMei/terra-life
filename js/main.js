@@ -35,7 +35,8 @@
       SETUP[key] = (allowEmpty && SETUP[key] === v) ? '' : v;
       Array.prototype.forEach.call(box.querySelectorAll('.chip'), c =>
         c.classList.toggle('on', c.dataset.v === SETUP[key]));
-      if (key === 'mode') renderOdds();
+      if (key === 'mode') { renderOdds(); renderNationChips(); }
+      box.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c.classList.contains('on'))));
     });
   }
 
@@ -46,17 +47,17 @@
     for (const o of odds) pOf[o.id] = o.p;
     // 按抽中概率排序，让「常见出生地」排在前面
     const sorted = TL.NATIONS.slice().sort((a, b) => (pOf[b.id] || 0) - (pOf[a.id] || 0));
-    let html = `<div class="chip ${SETUP.nation === '' ? 'on' : ''}" data-v="">随机<small class="sub">按真实权重抽签</small></div>`;
+    let html = `<button type="button" class="chip ${SETUP.nation === '' ? 'on' : ''}" aria-pressed="${SETUP.nation === ''}" data-v="">随机<small class="sub">按真实权重抽签</small></button>`;
     for (const n of sorted) {
       if (!pOf[n.id]) continue;
-      html += `<div class="chip ${SETUP.nation === n.id ? 'on' : ''}" data-v="${n.id}">${n.name}<small class="sub">${(pOf[n.id] * 100).toFixed(2)}%</small></div>`;
+      html += `<button type="button" class="chip ${SETUP.nation === n.id ? 'on' : ''}" aria-pressed="${SETUP.nation === n.id}" data-v="${n.id}">${n.name}<small class="sub">${(pOf[n.id] * 100).toFixed(2)}%</small></button>`;
     }
     box.innerHTML = html;
   }
 
   function renderRaceChips() {
     const box = $('raceChips');
-    let html = `<div class="chip ${SETUP.race === '' ? 'on' : ''}" data-v="">随出生地<small class="sub">按当地种族构成</small></div>`;
+    let html = `<button type="button" class="chip ${SETUP.race === '' ? 'on' : ''}" aria-pressed="${SETUP.race === ''}" data-v="">随出生地<small class="sub">按当地种族构成</small></button>`;
     // 标签显示「社会处境」与「技艺天赋」——这两样才是泰拉里真正决定命运的东西。
     // 早期只显示技艺等级，结果十几个种族都是同一句「无适应性」，毫无信息量。
     const standWord = r => {
@@ -70,32 +71,20 @@
     const sorted = TL.RACES.slice().sort((a, b) => b.stand - a.stand);
     for (const r of sorted) {
       const sub = (r.mod.art || 0) >= 4 ? '技艺天赋高' : standWord(r);
-      html += `<div class="chip ${SETUP.race === r.id ? 'on' : ''}" data-v="${r.id}" title="${r.desc.replace(/"/g, '')}">${r.name}<small class="sub">${sub}</small></div>`;
+      html += `<button type="button" class="chip ${SETUP.race === r.id ? 'on' : ''}" aria-pressed="${SETUP.race === r.id}" data-v="${r.id}" title="${r.desc.replace(/"/g, '')}">${r.name}<small class="sub">${sub}</small></button>`;
     }
     box.innerHTML = html;
   }
 
   function renderOdds() {
-    const odds = TL.lotteryOdds(SETUP.mode);
-    const top = odds.slice(0, 24);
-    const max = top[0].p;
-    let html = '<table>';
-    for (const o of top) {
-      html += `<tr><td>${o.name}</td>
-        <td class="bar"><div class="b" style="width:${(o.p / max * 100).toFixed(1)}%"></div></td>
-        <td class="p">${(o.p * 100).toFixed(2)}%</td></tr>`;
-    }
-    html += '</table>';
-    $('oddsTable').innerHTML = html;
-    $('oddsNote').textContent = SETUP.mode === 'birth'
-      ? '口径：此刻正在出生的婴儿（按年出生人数加权）'
-      : '口径：此刻生活在这片大地上的所有人（按人口加权）';
+    TL.renderLandingOdds(SETUP.mode);
   }
 
   /* ---------------------------------------------------------------------- */
   /* 启动                                                                    */
   /* ---------------------------------------------------------------------- */
-  function startGame() {
+  function startGame(withBirth) {
+    if (withBirth === true && !$('birth').hidden) return;
     if (SETUP.nation) { /* 指定国家 */ }
     const S = TL.newLife({
       mode: SETUP.mode,
@@ -106,25 +95,32 @@
       bornYear: SETUP.bornYear,
       seed: SETUP.seed
     });
-    UI.focus = null;
-    UI.lastLogLen = 0;
-    UI.lastAge = -1;
-    UI.auto = false;
-    $('feed').innerHTML = '';
-    $('start').hidden = true;
-    $('report').hidden = true;
-    $('game').hidden = false;
-    $('autoBtn').classList.remove('on');
+    const begin = () => {
+      S.paused = false;
+      UI.focus = null;
+      UI.lastLogLen = 0;
+      UI.lastAge = -1;
+      UI.auto = false;
+      $('feed').innerHTML = '';
+      $('start').hidden = true;
+      $('report').hidden = true;
+      $('game').hidden = false;
+      $('autoBtn').classList.remove('on');
 
-    // 开局先给一次身份旁白
-    announceOrigin(S);
-    TL.renderAll(S, true);
-    TL.renderFocus(S);
+      // 开局先给一次身份旁白
+      announceOrigin(S);
+      TL.renderAll(S, true);
+      TL.renderFocus(S);
 
-    lastTs = 0;
-    if (raf) cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(loop);
-    toast('按「下一个决定」或等待时间推进');
+      lastTs = 0;
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(loop);
+      toast('按「下一个决定」或等待时间推进');
+    };
+    if (withBirth === true) {
+      if (raf) { cancelAnimationFrame(raf); raf = null; }
+      TL.birthIntro(S, {mode: SETUP.mode, specified: !!SETUP.nation}, begin);
+    } else begin();
   }
 
   /** 开局旁白：把抽签结果讲成一个故事（出生那一句已由 newLife 写入，此处不重复） */
@@ -293,7 +289,8 @@
     bindChips('raceChips', 'race', true);
     bindChips('paceChips', 'pace', false);
 
-    $('startBtn').addEventListener('click', startGame);
+    $('startBtn').addEventListener('click', () => startGame(true));
+    TL.initLanding(() => startGame(true));
 
     $('seedBtn').addEventListener('click', () => {
       const v = $('seedInput').value.trim();
@@ -359,7 +356,7 @@
       SETUP.seed = S.lt && TL.seed() != null ? TL.seed() : null;
       if (SETUP.seed == null) { toast('这一局没有固定种子'); return; }
       $('report').hidden = true;
-      startGame();
+      startGame(true);
     });
 
     /* --- 工具浮层：设置 / 写下想法 / 提供意见 ------------------------------ */
@@ -391,6 +388,7 @@
 
     // 键盘：空格暂停，1-9 选择抉择选项，回车下一个决定
     document.addEventListener('keydown', e => {
+      if (!$('birth').hidden) return;
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       const S = TL.S;
       if (e.key === 'Escape') { closeSheet(); if (S) $('modal').hidden = true; return; }
@@ -645,7 +643,7 @@
     document.querySelector('#speeds .spd[data-s="0"]').textContent = TL.t('pause');
 
     $('startTitle').textContent = TL.lang === 'zh' ? '泰拉人生模拟' : 'Terra Life Simulator';
-    $('startBtn').textContent = TL.t('startBtn');
+    TL.renderLandingTitle();
     $('rChartLbl').textContent = TL.lang === 'zh'
       ? '一生曲线 · 体质 / 心境 / 学识 / 羁绊 / 结晶率'
       : 'Life curve · health / happiness / knowledge / bonds / crystallization';
@@ -664,8 +662,8 @@
     box.innerHTML = TL.LOCALE_LIST.map(id => {
       const R = TL.LOCALES[id];
       const on = id === TL.locale.id;
-      return `<div class="chip ${on ? 'on' : ''}" data-v="${id}">${esc(R.name)}
-        <small class="sub">${R.curCode} · ${esc(R.priceNote)}</small></div>`;
+      return `<button type="button" class="chip ${on ? 'on' : ''}" aria-pressed="${on}" data-v="${id}">${esc(R.name)}
+        <small class="sub">${R.curCode} · ${esc(R.priceNote)}</small></button>`;
     }).join('');
     Array.prototype.forEach.call(box.querySelectorAll('.chip'), el => {
       el.addEventListener('click', () => {
@@ -742,8 +740,10 @@
     const mark = (boxId, val) => {
       const box = $(boxId);
       if (!box) return;
-      Array.prototype.forEach.call(box.querySelectorAll('.chip'), c =>
-        c.classList.toggle('on', c.dataset.v === val));
+      Array.prototype.forEach.call(box.querySelectorAll('.chip'), c => {
+        c.classList.toggle('on', c.dataset.v === val);
+        c.setAttribute('aria-pressed', String(c.dataset.v === val));
+      });
     };
     mark('modeChips', SETUP.mode);
     mark('nationChips', SETUP.nation);

@@ -4,9 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>泰拉人生模拟 · 明日方舟</title>
-<meta name="description" content="在明日方舟的泰拉世界随机出生：21 个国家、26 个种族、26 个萨卡兹王庭、一份按阶层分层的社会预期寿命模型，以及一场无法选择的矿石病。把一次的人生活到最后。">
+<meta name="description" content="在明日方舟的泰拉世界随机出生：21 个国家、26 个种族、11 支萨卡兹王庭、一份按阶层分层的社会预期寿命模型，以及一场无法选择的矿石病。把一次的人生活到最后。">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/simulation.css">
+<link rel="stylesheet" href="css/landing.css">
 </head>
 <body>
 
@@ -155,7 +157,7 @@
 <!-- 抉择弹层                                                                -->
 <!-- ====================================================================== -->
 <div id="modal" hidden>
-  <div id="modalBox">
+  <div id="modalBox" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalText">
     <div id="modalHead">
       <div class="t" id="modalTitle">—</div>
       <div class="s" id="modalSub">—</div>
@@ -179,80 +181,93 @@
 <!-- ====================================================================== -->
 <!-- 开局界面                                                                -->
 <!-- ====================================================================== -->
-<div class="screen" id="start">
-  <div class="wrap">
-    <h1 id="startTitle">泰拉人生模拟</h1>
-    <div class="tagline">在这片被源石贯穿的大地上，随机出生，把一次的人生活到最后。</div>
-    <div class="hint">21 个国家 · 26 个种族 · 11 支萨卡兹王庭 · 四层出身阶层 · 一份真实的死亡率模型</div>
-
-    <div class="fieldset">
-      <label>你的地区（决定界面语言与货币口径）</label>
-      <div class="opts" id="regionChips"></div>
-      <div style="color:var(--fg3);font-size:11.5px;margin-top:7px" id="regionNote"></div>
+<div class="screen entrance" id="start">
+  <div class="landing-wrap">
+    <nav class="landing-nav" aria-label="地区与货币"><div id="regionChips"></div></nav>
+    <div class="landing-hero">
+      <section class="landing-copy">
+        <div class="landing-kicker">TERRA LIFE · 明日方舟同人人生模拟</div>
+        <h1 id="startTitle"><span>泰拉</span><span>人<em>生</em></span></h1>
+        <p class="landing-lede">此刻，在这片大地的某个角落，一个孩子降生了。你将成为其中一个，把仅此一次的人生走到最后。出生在哪里，成为谁的孩子，都由命运决定。</p>
+        <div class="landing-counts">
+          <div><strong>21</strong><span>可能出生的国家与地区</span></div>
+          <div><strong>26</strong><span>拥有不同命运的种族</span></div>
+          <div><strong>1</strong><span>仅此一次的人生</span></div>
+        </div>
+        <div class="landing-theme"><b>这片大地</b><span>天灾之下，移动的城市里，仍有人认真地生活。</span></div>
+        <div class="landing-options">
+          <div class="fieldset">
+            <div class="option-label">出生地的抽选方式</div>
+            <div class="opts" id="modeChips" role="group" aria-label="抽签口径">
+              <button class="chip on" data-v="birth" aria-pressed="true">此刻出生的婴儿</button>
+              <button class="chip" data-v="pop" aria-pressed="false">此刻活着的所有人</button>
+            </div>
+            <p class="landing-option-hint">依出生抽选时，按各地每年的出生人数；依人口抽选时，按人口比例。无论哪一种，人生都从 0 岁开始。</p>
+          </div>
+          <div class="fieldset">
+            <div class="option-label">一段人生的长度</div>
+            <div class="opts" id="paceChips" role="group" aria-label="播放节奏">
+              <button class="chip" data-v="short" aria-pressed="false">约 30 分钟</button>
+              <button class="chip on" data-v="normal" aria-pressed="true">约 1 小时</button>
+              <button class="chip" data-v="long" aria-pressed="false">约 1 小时 30 分钟</button>
+            </div>
+            <p class="landing-option-hint">这是走到预期寿命所需的时间。过程中可以暂停或加速，生命本身的长短由模拟决定。</p>
+          </div>
+          <details class="landing-advanced">
+            <summary>自定义出生 · 国家、种族与随机种子</summary>
+            <p class="landing-option-hint">默认随机出生。也可以指定一个起点，看看另一次人生。</p>
+            <div class="fieldset"><div class="option-label">出生地</div><div class="opts" id="nationChips"></div></div>
+            <div class="fieldset"><div class="option-label">种族</div><div class="opts" id="raceChips"></div></div>
+            <div class="fieldset"><div class="option-label">性别</div><div class="opts" id="sexChips" role="group" aria-label="性别">
+              <button class="chip on" data-v="" aria-pressed="true">随机</button><button class="chip" data-v="M" aria-pressed="false">男</button><button class="chip" data-v="F" aria-pressed="false">女</button>
+            </div></div>
+            <div class="fieldset"><label for="seedInput">随机种子（可选，用于复现同一局）</label><div class="seed-row"><input id="seedInput" placeholder="留空 = 随机"><button class="birth-back" id="seedBtn">应用</button></div></div>
+            <p class="landing-option-hint" id="regionNote"></p>
+          </details>
+          <div class="birth-actions"><button id="startBtn" class="birth-cta">出生</button><p>不必更改设置，直接出生也没关系。</p></div>
+        </div>
+      </section>
+      <aside class="landing-side">
+        <svg id="terraMap" class="terra-map" viewBox="0 0 600 280" role="img" aria-label="泰拉出生地分布示意，圆点大小代表抽中概率"></svg>
+        <div class="map-caption">TERRA · 出生地分布示意，非官方疆域图</div>
+        <section class="odds-card">
+          <h2 id="landingOddsTitle">如果你是此刻出生的婴儿</h2>
+          <p id="oddsNote"></p>
+          <div id="oddsTable"></div>
+          <details class="odds-rest"><summary>查看全部 21 个国家与地区</summary><div id="oddsAll"></div></details>
+        </section>
+        <section class="landing-archive"><h2>在这片大地留下的人生</h2><div id="saves"></div></section>
+      </aside>
     </div>
-
-    <div class="fieldset">
-      <label>抽签口径</label>
-      <div class="opts" id="modeChips">
-        <div class="chip" data-v="birth">此刻出生的婴儿<small class="sub">按年出生人数加权</small></div>
-        <div class="chip" data-v="pop">此刻活着的所有人<small class="sub">按人口加权</small></div>
-      </div>
-      <div style="color:var(--fg3);font-size:11.5px;margin-top:7px" id="oddsNote"></div>
-      <div id="oddsTable"></div>
-    </div>
-
-    <div class="fieldset">
-      <label>出生地（可选）</label>
-      <div class="opts" id="nationChips"></div>
-    </div>
-
-    <div class="fieldset">
-      <label>种族（可选）</label>
-      <div class="opts" id="raceChips"></div>
-    </div>
-
-    <div class="fieldset">
-      <label>性别（可选）</label>
-      <div class="opts" id="sexChips">
-        <div class="chip on" data-v="">随机</div>
-        <div class="chip" data-v="M">男</div>
-        <div class="chip" data-v="F">女</div>
-      </div>
-    </div>
-
-    <div class="fieldset">
-      <label>播放节奏</label>
-      <div class="opts" id="paceChips">
-        <div class="chip" data-v="short">约 30 分钟<small class="sub">每年停留短</small></div>
-        <div class="chip on" data-v="normal">约 1 小时<small class="sub">推荐</small></div>
-        <div class="chip" data-v="long">约 1.5 小时<small class="sub">每年停留长</small></div>
-      </div>
-      <div style="color:var(--fg3);font-size:11.5px;margin-top:7px">
-        节奏指的是「走到预期寿命」所需的真实时间，不是死亡年龄。
-      </div>
-    </div>
-
-    <div class="fieldset">
-      <label>随机种子（可选，用于复现同一局）</label>
-      <div style="display:flex;gap:8px">
-        <input id="seedInput" placeholder="留空 = 真随机">
-        <button class="tbtn" id="seedBtn">应用</button>
-      </div>
-    </div>
-
-    <button id="startBtn">开 始 出 生</button>
-
-    <div class="fieldset">
-      <label>过去的人生（存在这个浏览器里）</label>
-      <div id="saves"></div>
-    </div>
-
-    <div style="margin-top:26px;color:var(--fg3);font-size:11.5px;line-height:1.8;text-align:center">
-      同人作品。世界观与名词来自《明日方舟》（Hypergryph / Studio Montagne）。<br>
-      模拟逻辑移植自「80億分之1 / 1 in 8 Billion」的人生模拟框架，并针对泰拉重新建模。<br>
-      国家人口参照《大地巡旅》与社区推算；寿命、死亡率、矿石病参数为叙事化推演，非官方设定。
-    </div>
+    <section class="landing-notes">
+      <article><h3>出生之前，世界已经开始</h3><p>从 1042–1095 年间降生。历史不会等你长大，远方的战争与城市的迁徙，也会成为你人生的一部分。</p></article>
+      <article><h3>每一年，认真做一件事</h3><p>求学、工作、相爱、离开。为每一年选择重心，在命运交来的抉择前，决定如何过下去。</p></article>
+      <article><h3>关于这份模拟</h3><p>人口参考设定与社区推算；寿命、感染率和风险参数为同人建模。所有数值描绘的是这个模拟中的泰拉。</p></article>
+    </section>
+    <footer class="landing-footer">非商业同人作品 · 世界观与名词来自《明日方舟》（Hypergryph）。<br>人生模拟框架与首页交互参考 <a href="https://1in8b.life/zh/" target="_blank" rel="noreferrer">80億分之1 / 1 in 8 Billion</a>。人生记录仅保存在当前浏览器中。<br>正文使用 HarmonyOS Sans SC，版权归 Huawei Device Co., Ltd. 所有。</footer>
   </div>
+  <div class="landing-dock" id="birthDock"><button class="birth-cta" id="quickBirth">出生</button></div>
+</div>
+
+<div class="screen entrance" id="birth" hidden>
+  <div class="birth-roller" id="birthRoller">
+    <div class="roll-label" id="rollLabel">正在决定出生地</div>
+    <div class="roll-country" id="rollName"></div>
+    <div class="roll-meta" id="rollMeta"></div>
+  </div>
+  <article class="birth-certificate" id="birthCertificate" hidden aria-labelledby="certName">
+    <header class="cert-heading"><strong>出生登记</strong><span id="certNumber"></span></header>
+    <div class="cert-content">
+      <div class="landing-small">名字</div><h2 id="certName" tabindex="-1"></h2>
+      <p class="cert-story" id="certStory"></p><p class="landing-small" id="certPace"></p>
+      <dl class="cert-fields" id="certFields"></dl>
+      <svg id="certMap" class="terra-map" viewBox="0 0 600 280" role="img" aria-label="出生地在泰拉分布示意图中的位置"></svg>
+      <p class="landing-small">泰拉出生地分布示意，非官方疆域图</p>
+      <div class="cert-probability" id="certOdds"></div>
+      <h3>与你一同开始的人生</h3><ul class="cert-peers" id="certPeers"></ul>
+      <div class="cert-actions"><button class="birth-back" id="birthBack">返回首页</button><button class="birth-cta" id="beginLife">开始这一生</button></div>
+    </div>
+  </article>
 </div>
 
 <!-- ====================================================================== -->
@@ -260,6 +275,7 @@
 <!-- ====================================================================== -->
 <div class="screen" id="report" hidden>
   <div class="wrap">
+    <div class="report-kicker">TERRA LIFE · 一生纪要</div>
     <h1 class="rTitle" id="rTitle">—</h1>
     <div class="dead" id="rDead">—</div>
     <div class="rgrid" id="rGrid"></div>
@@ -312,6 +328,7 @@
 <script src="js/engine/year.js"></script>
 <script src="js/ui/pixelart.js"></script>
 <script src="js/ui/render.js"></script>
+<script src="js/ui/landing.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

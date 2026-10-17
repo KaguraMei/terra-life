@@ -1,3 +1,18 @@
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  src: url('../assets/fonts/HarmonyOS_Sans_SC_Medium.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  src: url('../assets/fonts/HarmonyOS_Sans_SC_Bold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 600 900;
+  font-display: swap;
+}
+
 /* ==========================================================================
  * TERRA LIFE SIM — 界面样式
  * --------------------------------------------------------------------------
@@ -10,8 +25,8 @@
  *   右栏：家人与生活 → 在同一秒出生的人们 → 人生地图 → 存活曲线
  *
  * 【配色】
- * 原作是奶油底色 + 深褐文字 + 朱红强调。这里保持同一族色相，
- * 把强调色改成泰拉的源石橙，并保留浅底深字的可读性对比。
+ * 本文件保留基础组件结构；当前官网浅灰绿主题与响应式版式
+ * 由 simulation.css 统一覆盖，首页与出生流程由 landing.css 定义。
  * ========================================================================== */
 
 /* ---------------------------------------------------------------------- */
@@ -34,7 +49,7 @@
   --pink:    #b0566f;   /* 人际 */
 
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
-  --sans: system-ui, -apple-system, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", sans-serif;
+  --sans: "HarmonyOS Sans SC", system-ui, -apple-system, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", sans-serif;
   --serif: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", Georgia, serif;
 }
 
@@ -187,7 +202,13 @@ body::before {
   display: inline-block; padding: 1px 5px; font-size: 10px;
   background: var(--panel2); border: 1px solid var(--line2); color: var(--fg2);
 }
-.tag.red    { border-color: var(--red);    color: var(--red);    background: #f7e6e2; }
+.tag.red    {
+  border-color: var(--violet);
+  color: var(--violet);
+  background: linear-gradient(135deg, #f5e8f9 0%, #ede0f4 100%);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(122, 79, 140, 0.12);
+}
 .tag.amber  { border-color: var(--amber);  color: var(--amber);  background: #f8eeda; }
 .tag.green  { border-color: var(--green);  color: var(--green);  background: #e9f0e0; }
 .tag.blue   { border-color: var(--blue);   color: var(--blue);   background: #e4ecf3; }
@@ -241,6 +262,40 @@ body::before {
 .statTop .v.sm { color: var(--blue); }
 .statTop .v.so { color: var(--pink); }
 .statTop .v.ar { color: var(--violet); }
+
+/* 矿石病结晶率专属样式 */
+.statRow.oriRow {
+  background: linear-gradient(90deg, transparent 0%, rgba(122, 79, 140, 0.03) 100%);
+  padding: 6px 8px;
+  margin: 8px -8px 0 -8px;
+  border-radius: 3px;
+}
+.statTop .v.ori {
+  color: var(--violet);
+  font-weight: 800;
+}
+.statTop .w.oriStage {
+  color: var(--violet);
+  font-weight: 600;
+  background: rgba(122, 79, 140, 0.08);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+.track.ori {
+  background: linear-gradient(90deg, #2a1a30 0%, #3a2040 100%);
+  border: 1px solid var(--violet);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.fill.ori {
+  background: linear-gradient(90deg, #7a4f8c 0%, #a06ac0 50%, #c080d8 100%);
+  box-shadow: 0 0 8px rgba(160, 106, 192, 0.6);
+  position: relative;
+  animation: crystalPulse 3s ease-in-out infinite;
+}
+@keyframes crystalPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; box-shadow: 0 0 12px rgba(160, 106, 192, 0.8); }
+}
 
 /* 财产两列 */
 .money2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
@@ -387,15 +442,17 @@ body::before {
 /* 抉择弹层                                                                */
 /* ====================================================================== */
 #modal {
-  position: fixed; inset: 0; z-index: 40;
+  position: fixed; inset: 0; z-index: 50;
   background: rgba(46,40,32,.55);
   display: flex; align-items: center; justify-content: center; padding: 22px;
 }
 #modal[hidden] { display: none; }
 #modalBox {
+  position: relative;
   width: 100%; max-width: 520px; max-height: 86vh; overflow-y: auto;
   background: var(--panel); border: 2px solid var(--line2);
   box-shadow: 0 10px 34px rgba(46,40,32,.34);
+  z-index: 51;
 }
 #modalHead { padding: 11px 15px; background: var(--panel2); border-bottom: 2px solid var(--line2); }
 #modalHead .t { font-family: var(--serif); font-size: 17px; font-weight: 700; }
@@ -405,7 +462,12 @@ body::before {
 .opt {
   display: flex; flex-direction: column; gap: 2px;
   padding: 9px 11px; margin-bottom: 6px;
-  background: var(--panel); border: 1px solid var(--line2); cursor: pointer;
+  background: var(--panel); border: 1px solid var(--line2);
+  cursor: pointer;
+  position: relative;
+  z-index: 52;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 .opt:hover { background: #f9ece8; border-color: var(--red); }
 .opt .ol { font-size: 13px; font-weight: 600; }
