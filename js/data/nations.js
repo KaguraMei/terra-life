@@ -8,7 +8,7 @@
  *   name  中文名
  *   en    英文名（界面语言为 en 时显示；官方英文译名优先）
  *   reg   区域（决定死因基线 CT、收入弹性 MORT_G）
- *   pop   人口（万人），官方数据优先，标注 * 为社区推算
+ *   pop   人口（万人），当前为待逐项核验的旧版模型权重
  *   b     年出生权重（万人/年）—— 抽签用「此刻出生的婴儿」
  *   le    预期寿命（岁，两性均值）
  *   gap   性别寿命差（女 - 男）
@@ -243,6 +243,22 @@
       tag: '一座会走的城市，走在天灾的缝隙里。这里什么都能买到，包括不被登记的活着。'
     }
   ];
+
+  // 本轮冻结旧版权重，不把缺乏原文页码的数值认定为官方人口。
+  // sourceYear 表示统计/设定对应年份，未知必须为 null；不是下载年份。
+  TL.POPULATION_SNAPSHOT = 'terra-population-2026-10-18-v1';
+  for (const n of TL.NATIONS) {
+    n.sourceYear = null;
+    n.sourceType = 'legacy-model';
+    n.analogue = null;
+    n.confidence = 'unverified';
+    n.populationSource = {
+      snapshot: TL.POPULATION_SNAPSHOT,
+      reference: 'docs/data/population-2026-10-18.json',
+      birthWeightType: 'model-weight',
+      note: '既有值保留用于可复现抽签，官方原文与社区推算出处待逐项核定'
+    };
+  }
 
   /** id → 国家对象 */
   TL.NATION_BY_ID = {};

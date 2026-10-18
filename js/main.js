@@ -47,7 +47,7 @@
     for (const o of odds) pOf[o.id] = o.p;
     // 按抽中概率排序，让「常见出生地」排在前面
     const sorted = TL.NATIONS.slice().sort((a, b) => (pOf[b.id] || 0) - (pOf[a.id] || 0));
-    let html = `<button type="button" class="chip ${SETUP.nation === '' ? 'on' : ''}" aria-pressed="${SETUP.nation === ''}" data-v="">随机<small class="sub">按真实权重抽签</small></button>`;
+    let html = `<button type="button" class="chip ${SETUP.nation === '' ? 'on' : ''}" aria-pressed="${SETUP.nation === ''}" data-v="">随机<small class="sub">按模型权重抽签</small></button>`;
     for (const n of sorted) {
       if (!pOf[n.id]) continue;
       html += `<button type="button" class="chip ${SETUP.nation === n.id ? 'on' : ''}" aria-pressed="${SETUP.nation === n.id}" data-v="${n.id}">${n.name}<small class="sub">${(pOf[n.id] * 100).toFixed(2)}%</small></button>`;
@@ -101,6 +101,7 @@
       UI.lastLogLen = 0;
       UI.lastAge = -1;
       UI.auto = false;
+      UI.seekingDecision = false;
       $('feed').innerHTML = '';
       $('start').hidden = true;
       $('report').hidden = true;
@@ -149,9 +150,18 @@
     if (dt > 0.4) dt = 0.4;              // 切标签页回来不要一次性跳很多年
 
     if (S.phase === 'life') {
+      if (UI.seekingDecision) {
+        const result = TL.advanceToDecision(S);
+        if (result !== 'searching') UI.seekingDecision = false;
+      } else if (UI.auto && S.pending) {
+        TL.autoChoose(S);
+        $('modal').hidden = true;
+        $('modal')._pendingDecision = null;
+      }
       // 自动模式下，无抉择时自动选重心
       if (UI.auto && !S.focus) { S.focus = TL.autoFocus(S); UI.focus = S.focus; }
-      TL.tick(S, dt);
+      if (!UI.seekingDecision) TL.tick(S, dt);
+      if (UI.auto && S.pending) TL.autoChoose(S);
 
       if (S.pending) {
         TL.renderAll(S, true);
@@ -240,9 +250,13 @@
   /* 本地存档（对应原作的「过去的人生」）                                      */
   /* ---------------------------------------------------------------------- */
   function loadSaves() {
-    try { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch (e) { return []; }
+    try {
+      const records = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+      return Array.isArray(records) ? records.filter(s => s && Number.isFinite(s.age) && typeof s.cause === 'string') : [];
+    } catch (e) { return []; }
   }
   function saveLife(S) {
+    if (!S || S.phase !== 'report' || !Number.isFinite(S.deathAge) || !S.deathCause) return;
     try {
       const all = loadSaves();
       all.unshift({
@@ -306,6 +320,7 @@
       el.addEventListener('click', () => {
         const S = TL.S; if (!S) return;
         const v = +el.dataset.s;
+        UI.seekingDecision = false;
         if (v === 0) { S.paused = !S.paused; }
         else { S.paused = false; S.speed = v; }
         lastTs = 0;
@@ -316,20 +331,19 @@
 
     $('autoBtn').addEventListener('click', () => {
       UI.auto = !UI.auto;
+      UI.seekingDecision = false;
       $('autoBtn').classList.toggle('on', UI.auto);
-      toast(UI.auto ? '自动模式：开' : '自动模式：关');
+      toast(UI.auto ? '自动模式：自动选择重心和抉择' : '自动模式：关');
     });
 
-    // 「下一个决定」：跳到队列里的下一个抉择
+    // 跨年逐个处理事件，分帧搜索；手动快转始终停在抉择前。
     $('nextBtn').addEventListener('click', () => {
       const S = TL.S; if (!S) return;
       if (S.pending) { TL.showDecision(S, S.pending); return; }
-      const next = S.queue.find(e => e.type === 'dec');
-      if (!next) { toast('今年没有别的决定'); return; }
-      // 直接把时间推进到那个事件之前
-      S.t = Math.max(0, next.at - 0.001);
-      TL.tick(S, 0.002 * S.yearSec / Math.max(0.001, S.speed));
-      TL.renderAll(S, true);
+      UI.auto = false;
+      $('autoBtn').classList.remove('on');
+      UI.seekingDecision = true;
+      toast('正在快转，遇到下一个抉择或人生结束时停止');
     });
 
     $('restartBtn').addEventListener('click', () => {
@@ -375,15 +389,16 @@
       toast(on ? '音乐：开（合成的环境音）' : '音乐：关');
     });
 
-    /* --- 关闭：回到开局界面（保存当前这一局的历史记录） --- */
+    /* --- 返回首页：进行中的人生不保存，历史记录仅收录已结束人生 --- */
     $('closeBtn').addEventListener('click', () => {
-      if (TL.S && TL.S.phase === 'life') saveLife(TL.S);
+      UI.seekingDecision = false;
       if (raf) { cancelAnimationFrame(raf); raf = null; }
       TL.S = null;
       $('game').hidden = true;
       $('report').hidden = true;
       $('start').hidden = false;
       renderSaves(); renderOdds();
+      toast('已返回首页；未结束的人生不保留进度');
     });
 
     // 键盘：空格暂停，1-9 选择抉择选项，回车下一个决定
@@ -395,6 +410,7 @@
       if (!S) return;
       if (e.code === 'Space') {
         e.preventDefault();
+        UI.seekingDecision = false;
         S.paused = !S.paused; lastTs = 0; TL.renderTop(S);
       } else if (e.code === 'Enter') { $('nextBtn').click(); }
       else if (S.pending && /^Digit[1-9]$/.test(e.code)) {
@@ -638,7 +654,7 @@
     $('noteBtn').textContent = TL.t('write');
     $('setBtn').textContent = TL.t('settings');
     $('fbBtn').textContent = TL.t('feedback');
-    $('closeBtn').textContent = TL.t('close');
+    $('closeBtn').textContent = TL.t('home');
     $('sheetClose').textContent = TL.t('close');
     document.querySelector('#speeds .spd[data-s="0"]').textContent = TL.t('pause');
 
@@ -684,9 +700,10 @@
   /* ---------------------------------------------------------------------- */
   /* 静默失败是这类纯前端项目最难查的 bug。宁可难看，也不要让人对着一个
      空白页面猜。错误同时写进 <title>，这样无头截图 / dump-dom 也能看到。 */
-  function reportFatal(where, err) {
+  const originalConsoleError = console.error.bind(console);
+  function reportFatal(where, err, log = true) {
     const msg = (err && (err.stack || err.message)) || String(err);
-    try { console.error('[' + where + ']', err); } catch (e) { /* 忽略 */ }
+    if (log) try { originalConsoleError('[' + where + ']', err); } catch (e) { /* 忽略 */ }
     try {
       document.title = 'ERR[' + where + '] ' + msg.split('\n')[0];
       // 把完整栈写进一个隐藏节点：无头 dump-dom 时能直接读到，不用开 devtools
@@ -711,10 +728,9 @@
      会表现为「这个事件永远不发生」，极难发现。这里把 console.error
      抄一份进 errbox。 */
   (function tapConsole() {
-    const orig = console.error;
     console.error = function () {
-      try { reportFatal('console', Array.prototype.join.call(arguments, ' ')); } catch (e) { /* 忽略 */ }
-      return orig.apply(console, arguments);
+      try { reportFatal('console', Array.prototype.join.call(arguments, ' '), false); } catch (e) { /* 忽略 */ }
+      return originalConsoleError(...arguments);
     };
   })();
 

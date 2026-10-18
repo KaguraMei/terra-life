@@ -46,6 +46,22 @@
   /** 年表最早与最晚的年份，供界面提示「年表之外」 */
   TL.TL_SPAN = [1031, 1099];
 
+  // 游戏采用保守的组织出场年；不是经官方原文核定的成立年份。
+  // 来源与待核项见 docs/PRTS设定调研-2026-10-18.md。
+  TL.ORGANIZATION_ERAS = {
+    rhodes: { from: 1095, sourceType: 'project-rule', confidence: 'unverified' },
+    reunion: { from: 1094, sourceType: 'project-rule', confidence: 'unverified' }
+  };
+  TL.organizationAvailable = function (S, id) {
+    const era = TL.ORGANIZATION_ERAS[id];
+    return !!era && Number.isFinite(S.year) && S.year >= era.from;
+  };
+  TL.contentAvailable = function (S, item) {
+    return !!item && !item.disabledReason &&
+      (!item.organization || TL.organizationAvailable(S, item.organization)) &&
+      (item.fromYear == null || S.year >= item.fromYear);
+  };
+
   /* ---------------------------------------------------------------------- */
   /* 年表                                                                    */
   /* ---------------------------------------------------------------------- */

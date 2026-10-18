@@ -24,20 +24,41 @@
     if (!S || S.phase !== 'life' || S.pending || S.paused) return;
     // dt = 真实秒 × 倍速 ÷ 每年所需秒数
     const dt = dtSec * S.speed / S.yearSec;
-    if (S.focus) S.fT[S.focus] = (S.fT[S.focus] || 0) + dt;
-
-    const nt = S.t + dt;
+    const nt = Math.min(S.t + dt, 1);
+    const accrue = to => {
+      if (S.focus) S.fT[S.focus] = (S.fT[S.focus] || 0) + Math.max(0, to - S.t);
+      S.t = to;
+    };
 
     // 触发队列中所有已到期的事件
     while (S.queue.length && S.queue[0].at <= nt) {
       const e = S.queue.shift();
-      S.t = e.at;
+      accrue(e.at);
       TL.fire(S, e);
       if (S.pending || S.phase !== 'life') return;
     }
 
-    S.t = Math.min(nt, 1);
+    accrue(nt);
     if (S.t >= 1) TL.endYear(S);
+  };
+
+  // 小步跨年快转，不跳过中间事件，也不提前结算抉择之后的重心时间。
+  // 有限步数让 UI 可以分帧执行；不替玩家选重心或回答抉择。
+  TL.advanceToDecision = function (S, budget = 256) {
+    if (!S || S.phase !== 'life') return 'ended';
+    const speed = S.speed;
+    S.speed = 1;
+    try {
+      for (let i = 0; i < budget && S.phase === 'life' && !S.pending; i++) {
+        S.paused = false;
+        const at = S.queue.length ? S.queue[0].at : 1;
+        TL.tick(S, (Math.max(0, at - S.t) + 1e-10) * S.yearSec);
+      }
+    } finally {
+      S.speed = speed;
+      S.paused = true;
+    }
+    return S.pending ? 'decision' : S.phase === 'life' ? 'searching' : 'ended';
   };
 
   /* ---------------------------------------------------------------------- */
@@ -65,13 +86,16 @@
     try {
       if (e.type === 'ev') {
         const ev = TL.EVMAP[e.id];
-        if (!ev) return;
+        if (!TL.contentAvailable(S, ev)) return;
         if (ev.when && !ev.when(S)) return;
         /* 一生次数上限必须在这里拦 —— 这里是所有事件的唯一入口。
            只在 pickFrom 里拦是不够的：scheduleEvents 里那些「强制排入」的
            事件（阶层天灾、纠察队、矿坑）根本不走选池，于是 cat_city
            能在一条命里刷二十几次，同一句话重复到读者出戏。 */
-        if (ev.max != null && (S.evCount[e.id] || 0) >= ev.max) return;
+        if ((S.evCount[e.id] || 0) >= (ev.max == null ? 2 : ev.max)) return;
+        const last = S.flags['ev_' + e.id];
+        const cooldown = ev.cd == null ? 4 : ev.cd;
+        if (last != null && S.age - last < cooldown) return;
         S.actEvent = e.id;
         const before = TL.netWorth(S);
         const r = ev.run(S, e.p);

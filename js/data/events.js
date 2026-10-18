@@ -22,7 +22,7 @@
     const ok = [];
     for (const id of ids) {
       const e = TL.EVMAP[id];
-      if (!e) continue;
+      if (!TL.contentAvailable(S, e)) continue;
       // 次数上限：一个人一生中同一件事最多发生几次。
       // 这一条是控制「日志读起来像卡带」最有效的机制 ——
       // 光靠冷却不够，因为人生可以很长（60~80 年），
@@ -618,19 +618,13 @@
 
   def('reunion_choice', {
     title: '整合运动 · 抉择', book: '矿石病',
-    when: S => S.flags.reunionTouched && !S.flags.reunionJoined && !S.opClass && S.age - S.flags.reunionTouched <= 3,
+    when: S => S.flags.reunionTouched != null && !S.flags.reunion && !S.opClass &&
+      S.flags.dec_reunion_invite == null && S.age - S.flags.reunionTouched <= 3,
     max: 1,
     cd: 0,
     run(S) {
-      const lean = TL.reunionLean(S);
-      if (lean > 0.7 && TL.chance(0.35)) {
-        S.flags.reunionJoined = S.age;
-        S.job = 'mercenary';
-        TL.eff(S, { h: 12, so: 10, hl: -5 });
-        return TL.L`你去了那个营地。他们给你一块面罩，说：在这里，没有人会因为你的脸而赶你走。你留下了。`;
-      }
-      TL.eff(S, { h: -6 });
-      return TL.L`你在营地外站了很久。最后还是转身走了。你不知道这个选择是对是错。`;
+      TL.openDecision(S, 'reunion_invite');
+      return TL.L`营地的人邀请你留下。你需要作出自己的选择。`;
     }
   });
 
@@ -672,7 +666,7 @@
 
   def('ori_hide_identity', {
     title: '隐藏', book: '矿石病',
-    when: S => S.ori && S.ori.stage >= 1 && !S.flags.oriExposed && !S.flags.oriHiding,
+    when: S => S.age >= 12 && S.ori && !S.ori.known && S.ori.stage >= 1 && !S.flags.oriExposed && !S.flags.oriHiding,
     max: 1,
     cd: 0,
     run(S) {
@@ -689,7 +683,7 @@
 
   def('ori_hiding_stress', {
     title: '隐藏的代价', book: '矿石病',
-    when: S => S.flags.oriHiding && !S.flags.oriExposed,
+    when: S => S.ori && !S.ori.known && S.flags.oriHiding && !S.flags.oriExposed,
     cd: 2,
     run(S) {
       TL.eff(S, { h: -5, so: -3 });
@@ -704,18 +698,19 @@
 
   def('ori_identity_exposed', {
     title: '暴露', book: '矿石病',
-    when: S => S.flags.oriHiding && !S.flags.oriExposed && S.ori.stage >= 2,
+    when: S => S.ori && !S.ori.known && S.flags.oriHiding && !S.flags.oriExposed && S.ori.stage >= 2,
     max: 1,
     cd: 0,
     run(S) {
       if (TL.chance(0.3 + S.ori.stage * 0.15)) {
         S.flags.oriExposed = true;
+        S.ori.known = true;
         S.flags.oriHiding = false;
         const tol = TL.tolOf(S.nation, S.year);
         TL.eff(S, { h: -15, so: -10 });
 
         if (tol < 20) {
-          S.job = 'unemployed';
+          S.job = 'seeking';
           return TL.L`你倒在了工作的地方。醒来时周围围了一圈人。有人看到了你手臂上的结晶。第二天你被开除了。没有人跟你说再见。`;
         } else if (tol < 40) {
           return TL.L`袖子在工作时被勾住了，撕开了一条口子。结晶暴露在阳光下。同事们后退了一步。你听到有人说：感染者。`;
@@ -1015,7 +1010,7 @@
   /* ====================================================================== */
   def('war_draft', {
     title: '征召', book: '战争',
-    when: S => S.age >= 17 && S.age <= 45 && TL.NATION_BY_ID[S.nation].war > 0.3,
+    when: S => S.age >= 17 && S.age <= 45 && S.serveLeft === 0 && TL.NATION_BY_ID[S.nation].war > 0.3,
     run(S) {
       const n = TL.NATION_BY_ID[S.nation];
       S.serveLeft = Math.round(TL.range(2, 6));
@@ -1558,6 +1553,8 @@
     cd: 6,
     run(S) {
       if (TL.chance(0.25)) {
+        S.flags.lastJob = S.job;
+        S.serveLeft = Math.round(TL.range(2, 6));
         S.job = 'soldier';
         TL.eff(S, { h: -8, hl: -5, so: -4 });
         return TL.L`征兵令下来了。你的名字在名单上。一周后，你穿上了军服，被送往北方。`;
@@ -1671,7 +1668,7 @@
       TL.eff(S, { h: 7, so: 4 });
       return TL.pick([
         TL.L`今天有骑士比赛。全城的人都去看了。你站在人群最后面，只能看见一点影子，但欢呼声震耳欲聋。`,
-        TL.L`听说耀骑士要出场。售票处排了几条街的队。你没去，但在收音机里听了实况。`,
+        TL.L`听说一位热门骑士要出场。售票处排了几条街的队。你没去，但在收音机里听了实况。`,
         TL.L`竞技场的海报贴满了整条街。上面的骑士穿着华丽的铠甲，你想象不出那有多重。`,
         TL.L`有人在街上模仿骑士决斗。孩子们围成一圈看，欢呼声比真的比赛还响。`
       ]);
@@ -1778,7 +1775,7 @@
 
   def('rhodes_scholar', {
     title: '罗德岛 · 学者路径', book: '身份',
-    when: S => S.age >= 18 && S.age <= 35 && S.st.sm >= 75 && !S.opClass && S.edu >= 3,
+    when: S => S.age >= 18 && S.age <= 35 && S.st.sm >= 75 && !S.opClass && S.eduLevel >= 3,
     max: 1,
     cd: 0,
     run(S) {
@@ -1834,20 +1831,20 @@
         S.flags.rhodesFamily = true;
         TL.eff(S, { h: 10, so: 8, hl: 5 });
         S.money -= n.ppp * 8;
-        return TL.L`家里人凑了一笔钱，把你送上了罗德岛的医疗船。医生说这病能治，但要长期用药。父亲签字的时候手在抖。他说：活着就好。`;
+        return TL.L`家里人凑了一笔钱，把你送上了罗德岛的医疗船。医生说还不能根治，但长期治疗能抑制病情。家人签字的时候手在抖：活着就好。`;
       }
       TL.eff(S, { h: -8, so: -3 });
-      return TL.L`母亲打听到罗德岛可以治矿石病，但要很多钱。她在纸上算了一晚上，最后把纸撕了。`;
+      return TL.L`家里打听到罗德岛可以提供抑制治疗，但费用很高。账算了一晚上，还是没有凑够。`;
     }
   });
 
   def('rhodes_specialist_recruit', {
     title: '罗德岛 · 特殊招募', book: '身份',
-    when: S => S.age >= 16 && S.age <= 40 && !S.opClass && (S.arts >= 80 || S.race === 'draco' || S.race === 'vouivre' || S.courtId != null),
+    when: S => S.age >= 16 && S.age <= 40 && !S.opClass && (S.arts >= 80 || S.race === 'draco' || S.race === 'vouivre' || (S.court && S.court !== 'none')),
     max: 1,
     cd: 0,
     run(S) {
-      const isRare = S.race === 'draco' || S.race === 'vouivre' || S.courtId != null;
+      const isRare = S.race === 'draco' || S.race === 'vouivre' || (S.court && S.court !== 'none');
       const isHighArts = S.arts >= 80;
 
       if (TL.chance(isRare ? 0.35 : (isHighArts ? 0.28 : 0.15))) {
@@ -1874,6 +1871,7 @@
     max: 1,
     cd: 0,
     run(S) {
+      const previousJob = S.job;
       if (TL.chance(0.2)) {
         if (TL.tryJoinRhodes(S)) {
           TL.eff(S, { h: 11, so: 6 });
@@ -1884,7 +1882,7 @@
             oridoc: TL.L`罗德岛的医疗部门来你们诊所做过技术交流。他们的抑制药剂配方比你见过的任何版本都有效。他们说：要不要来我们这里？你说：可以。`,
             witch: TL.L`罗德岛的人说他们在组建一个源石技艺研究小组，需要有实战经验的术师。你问：收感染者吗？对方说：我们一半的人都是。`
           };
-          return jobMap[S.job] || TL.L`你通过工作渠道接触到了罗德岛，他们给了你一个转职机会。`;
+          return jobMap[previousJob] || TL.L`你通过工作渠道接触到了罗德岛，他们给了你一个转职机会。`;
         }
       }
       TL.eff(S, { h: 2 });
@@ -2068,6 +2066,29 @@
   };
   for (const id in MAX) if (TL.EVMAP[id]) TL.EVMAP[id].max = MAX[id];
 
+  TL.EVMAP.illness.disabledReason = '慢病由 ncdYear 独立判定，禁止重复进入随机事件池';
+  for (const id of ['ori_rhodes', 'ori_medcart', 'ori_drug_sideeffect', 'move_destiny',
+    'rhodes_scholar', 'rhodes_rescued', 'rhodes_family_paid', 'rhodes_specialist_recruit', 'rhodes_cooperation']) {
+    TL.EVMAP[id].organization = 'rhodes';
+  }
+  for (const id of ['reunion_recruit', 'reunion_choice', 'reunion_life', 'reunion_conflict']) {
+    TL.EVMAP[id].organization = 'reunion';
+  }
+  // 巫王被推翻之后才有“残党”；与现有年表共用边界。
+  TL.EVMAP.lei_witch_hunt.fromYear = TL.TIMELINE.find(e => e.id === 'lei_september').year;
+  // 新增内容显式登记到调度池；不增加每年事件总数。
+  TL.SUPPLEMENTAL_EVENTS = [
+    'reunion_choice', 'reunion_life', 'reunion_conflict',
+    'ori_hide_identity', 'ori_hiding_stress', 'ori_identity_exposed',
+    'war_draft', 'war_reunion', 'ori_drug_sideeffect', 'ori_treatment_cost',
+    'ori_blackmarket_drug', 'ori_folk_remedy',
+    'yan_street_food', 'yan_festival', 'yan_tianshi',
+    'urs_cold', 'urs_conscription', 'urs_inspection',
+    'vic_fog', 'vic_nobility', 'vic_factory', 'srg_desert', 'srg_caravan',
+    'kaz_arena', 'kaz_business', 'clb_tech', 'clb_frontier', 'lei_arts', 'lei_witch_hunt',
+    'rhodes_scholar', 'rhodes_rescued', 'rhodes_family_paid', 'rhodes_specialist_recruit', 'rhodes_cooperation'
+  ];
+
   /* ====================================================================== */
   /* 排程：每年该发生什么（对应原作的事件调度）                                */
   /* ====================================================================== */
@@ -2184,6 +2205,8 @@
       pool = pool.concat(['ori_acute']);
     }
 
+    if (a >= 6) pool = pool.concat(TL.SUPPLEMENTAL_EVENTS);
+
     // ⑥ 排入
     const used = {};
     for (let i = 0; i < nEv; i++) {
@@ -2239,6 +2262,7 @@
       if (J.art * 100 > S.arts) continue;
       // 干员路线需要满足额外条件
       if (J.cls) {
+        if (!TL.organizationAvailable(S, 'rhodes')) continue;
         if (S.age < 16) continue;
         if (TL.combatValue(S) < 45) continue;
       }
@@ -2265,6 +2289,7 @@
 
   /** 干员入队判定：技艺、战力、以及「是否愿意收一个感染者」 */
   TL.tryJoinRhodes = function (S) {
+    if (!TL.organizationAvailable(S, 'rhodes')) return false;
     if (S.age < 16) return false;
     const cv = TL.combatValue(S);
     if (cv < 55) return false;

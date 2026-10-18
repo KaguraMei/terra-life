@@ -41,7 +41,7 @@
   /* ---------------------------------------------------------------------- */
   TL.openDecision = function (S, id, p) {
     const d = TL.DECISIONS[id];
-    if (!d) return;
+    if (!TL.contentAvailable(S, d) || (d.when && !d.when(S))) return;
     // 过滤不可用选项
     const opts = (d.options || []).filter(o => !o.require || o.require(S));
     if (!opts.length) return;
@@ -141,7 +141,7 @@
 
     const add = (id, at, p) => {
       const d = TL.DECISIONS[id];
-      if (!d) return;
+      if (!TL.contentAvailable(S, d)) return;
       const last = S.flags['dec_' + id];
       // once：一生只问一次
       if (d.once && last != null) return;

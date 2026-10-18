@@ -1,6 +1,11 @@
 # ── 验证与截图（本地生成，不入库）──────────────────────────
 shots/
 dist/
+_site/
+site/
+coverage/
+playwright-report/
+test-results/
 
 # ── 依赖与缓存 ────────────────────────────────────────────
 node_modules/
@@ -26,3 +31,8 @@ desktop.ini
 *.blend1
 _probe/
 dom*.html
+
+# ── 本地环境变量与密钥 ─────────────────────────────────────
+.env
+.env.*
+!.env.example

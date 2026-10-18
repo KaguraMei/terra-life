@@ -37,7 +37,7 @@ const html = read('index.html');
 const htmlIds = new Set();
 for (const m of html.matchAll(/\sid="([^"]+)"/g)) htmlIds.add(m[1]);
 
-const jsFiles = ['js/ui/render.js', 'js/ui/pixelart.js', 'js/main.js'];
+const jsFiles = ['js/ui/render.js', 'js/ui/pixelart.js', 'js/ui/landing.js', 'js/main.js'];
 
 /* 运行期才建出来的 id 也算「有定义」：
    浮层内容是用 innerHTML 拼的，errbox 是出错时才 append 的。
@@ -125,16 +125,46 @@ const TL = ctx.window.TL;
 const evSrc = read('js/data/events.js');
 const poolBlock = evSrc.slice(evSrc.indexOf('TL.scheduleEvents'));
 const poolIds = new Set();
+for (const id of TL.SUPPLEMENTAL_EVENTS || []) poolIds.add(id);
 for (const m of poolBlock.matchAll(/pool\s*=\s*\[([\s\S]*?)\]/g)) {
   for (const s of m[1].matchAll(/'([a-z][a-z0-9_]+)'/g)) poolIds.add(s[1]);
 }
 for (const m of poolBlock.matchAll(/pool\.concat\(\s*\[([\s\S]*?)\]/g)) {
   for (const s of m[1].matchAll(/'([a-z][a-z0-9_]+)'/g)) poolIds.add(s[1]);
 }
-for (const m of poolBlock.matchAll(/queueEvent\([^)]*?'ev'\s*,\s*'([a-z][a-z0-9_]+)'/g)) poolIds.add(m[1]);
+for (const m of poolBlock.matchAll(/queueEvent\([^;\n]*?'ev'\s*,\s*'([a-z][a-z0-9_]+)'/g)) poolIds.add(m[1]);
 const badEv = [...poolIds].filter(id => !TL.EVMAP[id]);
 bad('scheduleEvents 里出现了未定义的事件 id', badEv.map(id => `${id}（EVMAP 里没有）`));
 if (!badEv.length) ok(`事件池里的 id 全部有定义（检查了 ${poolIds.size} 个）`);
+
+const unlinked = Object.keys(TL.EVMAP).filter(id => !poolIds.has(id) && !TL.EVMAP[id].disabledReason);
+bad('事件没有调度入口或明确停用理由', unlinked);
+if (!unlinked.length) ok('所有事件都有调度入口或明确独立处理理由');
+
+const obsolete = [];
+for (const f of FILES) {
+  for (const [i, line] of read(f).split('\n').entries()) {
+    if (/\bS\.(edu|courtId)\b/.test(line)) obsolete.push(f + ':' + (i + 1) + ' 使用已废弃状态字段');
+    for (const m of line.matchAll(/S\.job\s*=\s*'([^']+)'(?=\s*[;}])/g)) {
+      if (!TL.JOBS[m[1]] && !TL.NONWORK.includes(m[1])) obsolete.push(f + ':' + (i + 1) + ' 未登记职业 ' + m[1]);
+    }
+  }
+}
+bad('状态字段或职业引用错误', obsolete);
+if (!obsolete.length) ok('教育/王庭字段与直接赋值职业引用正确');
+
+const snapshot = JSON.parse(read('docs/data/population-2026-10-18.json'));
+const populationErrors = [];
+if (snapshot.id !== TL.POPULATION_SNAPSHOT || snapshot.nations.length !== TL.NATIONS.length)
+  populationErrors.push('快照版本或国家数量不同');
+for (const n of TL.NATIONS) {
+  const saved = snapshot.nations.find(v => v.id === n.id);
+  for (const key of ['pop', 'b', 'sourceYear', 'sourceType', 'analogue', 'confidence']) {
+    if (!saved || saved[key] !== n[key]) populationErrors.push(n.id + '.' + key);
+  }
+}
+bad('人口快照与运行时不一致', populationErrors);
+if (!populationErrors.length) ok('21 国人口/出生权重及来源字段与冻结快照一致');
 
 /* 每个事件都必须能返回一句文本（或 {t}），否则 fire() 会静默什么都不记 */
 const noRun = [], noTitle = [];

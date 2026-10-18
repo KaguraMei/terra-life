@@ -70,7 +70,7 @@
       },
       {
         label: '去考干员', hint: '改变一生的机会，也可能白跑一趟',
-        require: S => TL.combatValue(S) >= 45,
+        require: S => TL.organizationAvailable(S, 'rhodes') && TL.combatValue(S) >= 45,
         eff: { hl: 2, h: 3, so: -3, sm: 1 },
         run(S) {
           if (TL.tryJoinRhodes(S)) return TL.L`选拔过了。你有了一个代号，和一箱属于自己的东西。`;
@@ -143,8 +143,8 @@
       },
       {
         label: '试着进罗德岛',
-        hint: '感染者唯一的正规出路',
-        require: S => TL.combatValue(S) >= 50,
+        hint: '参加招募考核',
+        require: S => TL.organizationAvailable(S, 'rhodes') && TL.combatValue(S) >= 50,
         eff: { h: 3, so: -2 },
         run(S) {
           if (TL.tryJoinRhodes(S)) return TL.L`你拿到了罗德岛的入职通知。上面写着：不问出身，不问种族，不问感染状态。`;
@@ -291,7 +291,7 @@
     options: [
       {
         label: '去罗德岛', hint: '效果最好 最贵',
-        require: S => S.money >= TL.NATION_BY_ID[S.nation].ppp * 5 || S.q >= 4,
+        require: S => TL.organizationAvailable(S, 'rhodes') && (S.money >= TL.NATION_BY_ID[S.nation].ppp * 5 || S.q >= 4),
         eff: { h: 8, hl: 3 },
         run(S) {
           S.money -= TL.NATION_BY_ID[S.nation].ppp * 5;
@@ -320,6 +320,8 @@
   });
 
   D('reunion_invite', {
+    organization: 'reunion',
+    when: S => !S.flags.reunion,
     title: '他们邀请你',
     text: S => TL.L`整合运动的人找到了你。他们说，你不必再道歉。`,
     options: [
@@ -329,6 +331,7 @@
         run(S) {
           S.flags.reunion = true;
           S.flags.reunionAt = S.age;
+          S.flags.reunionJoined = S.age;
           S.arts = TL.clamp(S.arts + 8, 0, 100);
           return TL.L`你跟着他们走了。第一次有人教你，怎么把身上的东西变成武器。`;
         }
@@ -364,7 +367,7 @@
       { label: '把想做的事做完', hiden: false, eff: { h: 6, sm: 3, hl: -3 }, run(S) { S.flags.bucketList = 1; return TL.L`你列了一张单子。上面第一件事是回一趟老家。`; } },
       { label: '继续照常上工', eff: { hl: -6, so: 2, money: 2 }, run(S) { return TL.L`你什么也没改。工还是要上，饭还是要吃。`; } },
       { label: '把自己关起来', eff: { h: -12, so: -12, hl: -2 }, run(S) { S.flags.withdrawn = 1; return TL.L`你开始少见人。反正见不见都一样。`; } },
-      { label: '去找罗德岛', require: S => !S.ori.treated, eff: { h: 6 }, run(S) { S.flags.seekRhodes = 1; return TL.L`你收拾了一个包，往南走。听说他们的医疗车每个月会来一次。`; } }
+      { label: '去找罗德岛', require: S => TL.organizationAvailable(S, 'rhodes') && !S.ori.treated, eff: { h: 6 }, run(S) { S.flags.seekRhodes = 1; return TL.L`你收拾了一个包，往南走。听说他们的医疗车每个月会来一次。`; } }
     ]
   });
 
