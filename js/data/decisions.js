@@ -70,18 +70,10 @@
       },
       {
         label: '去考干员', hint: '改变一生的机会，也可能白跑一趟',
-        require: S => TL.organizationAvailable(S, 'rhodes') && TL.combatValue(S) >= 45,
+        require: S => TL.canJoinOrganization(S, 'rhodes', 'operator'),
         eff: { hl: 2, h: 3, so: -3, sm: 1 },
         run(S) {
-          if (TL.tryJoinRhodes(S)) return TL.L`选拔过了。你有了一个代号，和一箱属于自己的东西。`;
-          // 落选之后走哪条路，取决于你身上原本有什么
-          const fallback = TL.wpick({
-            mercenary: 1.0, guard: 0.9, courier: 1.1, soldier: 0.7,
-            hunter: 0.5, vendor: 0.6, farmhand: 0.6
-          });
-          S.job = fallback;
-          TL.eff(S, { h: -5 });
-          return TL.L`选拔没过。你在营地里待了一阵，最后跟着人做起了${TL.JOBS[fallback].name}。`;
+          return TL.tryJoinRhodes(S) ? '你递交了申请，开始参加罗德岛的面谈。' : '你还不符合当前招募条件，可以积累经验后再试。';
         }
       }
     ]
@@ -144,11 +136,75 @@
       {
         label: '试着进罗德岛',
         hint: '参加招募考核',
-        require: S => TL.organizationAvailable(S, 'rhodes') && TL.combatValue(S) >= 50,
+        require: S => TL.canJoinOrganization(S, 'rhodes', 'operator'),
         eff: { h: 3, so: -2 },
         run(S) {
-          if (TL.tryJoinRhodes(S)) return TL.L`你拿到了罗德岛的入职通知。上面写着：不问出身，不问种族，不问感染状态。`;
+          if (TL.tryJoinRhodes(S)) return '你递交了申请，开始参加罗德岛的面谈。';
           return TL.L`你投了简历，没有回音。`;
+        }
+      }
+    ]
+  });
+
+  /* ====================================================================== */
+  /* 组织招募（面试题库接口）                                                */
+  /* ====================================================================== */
+  D('organization_offer', {
+    when: S => !!S.orgApplication && !S.affiliation,
+    title: S => {
+      const a = S.orgApplication;
+      return a ? TL.organizationName(a.organization) + '·' + TL.organizationAdmissionName(a.organization) : '组织招募';
+    },
+    text: S => {
+      const a = S.orgApplication;
+      if (!a) return '你收到了一份组织招募信息。';
+      if (a.organization === 'sir_family') return '中间人把你带到家族联络人面前。对方会试探你能否守密、认清指令来源并承担人情。加入并不保证安全，更不意味着家族的命令都正当。';
+      return TL.organizationName(a.organization) + '向你开放了「' +
+        TL.organizationRouteName(a.organization, a.route) +
+        '」路线。对方邀请你提交材料并参加招募考核。';
+    },
+    options: [
+      {
+        label: S => S.orgApplication?.organization === 'sir_family' ? '随引荐人赴约' : '接受招募考核', hint: '通过后加入组织',
+        eff: { h: 4, so: 2 },
+        run(S) {
+          const a = S.orgApplication;
+          S.orgApplication = null;
+          if (!a) return '招募信息已经失效了。';
+          const result = TL.tryJoinOrganization(S, a.organization, a.route);
+          if (result.status === 'interview' || result.status === 'pending') return TL.organizationAdmissionName(a.organization) + '已经开始。';
+          if (result.status === 'unavailable') return '这次面谈暂缓，等待新的安排。';
+          if (result.ok) {
+            return '你通过了' + TL.organizationName(a.organization) + '的初步考核，加入了' +
+              TL.organizationRouteName(a.organization, a.route) + '路线。';
+          }
+          return '考核没有通过。' + TL.organizationName(a.organization) + '暂时不会再次联系你。';
+        }
+      },
+      {
+        label: '先了解再说', hint: '保留机会，暂不加入',
+        eff: { sm: 2, h: 1 },
+        run(S) {
+          const a = S.orgApplication;
+          S.orgApplication = null;
+          if (a) {
+            if (!S.orgCooldowns) S.orgCooldowns = {};
+            S.orgCooldowns[a.organization] = (S.year || 0) + 2;
+          }
+          return '你没有立刻答应，决定想清楚之后再联系。';
+        }
+      },
+      {
+        label: '拒绝', hint: '短期内不会再次收到同一邀请',
+        eff: { h: -1, so: 1 },
+        run(S) {
+          const a = S.orgApplication;
+          S.orgApplication = null;
+          if (a) {
+            if (!S.orgCooldowns) S.orgCooldowns = {};
+            S.orgCooldowns[a.organization] = (S.year || 0) + 8;
+          }
+          return '你把招募信折好，放回了信封。';
         }
       }
     ]
@@ -321,19 +377,15 @@
 
   D('reunion_invite', {
     organization: 'reunion',
-    when: S => !S.flags.reunion,
+    when: S => !S.flags.reunion && TL.canJoinOrganization(S, 'reunion', 'infected'),
     title: '他们邀请你',
-    text: S => TL.L`整合运动的人找到了你。他们说，你不必再道歉。`,
+    text: S => TL.L`此前接触过的感染者把你带到一处整合运动营地。他们要确认你的来意和同行的底线。这里没有固定工资，只有有限口粮；加入武装团体也意味着冲突和牵连。此处接纳仅代表这个营地，不代表所有整合派系。`,
     options: [
       {
-        label: '加入', hint: '力量↑ 走上另一条路',
-        eff: { hl: 4, so: 8, h: 6 },
+        label: '商量同行与分工', hint: '确认能否被营地接纳；无固定工资',
         run(S) {
-          S.flags.reunion = true;
-          S.flags.reunionAt = S.age;
-          S.flags.reunionJoined = S.age;
-          S.arts = TL.clamp(S.arts + 8, 0, 100);
-          return TL.L`你跟着他们走了。第一次有人教你，怎么把身上的东西变成武器。`;
+          const result = TL.tryJoinOrganization(S, 'reunion', 'infected');
+          return result.status === 'interview' ? '你坐下来，和营地的人谈起接下来的打算。' : '当前还不能开始面谈。';
         }
       },
       {

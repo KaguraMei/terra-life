@@ -127,6 +127,12 @@
     if (S.opClass) {
       tags.push(`<span class="tag green">${esc(TL.opRankName(S.opRank))} · ${esc(TL.opClassName(S.opClass))}</span>`);
     }
+    if (S.affiliation && TL.organizationName) {
+      const orgName = TL.organizationName(S.affiliation);
+      const routeName = TL.organizationRouteName ? TL.organizationRouteName(S.affiliation, S.orgRoute) : '';
+      const rankName = TL.organizationRankName ? TL.organizationRankName(S.affiliation, S.orgRoute, S.orgRank) : '';
+      tags.push(`<span class="tag green">${esc(orgName)} · ${esc(routeName)}${rankName && rankName !== '—' ? ' · ' + esc(rankName) : ''}</span>`);
+    }
     if (S.refugee) tags.push(`<span class="tag red">流亡</span>`);
     if (S.job === 'slave') tags.push(`<span class="tag red">奴工</span>`);
     $('idTags').innerHTML = tags.join('');
@@ -364,7 +370,15 @@
       `<div class="factLine"><span class="fk">${k}</span><span class="fv ${cls || ''}">${v}</span></div>`);
 
     add(TL.t('job'), esc(TL.jobLabel(S.job)));
-    add(TL.lang === 'zh' ? '大陆收入分位' : 'Continental income pct',
+    if (S.affiliation && TL.organizationName) {
+      add(TL.lang === 'zh' ? '组织' : 'Organization', esc(TL.organizationName(S.affiliation)));
+      if (TL.organizationRouteName) add(TL.lang === 'zh' ? '组织路线' : 'Route', esc(TL.organizationRouteName(S.affiliation, S.orgRoute)));
+      if (TL.organizationRankName) add(TL.lang === 'zh' ? '组织等级' : 'Rank',
+        esc(TL.organizationRankName(S.affiliation, S.orgRoute, S.orgRank)));
+    }
+    if (S.subsistenceAnnual > 0) add(TL.lang === 'zh' ? '营地补给' : 'Camp supplies',
+      TL.lang === 'zh' ? '口粮抵扣基本生活费，无固定工资' : 'Basic rations; no fixed wages');
+    add(TL.lang === 'zh' ? (S.subsistenceAnnual > 0 ? '生活保障分位（含口粮）' : '大陆收入分位') : 'Livelihood percentile',
         esc(TL.fmt.pct(S.pct, 0)));
     if (S.debt > 0) add(TL.lang === 'zh' ? '负债' : 'Debt', esc(TL.moneyStr(S.debt)), 'neg');
     add(TL.t('livingWithParents'),

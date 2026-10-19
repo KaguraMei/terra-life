@@ -220,6 +220,28 @@
       ['峰值净资产', TL.fmt.money(rep.peakNetWorth), 'amber'],
       ['子女', rep.kidsAlive + ' / ' + rep.kids + ' 在世', '']
     ];
+    if (rep.organization) {
+      cells.push(['组织', rep.organization.name, 'green']);
+      cells.push(['组织路线', rep.organization.routeName + ' · ' + rep.organization.rankName, 'teal']);
+    }
+    if (rep.orgHistory && rep.orgHistory.length) {
+      cells.push(['组织履历', rep.orgHistory.map(h =>
+        h.joinedYear + '–' + (h.leftYear == null ? '至终年' : h.leftYear) + ' ' +
+        TL.organizationName(h.organization) + ' · ' +
+        TL.organizationRouteName(h.organization, h.route) + ' · ' +
+        TL.organizationRankName(h.organization, h.route, Math.max(...h.ranks)) +
+        (h.reason ? '（' + h.reason + '）' : '')).join('<br>'), 'teal']);
+    }
+    const contacts = Object.values(rep.orgContacts || {});
+    if (contacts.length) cells.push(['人物往来', contacts.map(c => c.name + ' · ' + c.count + ' 次').join('、'), '']);
+    if (rep.orgInterviewHistory && rep.orgInterviewHistory.length) {
+      const statuses = {passed:'录用',waitlisted:'候补',rejected:'未通过',withdrawn:'撤回',ineligible:'资格变化',unavailable:'暂缓'};
+      cells.push(['面试记录', rep.orgInterviewHistory.map(r => escapeHtml(r.year + ' · ' +
+        TL.organizationName(r.organization) + ' · ' + TL.organizationRouteName(r.organization,r.route) + ' · ' +
+        TL.organizationAdmissionName(r.organization) + '：' +
+        (r.status === 'passed' && TL.organizationDef(r.organization)?.admission ? '接纳' : (statuses[r.status] || r.status)) +
+        (r.score == null ? '' : '（' + r.score.toFixed(1) + '）'))).join('<br>'), '']);
+    }
     if (rep.ori) {
       cells.push(['感染年龄', rep.ori.at + ' 岁', 'red']);
       cells.push(['离世时结晶率', Math.round(rep.ori.crystal) + '%', 'red']);
@@ -235,7 +257,7 @@
     });
 
     // 生平摘要（只挑关键节点，不是全部日志）
-    const key = rep.log.filter(e => ['birth', 'mil', 'dec', 'death', 'ori', 'fam'].indexOf(e.kind) >= 0);
+    const key = rep.log.filter(e => ['birth', 'mil', 'dec', 'death', 'ori', 'fam', 'org'].indexOf(e.kind) >= 0);
     const show = key.length > 80 ? key.filter((e, i) => i % Math.ceil(key.length / 80) === 0) : key;
     $('reportLog').innerHTML = show.map(e =>
       `<div class="entry ${e.kind}"><span class="age">${e.age}岁</span><span class="txt">${escapeHtml(e.text)}</span></div>`

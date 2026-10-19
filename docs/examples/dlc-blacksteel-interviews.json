@@ -1,0 +1,58 @@
+{
+  "id": "dlc_blacksteel_example",
+  "schemaVersion": 1,
+  "version": 1,
+  "sourceType": "project-rule",
+  "questions": [
+    {
+      "id": "dlc_blacksteel_example_handover",
+      "organization": "blacksteel",
+      "kind": "organization",
+      "prompt": "合同交接前，接替队伍尚未掌握一段撤离路线，你会怎么做？",
+      "options": [
+        {
+          "id": "brief",
+          "label": "补齐路线说明并确认双方交接，保留共同联络窗口",
+          "scores": {
+            "discipline": 3,
+            "teamwork": 3,
+            "risk": 3
+          }
+        },
+        {
+          "id": "delay",
+          "label": "申请推迟交接，留出实地熟悉路线的时间",
+          "scores": {
+            "discipline": 2,
+            "teamwork": 2,
+            "risk": 3
+          }
+        },
+        {
+          "id": "leave",
+          "label": "认为合同时间已到，立即撤走全部人员",
+          "scores": {
+            "discipline": 1,
+            "teamwork": 0,
+            "risk": 0
+          }
+        }
+      ]
+    }
+  ],
+  "pools": [],
+  "extensions": [
+    {
+      "pool": "blacksteel_security",
+      "questionIds": [
+        "dlc_blacksteel_example_handover"
+      ]
+    },
+    {
+      "pool": "blacksteel_engineering",
+      "questionIds": [
+        "dlc_blacksteel_example_handover"
+      ]
+    }
+  ]
+}

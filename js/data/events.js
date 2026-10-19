@@ -242,7 +242,10 @@
     run(S) {
       TL.eff(S, { h: 8, sm: 2 });
       S.flags.promoted = (S.flags.promoted || 0) + 1;
-      S.opRank = Math.min(4, S.opRank + 1);
+      if (S.affiliation) {
+        return TL.promoteOrganization(S) ? '你的组织履历记录了这次晋升。' : '你获得了肯定，晋升还需要更多任职经历。';
+      }
+      if (S.opClass) S.opRank = Math.min(4, S.opRank + 1);
       const J = TL.JOBS[S.job];
       if (J && J.cls) return TL.L`你的档案上多了一行字。${TL.OP_RANKS[S.opRank].name}——从今天起，别人这样叫你。`;
       return TL.L`工头把你叫到一边，说下个月起你的工钱加两成。`;
@@ -591,10 +594,11 @@
 
   def('reunion_recruit', {
     title: '整合运动', book: '矿石病',
-    when: S => S.ori && TL.reunionLean(S) > 0.5 && S.age >= 15,
+    when: S => TL.reunionCanContact(S),
     run(S) {
       TL.eff(S, { h: 9, so: 6 });
       S.flags.reunionTouched = S.age;
+      S.flags.reunionContactYear = S.year;
       const lines = [
         TL.L`有人在墙上画了一个符号。第二天你又路过，符号还在，下面多了几个字：「你不必道歉。」`,
         TL.L`一个和你一样手上有结晶的人递给你一张传单。上面写：为我们的身份感到骄傲。`,
@@ -618,8 +622,8 @@
 
   def('reunion_choice', {
     title: '整合运动 · 抉择', book: '矿石病',
-    when: S => S.flags.reunionTouched != null && !S.flags.reunion && !S.opClass &&
-      S.flags.dec_reunion_invite == null && S.age - S.flags.reunionTouched <= 3,
+    when: S => TL.canJoinOrganization(S, 'reunion', 'infected') &&
+      S.flags.dec_reunion_invite == null,
     max: 1,
     cd: 0,
     run(S) {
@@ -630,7 +634,7 @@
 
   def('reunion_life', {
     title: '整合运动 · 营地生活', book: '矿石病',
-    when: S => S.flags.reunionJoined && !S.flags.reunionLeft,
+    when: S => S.affiliation === 'reunion' && TL.organizationAvailable(S, 'reunion'),
     cd: 2,
     run(S) {
       TL.eff(S, { so: 5, h: 3, hl: -2 });
@@ -638,14 +642,14 @@
         TL.L`营地里的人来自各个国家。有人教你他们的语言，你也教他们你的。`,
         TL.L`训练时有人倒下了。结晶率太高。大家把他抬到帐篷里，但没有药。`,
         TL.L`篝火旁有人在讲他是怎么被赶出城的。你听着，想起了自己的经历。`,
-        TL.L`队长说：我们不是暴徒，我们只是想活下去。你点了点头。`
+        TL.L`有人谈起其他队伍对平民的报复。你所在的小营地仍在分发口粮，但互助不能掩盖队伍中的暴力与分歧。`
       ]);
     }
   });
 
   def('reunion_conflict', {
     title: '整合运动 · 冲突', book: '矿石病',
-    when: S => S.flags.reunionJoined && !S.flags.reunionLeft && S.age - S.flags.reunionJoined >= 1,
+    when: S => S.affiliation === 'reunion' && TL.organizationAvailable(S, 'reunion') && S.age - S.flags.reunionJoined >= 1,
     max: 2,
     cd: 3,
     run(S) {
@@ -1762,12 +1766,8 @@
     title: '罗德岛', book: '身份',
     when: S => S.age >= 16 && S.age <= 45 && TL.combatValue(S) >= 60 && !S.opClass,
     run(S) {
-      if (TL.tryJoinRhodes(S)) {
-        TL.eff(S, { h: 12, so: 6, hl: 3 });
-        return TL.L`你签了罗德岛的合同。上面写着：不问出身，不问种族，不问感染状态。你看了三遍那一行字。`;
-      }
-      TL.eff(S, { h: -5 });
-      return TL.L`你去试了。考核没过。考官说你的底子还行，但差一点。`;
+      if (TL.tryJoinRhodes(S)) return '罗德岛递来一份招募资料。你决定参加面谈，了解双方是否合适。';
+      return '你了解了罗德岛的招募要求，目前还不符合申请条件。';
     }
   });
 
@@ -1779,17 +1779,8 @@
     max: 1,
     cd: 0,
     run(S) {
-      const specialties = ['源石病理学', '源石工艺学', '移动城市动力工程', '天灾气象学'];
-      const field = TL.pick(specialties);
-      if (TL.chance(0.6 + (S.st.sm - 75) / 100)) {
-        if (TL.tryJoinRhodes(S)) {
-          TL.eff(S, { h: 14, so: 8, sm: 5 });
-          S.flags.rhodesPath = 'scholar';
-          return TL.L`罗德岛的人力资源部找到你。他们说，你在${field}上的研究成果引起了注意。一周后，你签了研究员的合同。`;
-        }
-      }
-      TL.eff(S, { h: 3, sm: 2 });
-      return TL.L`收到了罗德岛的招募材料。他们似乎在找${field}方面的人才。`;
+      if (TL.tryJoinRhodes(S)) return '罗德岛对你的专业经历感兴趣，邀请你参加岗位面谈。';
+      return '你了解了罗德岛的招募要求，目前还不符合申请条件。';
     }
   });
 
@@ -1799,21 +1790,8 @@
     max: 1,
     cd: 0,
     run(S) {
-      if (TL.chance(0.25)) {
-        if (TL.tryJoinRhodes(S)) {
-          TL.eff(S, { h: 16, hl: 8, so: 10 });
-          S.flags.rhodesPath = 'rescued';
-          if (S.flags.postCatastrophe) {
-            return TL.L`天灾过后的废墟里，一艘陆行舰停在城市边缘。船身印着的标志你见过——罗德岛。他们把你从瓦砾下拉出来，给你包扎，然后问：要跟我们走吗？`;
-          } else if (S.ori && S.ori.stage >= 2) {
-            return TL.L`你在街上倒下了。醒来时发现自己在一艘陆行舰的医疗室里。医生说：你的结晶率很高，但还来得及。他们给你两个选择：留在这里治疗并工作，或者下船。你选了前者。`;
-          } else {
-            return TL.L`战火中有人把你拖进了装甲车。车上的徽章是罗德岛的。他们问你叫什么，会做什么。你说不清。他们说：没关系，先活下来。`;
-          }
-        }
-      }
-      TL.eff(S, { h: 2 });
-      return TL.L`听说罗德岛的陆行舰最近在附近活动，在救援受灾的人。`;
+      if (TL.tryJoinRhodes(S)) return '救援中，你接触到了罗德岛。身体情况允许后，你申请参加招募面谈；治疗援助不以入职为条件。';
+      return '你了解了罗德岛的招募要求，目前还不符合申请条件。';
     }
   });
 
@@ -1844,24 +1822,8 @@
     max: 1,
     cd: 0,
     run(S) {
-      const isRare = S.race === 'draco' || S.race === 'vouivre' || (S.court && S.court !== 'none');
-      const isHighArts = S.arts >= 80;
-
-      if (TL.chance(isRare ? 0.35 : (isHighArts ? 0.28 : 0.15))) {
-        if (TL.tryJoinRhodes(S)) {
-          TL.eff(S, { h: 13, so: 7, sm: 4 });
-          S.flags.rhodesPath = 'specialist';
-          if (isHighArts) {
-            return TL.L`罗德岛的人找到你，说你的源石技艺适应性数据「很有意思」。他们想知道你是怎么做到的。三次面谈后，你签了术师组的合同。`;
-          } else if (S.race === 'draco') {
-            return TL.L`罗德岛的招募专员见到你时愣了一下。德拉克在这个时代已经很少见了。她说：我们需要你这样的人。不是因为血统，是因为你能做到的事。`;
-          } else {
-            return TL.L`罗德岛的人说，他们在找一些「特别的人」。你不确定自己算不算，但他们坚持要你试试。`;
-          }
-        }
-      }
-      TL.eff(S, { h: 1 });
-      return TL.L`听说罗德岛在招人，而且不问出身。`;
+      if (TL.tryJoinRhodes(S)) return '招募人员注意到你的技艺，邀请你谈谈协作方式与行动判断。';
+      return '你了解了罗德岛的招募要求，目前还不符合申请条件。';
     }
   });
 
@@ -1871,22 +1833,8 @@
     max: 1,
     cd: 0,
     run(S) {
-      const previousJob = S.job;
-      if (TL.chance(0.2)) {
-        if (TL.tryJoinRhodes(S)) {
-          TL.eff(S, { h: 11, so: 6 });
-          S.flags.rhodesPath = 'cooperation';
-          const jobMap = {
-            mercenary: TL.L`你接了一单护送任务，雇主是罗德岛。任务结束时，对方的指挥官问：有没有兴趣换个长期雇主？报酬稳定，包医疗。你想了想，同意了。`,
-            soldier: TL.L`你所在的部队与罗德岛有过一次联合行动。行动后，罗德岛的作战主管找到你，说你的战术素养不错。一个月后，你拿到了转职邀请。`,
-            oridoc: TL.L`罗德岛的医疗部门来你们诊所做过技术交流。他们的抑制药剂配方比你见过的任何版本都有效。他们说：要不要来我们这里？你说：可以。`,
-            witch: TL.L`罗德岛的人说他们在组建一个源石技艺研究小组，需要有实战经验的术师。你问：收感染者吗？对方说：我们一半的人都是。`
-          };
-          return jobMap[previousJob] || TL.L`你通过工作渠道接触到了罗德岛，他们给了你一个转职机会。`;
-        }
-      }
-      TL.eff(S, { h: 2 });
-      return TL.L`工作中听说过罗德岛这个名字。据说他们什么人都收。`;
+      if (TL.tryJoinRhodes(S)) return '合作任务结束后，罗德岛邀请你参加长期岗位的面谈。';
+      return '你了解了罗德岛的招募要求，目前还不符合申请条件。';
     }
   });
 
@@ -1967,6 +1915,60 @@
   });
 
   /* ====================================================================== */
+  /* ⑩ 组织路线：招募、服役与人物联系                                      */
+  /* ====================================================================== */
+  // 返回当前状态下可以看到的组织路线，作为招募与面试的共同输入。
+  TL.organizationOpportunities = function (S) {
+    if (!TL.ORGANIZATION_LIST || S.affiliation) return [];
+    const out = [];
+    for (const id of TL.ORGANIZATION_LIST.filter(id => !['rhodes', 'reunion'].includes(id))) {
+      const o = TL.organizationDef(id);
+      if (!o || !o.routes) continue;
+      for (const routeId of Object.keys(o.routes)) {
+        // 家族机会来自熟人引荐；这里只预检资格，真实邀请执行时才记录引荐。
+        const candidate = id === 'sir_family' ? Object.assign({}, S, {
+          flags: Object.assign({}, S.flags, { sirFamilyIntroducedYear: S.year })
+        }) : S;
+        const check = TL.organizationEligibility(candidate, id, routeId);
+        if (!check.ok) continue;
+        let weight = 1;
+        const route = TL.organizationRouteDef(id, routeId);
+        if (route.jobs && route.jobs.indexOf(S.job) >= 0) weight += 2.5;
+        if (o.nations && o.nations.indexOf(S.nation) >= 0) weight += 1.5;
+        if (id === 'sarkaz_mercs' && S.race === 'sarkaz') weight += 2;
+        if (id === 'sir_newcourt' && S.city && S.city.indexOf('沃尔西尼') >= 0) weight += 3;
+        if (id === 'lungmen_guard' && S.city && S.city.indexOf('龙门') >= 0) weight += 3;
+        out.push({ organization: id, route: routeId, weight: weight, interview: check.interview });
+      }
+    }
+    return out;
+  };
+
+  def('organization_offer', {
+    title: '组织招募', book: '组织',
+    when: S => S.age >= 16 && S.age <= 60 && !S.affiliation && !S.orgApplication && TL.organizationOpportunities(S).length > 0,
+    max: 8, cd: 5, w: 0.8,
+    run(S) {
+      const choices = TL.organizationOpportunities(S);
+      if (!choices.length) return '这一年没有适合你的组织招募机会。';
+      const offer = TL.wpickArr(choices, 'weight');
+      if (offer.organization === 'sir_family') S.flags.sirFamilyIntroducedYear = S.year;
+      S.orgApplication = {
+        organization: offer.organization,
+        route: offer.route,
+        offeredAt: S.age,
+        offeredYear: S.year,
+        interview: offer.interview,
+        source: 'event'
+      };
+      TL.openDecision(S, 'organization_offer');
+      if (offer.organization === 'sir_family') return '一个熟识的中间人愿意替你引荐家族。对方要先试探你的口风与立场；这意味着人情、秘密和可能卷入暴力的代价。';
+      return '有人向你递来一份' + TL.organizationName(offer.organization) +
+        '的招募信息，岗位是' + TL.organizationRouteName(offer.organization, offer.route) + '。';
+    }
+  });
+
+  /* ====================================================================== */
   /* 事件权重                                                                */
   /* ====================================================================== */
   /**
@@ -1992,6 +1994,7 @@
     ori_rhodes: 1.6, ori_clinic: 1.2, war_end: 1.4, ori_despair: 1.2,
     move_nomad: 1.2, blackmarket: 1.3, faith_found: 1.2, ori_community: 1.8,
     ori_medcart: 1.8, work_overtime: 1.2,
+    organization_offer: 0.85, organization_contact: 0.45,
 
     /* 负面：压低权重 */
     child_sick: 0.7, injury_accident: 0.5, work_injury: 0.6, mental_low: 0.55,
@@ -2021,7 +2024,8 @@
     work_overtime: 4, work_colleague: 4, work_robbery: 8, move_nomad: 4,
     ori_community: 4, ori_medcart: 3, merc_job: 3, blackmarket: 5,
     move_destiny: 99, faith_found: 99, old_parent: 99, kid_grow: 3,
-    neighbor_help: 4, small_luck: 5
+    neighbor_help: 4, small_luck: 5,
+    organization_offer: 5, organization_contact: 3
   };
   for (const id in CD) if (TL.EVMAP[id]) TL.EVMAP[id].cd = CD[id];
 
@@ -2062,7 +2066,8 @@
     work_overtime: 4, work_colleague: 3, work_robbery: 2, move_nomad: 3,
     ori_community: 3, ori_medcart: 5, merc_job: 4, blackmarket: 3,
     move_destiny: 1, faith_found: 1, old_parent: 1, kid_grow: 5,
-    neighbor_help: 4, small_luck: 4
+    neighbor_help: 4, small_luck: 4,
+    organization_offer: 8, organization_contact: 8
   };
   for (const id in MAX) if (TL.EVMAP[id]) TL.EVMAP[id].max = MAX[id];
 
@@ -2086,7 +2091,8 @@
     'urs_cold', 'urs_conscription', 'urs_inspection',
     'vic_fog', 'vic_nobility', 'vic_factory', 'srg_desert', 'srg_caravan',
     'kaz_arena', 'kaz_business', 'clb_tech', 'clb_frontier', 'lei_arts', 'lei_witch_hunt',
-    'rhodes_scholar', 'rhodes_rescued', 'rhodes_family_paid', 'rhodes_specialist_recruit', 'rhodes_cooperation'
+    'rhodes_scholar', 'rhodes_rescued', 'rhodes_family_paid', 'rhodes_specialist_recruit', 'rhodes_cooperation',
+    'organization_offer', 'organization_contact'
   ];
 
   /* ====================================================================== */
@@ -2095,6 +2101,9 @@
   TL.scheduleEvents = function (S) {
     const a = S.age;
     const n = TL.NATION_BY_ID[S.nation];
+    if (TL.organizationScheduledDecisions) {
+      for (const d of TL.organizationScheduledDecisions(S)) TL.queueEvent(S, d.at, 'dec', d.id);
+    }
 
     // ① 抉择事件优先排入
     for (const d of TL.scheduledDecisions(S)) {
@@ -2205,7 +2214,14 @@
       pool = pool.concat(['ori_acute']);
     }
 
-    if (a >= 6) pool = pool.concat(TL.SUPPLEMENTAL_EVENTS);
+    if (a >= 6) pool = pool.concat(TL.SUPPLEMENTAL_EVENTS.filter(id =>
+      !id.startsWith('org_') && id !== 'organization_contact'));
+    // 成员每年获得一个组织事件机会，占用原有事件位，避免额外堆叠风险。
+    const organizationEvent = TL.pickOrganizationEvent ? TL.pickOrganizationEvent(S) : null;
+    if (organizationEvent) {
+      TL.queueEvent(S, TL.rnd(), 'ev', organizationEvent);
+      nEv--;
+    }
 
     // ⑥ 排入
     const used = {};
@@ -2262,6 +2278,7 @@
       if (J.art * 100 > S.arts) continue;
       // 干员路线需要满足额外条件
       if (J.cls) {
+        if (!S.affiliation || S.affiliation !== 'rhodes') continue;
         if (!TL.organizationAvailable(S, 'rhodes')) continue;
         if (S.age < 16) continue;
         if (TL.combatValue(S) < 45) continue;
@@ -2287,40 +2304,10 @@
     return TL.wpickArr(pool).id;
   };
 
-  /** 干员入队判定：技艺、战力、以及「是否愿意收一个感染者」 */
+  /** 兼容旧剧情入口：true 表示开始面试，录用后才改变职业。 */
   TL.tryJoinRhodes = function (S) {
-    if (!TL.organizationAvailable(S, 'rhodes')) return false;
-    if (S.age < 16) return false;
-    const cv = TL.combatValue(S);
-    if (cv < 55) return false;
-    let p = TL.clamp((cv - 55) / 160, 0, 0.55);
-    p += TL.artRank(S) * 0.06;
-    // 罗德岛是少数会收感染者的地方 —— 这是它的设定核心
-    if (S.ori) p += 0.22;
-    if (S.st.sm > 70) p += 0.08;
-    if (!TL.chance(TL.clamp(p, 0, 0.8))) return false;
-
-    // 分支选择要尊重源石技艺门槛（JOBS[].art 是 0..1 的比例）
-    const opts = {};
-    for (const c of TL.OP_CLASSES) {
-      const J = TL.JOBS['op_' + c.id];
-      if (J && J.art * 100 > S.arts) continue;   // 技艺不够，走不了这条
-      opts[c.id] = 1.0;
-    }
-    if (opts.vanguard != null) opts.vanguard = 1.2;
-    if (opts.guard != null) opts.guard = 1.3;
-    if (opts.defender != null) opts.defender = 1.1;
-    if (opts.sniper != null) opts.sniper = 1.0;
-    if (opts.caster != null) opts.caster = 0.4 + S.arts / 80;
-    if (opts.medic != null) opts.medic = 0.5 + S.st.sm / 120;
-    if (opts.supporter != null) opts.supporter = 0.3 + S.arts / 90;
-    if (opts.specialist != null) opts.specialist = 0.8;
-    const cls = TL.wpick(Object.keys(opts).length ? opts : { vanguard: 1 });
-    S.opClass = cls;
-    S.opRank = 1;
-    S.job = 'op_' + cls;
-    S.flags.lastJob = S.job;
-    return true;
+    const result = TL.tryJoinOrganization(S, 'rhodes', 'operator');
+    return result.status === 'interview' || result.ok === true;
   };
 
 })(window.TL = window.TL || {});

@@ -120,6 +120,8 @@
     } catch (err) {
       // 单个事件出错不应毁掉整局
       if (typeof console !== 'undefined') console.error('[ev]', e.id, err);
+    } finally {
+      if (S.phase === 'life' && TL.syncOrganization) TL.syncOrganization(S);
     }
   };
 
@@ -141,6 +143,7 @@
   TL.endYear = function (S) {
     S.actEvent = null;
     S.actDec = null;
+    if (TL.syncOrganization) TL.syncOrganization(S);
     const n = TL.NATION_BY_ID[S.nation];
     const a = S.age;
     const st = S.st;
@@ -229,6 +232,14 @@
     /* ---------- ⑨ 泰拉特有：矿石病推进 ---------- */
     TL.oriYear(S);
 
+    /* ---------- ⑨b 组织服役与晋升 ---------- */
+    /* 组织是职业之外的长期归属。先记满一年的服务，再按路线门槛
+       处理一次晋升；面试系统将来只负责入职前的多轮答题。 */
+    if (TL.organizationYear) {
+      TL.organizationYear(S);
+      if (TL.promoteOrganization) TL.promoteOrganization(S);
+    }
+
     /* ---------- ⑩ 记录本年快照 ---------- */
     S.stats.years.push({
       age: a,
@@ -281,6 +292,7 @@
        先跑它，这一年的常规事件才是「在这件事的背景下」发生的。 */
     if (TL.timelineYear) TL.timelineYear(S);
     if (S.phase !== 'life') return;
+    if (TL.syncOrganization) TL.syncOrganization(S);
 
     /* ---------- ⑮ 为「新的一年」排程事件 ---------- */
     // 注意：必须在 S.queue = [] 之后，否则刚排的事件会被清掉。
@@ -411,7 +423,8 @@
     // 慢性病
     cost += Object.keys(S.conds).length * n.ppp * 0.28;
 
-    const net = inc - cost;
+    const support = TL.organizationSubsistence ? TL.organizationSubsistence(S) : 0;
+    const net = inc - Math.max(0, cost - support);
     S.money += net;
     if (S.money < 0) {
       // 负债：借款有利息
@@ -539,7 +552,13 @@
   /* 死亡（对应原作 die）                                                     */
   /* ---------------------------------------------------------------------- */
   TL.die = function (S, cause, trigger) {
+    if (TL.syncOrganization) TL.syncOrganization(S);
     S.phase = 'dead';
+    if (S.orgApplication && S.orgApplication.session && TL.finishOrganizationInterview) {
+      TL.finishOrganizationInterview(S);
+      S.orgInterviewResult = null;
+    }
+    S.pending = null;
     S.deathAge = S.age;
     S.deathCause = cause;
     S.deathTrigger = trigger || 'event';
@@ -622,6 +641,19 @@
         opRank: S.opRank,
         eduLevel: S.eduLevel
       },
+      orgHistory: (S.orgHistory || []).map(h => JSON.parse(JSON.stringify(h))),
+      orgContacts: JSON.parse(JSON.stringify(S.orgContacts || {})),
+      orgInterviewHistory: JSON.parse(JSON.stringify(S.orgInterviewHistory || [])),
+      organization: S.affiliation ? {
+        id: S.affiliation,
+        name: TL.organizationName ? TL.organizationName(S.affiliation) : S.affiliation,
+        route: S.orgRoute,
+        routeName: TL.organizationRouteName ? TL.organizationRouteName(S.affiliation, S.orgRoute) : S.orgRoute,
+        rank: S.orgRank || 0,
+        rankName: TL.organizationRankName ? TL.organizationRankName(S.affiliation, S.orgRoute, S.orgRank) : '',
+        history: (S.orgHistory || []).map(h => Object.assign({}, h)),
+        contacts: Object.assign({}, S.orgContacts || {})
+      } : null,
       ori: S.ori ? {
         at: S.ori.at, stage: S.ori.stage, crystal: Math.round(S.ori.crystal),
         treated: S.ori.treated, known: S.ori.known, provider: S.ori.provider

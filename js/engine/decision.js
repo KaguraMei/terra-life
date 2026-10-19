@@ -43,7 +43,8 @@
     const d = TL.DECISIONS[id];
     if (!TL.contentAvailable(S, d) || (d.when && !d.when(S))) return;
     // 过滤不可用选项
-    const opts = (d.options || []).filter(o => !o.require || o.require(S));
+    const sourceOptions = typeof d.options === 'function' ? d.options(S) : (d.options || []);
+    const opts = sourceOptions.filter(o => !o.require || o.require(S));
     if (!opts.length) return;
 
     S.pending = {
@@ -92,6 +93,9 @@
 
     S.pending = null;
     S.paused = false;
+    if (TL.syncOrganization) TL.syncOrganization(S);
+    // 面试等多轮流程可在旧题清空后排下一题，避免 run() 内打开的题被覆盖。
+    if (TL.afterDecision) TL.afterDecision(S, p, index);
     if (TL.onDecided) TL.onDecided(S, p, index);
     return result;
   };
@@ -110,6 +114,7 @@
     let best = 0, bestScore = -1e9;
     for (let i = 0; i < p._opts.length; i++) {
       const o = p._opts[i];
+      if (o.autoExclude) continue;
       const e = o.eff || {};
       // 打分：把四维变化按「当前短缺程度」加权
       let s = 0;
@@ -171,7 +176,7 @@
       if (a === S.ori.at + 1) add('ori_disclose', 0.3);
       if (a === S.ori.at + 2) add('ori_treatment', 0.35);
       if (a >= 16 && S.ori.known) add('ori_job_loss', 0.6);
-      if (a >= 16 && TL.reunionLean(S) > 0.45) add('reunion_invite', 0.6);
+      if (a >= 15 && TL.reunionContactCurrent(S)) add('reunion_invite', 0.6);
       if (S.ori.stage >= 2) add('ori_despair', 0.6);
       if (S.ori.stage >= 3) add('ori_last', 0.7);
     }

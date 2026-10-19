@@ -49,7 +49,7 @@ T.deathProb = death; T.scheduleEvents = schedule;
 S = T.newLife({seed:7,nation:'URS',bornYear:1042});
 S.age=25; S.year=1067; S.st.sm=90; S.eduLevel=4; S.arts=95; S.q=4; S.money=100;
 T.infect(S,true);
-for (const [id,ev] of Object.entries(T.EVMAP).filter(([,e])=>e.organization)) {
+for (const [id,ev] of Object.entries(T.EVMAP).filter(([,e])=>['rhodes','reunion'].includes(e.organization))) {
   assert.equal(T.contentAvailable(S,ev),false,id);
   T.fire(S,{type:'ev',id}); assert.equal(S.evCount[id],undefined);
 }
@@ -62,9 +62,18 @@ T.openDecision(S,'teen_fork');
 assert.ok(S.pending.options.every(o=>!o.label.includes('考干员')));
 T.choose(S,0);
 S.year=1100;
+S.school=null; S.job='guard'; S.serveLeft=0;
 assert.equal(T.organizationAvailable(S,'rhodes'),true);
 assert.ok(T.EVMAP.rhodes_scholar.when(S));
+assert.equal(T.canJoinOrganization(S,'reunion','infected'),false);
+S.year=1095;S.flags.reunionContactYear=1095;
 T.openDecision(S,'reunion_invite'); T.choose(S,0);
+while (S.pending?.id === 'organization_interview') {
+  const a=S.orgApplication, q=a.session.questions[a.session.answers.length];
+  const scores=q.options.map(o=>a.session.pool.axes.reduce((sum,x)=>sum+o.scores[x.id]*x.weight,0));
+  T.choose(S,scores.indexOf(Math.max(...scores)));
+}
+if(S.pending?.id === 'organization_interview_result') T.choose(S,0);
 assert.ok(S.flags.reunion);
 assert.equal(S.flags.reunionJoined,S.age);
 assert.ok(T.EVMAP.reunion_life.when(S));

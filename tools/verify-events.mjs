@@ -51,13 +51,38 @@ for (const id of controlledIds) {
     if (id === 'clb_frontier') { S.urban = false; S.stratum = 'wild'; }
     if (id === 'war_reunion') { S.serveLeft = 2; S.ori.known = true; }
     else S.serveLeft = 0;
-    if (id === 'reunion_choice') S.flags.reunionTouched = 24;
+    if (['reunion_choice','reunion_life','reunion_conflict'].includes(id)) {
+      S.year=1095; S.bornYear=S.year-S.age;
+      S.flags.reunionTouched=24; S.flags.reunionContactYear=1095;
+    }
     if (['reunion_life','reunion_conflict'].includes(id)) {
-      S.flags.reunion = true; S.flags.reunionJoined = 23;
+      assert.ok(TL.joinOrganization(S,'reunion','infected'));
+      S.flags.reunionJoined = 23;
     }
     if (['ori_hiding_stress','ori_identity_exposed'].includes(id)) S.flags.oriHiding = true;
     if (id === 'cat_aftermath') {
       S.ori = null; S.flags.postCatastrophe = 1; S.urban = false; S.stratum = 'wild';
+    }
+    if (id === 'organization_offer') { S.nation = 'CLB'; S.job = 'scholar'; }
+    if (id === 'organization_contact' || id.startsWith('org_')) {
+      const org = id === 'organization_contact' ? 'lungmen_guard' : TL.EVMAP[id].organization;
+      const def = TL.ORGANIZATIONS[org];
+      const route = Object.keys(def.routes)[0];
+      const rd = def.routes[route];
+      S.nation = def.nations ? def.nations[0] : 'KDZ';
+      S.year = Math.max(1094, def.fromYear, rd.fromYear || 0);
+      if (org === 'babel') S.year = 1090;
+      S.bornYear = S.year - S.age;
+      S.race = org === 'laterano_gunknights' ? 'sankta' : 'sarkaz';
+      S.job = org === 'rhodes' ? 'op_guard' : (rd.jobs || ['guard'])[0];
+      if (org === 'rhodes') { S.opClass = 'guard'; S.opRank = 1; }
+      if (org === 'babel') S.flags.babel_ask = 1;
+      if (org === 'reunion') S.flags.reunionContactYear = S.year;
+      if (org === 'sir_family') S.flags.sirFamilyIntroducedYear = S.year;
+      assert.ok(TL.joinOrganization(S, org, route), id + ' fixture join');
+      S.orgRank = 1;
+      // 服役事件的构造场景已经处理历史去留；转折链另有专门测试。
+      for (const change of TL.organizationTransitions) S.flags['org_transition_' + change.id] = 1;
     }
     TL.scheduleEvents(S);
     const queued = S.queue.find(e => e.type === 'ev' && e.id === id);

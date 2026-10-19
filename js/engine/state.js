@@ -250,6 +250,20 @@
       opRank: 0,
       serveLeft: 0,
 
+      /* 组织归属独立于谋生职业；orgApplication 保存多轮面试会话。 */
+      affiliation: null,
+      orgSchema: 1,
+      orgRoute: null,
+      orgRank: 0,
+      orgService: 0,
+      orgJoinedAt: null,
+      orgHistory: [],
+      orgContacts: {},
+      orgCooldowns: {},
+      orgApplication: null,
+      orgInterviewHistory: [],
+      orgInterviewResult: null,
+
       /* 年度重心（对应原作 focus / fT） */
       focus: null,
       fT: {},
@@ -417,6 +431,7 @@
    * pct = 该收入在大陆全体人口中的分位（0..1），用于死亡率的贫富梯度
    */
   TL.computeIncome = function (S) {
+    if (TL.syncOrganization) TL.syncOrganization(S);
     const n = TL.NATION_BY_ID[S.nation];
     const J = TL.JOBS[S.job];
     let base;
@@ -428,6 +443,7 @@
       base = n.ppp * (J.lo + (J.hi - J.lo) * t);
       // 干员阶级加成
       if (J.cls && S.opRank > 0) base *= TL.OP_RANKS[S.opRank].pay;
+      if (TL.organizationPayMultiplier) base *= TL.organizationPayMultiplier(S);
     } else if (S.job === 'retired') {
       base = n.ppp * 0.45;
     } else if (S.job === 'child' || S.job === 'student') {
@@ -441,6 +457,7 @@
     // 家境惯性：出身好的人起点高
     base *= 1 + (S.q - 3) * 0.06;
     S.income = Math.max(0, base);
+    S.subsistenceAnnual = TL.organizationSubsistence ? TL.organizationSubsistence(S) : 0;
     /* 分位：把月收入映射到 0..1。
        对数尺度是对的（收入本来就是对数分布），但**锚点必须覆盖真实区间**：
        早先的写法是 log(income/0.35)/log(8)，也就是月收入 ≥ 2.8 一律算 100%。
@@ -449,7 +466,8 @@
        一个干员，也可能是整个大陆最富的人。
        现在的锚点取自模拟出来的实际分布（P10≈0.17 / P50≈0.5 / P90≈4.9 / max≈9.3），
        低端 0.05、高端 15，两端各留余量，中位数落在 42% 附近。 */
-    const x = Math.log(Math.max(0.05, S.income) / 0.05) / Math.log(300);
+    // 实物口粮只计入生活保障，不进入现金收入或资产。
+    const x = Math.log(Math.max(0.05, S.income + S.subsistenceAnnual / 12) / 0.05) / Math.log(300);
     S.pct = TL.clamp(x, 0, 1);
     return S.income;
   };

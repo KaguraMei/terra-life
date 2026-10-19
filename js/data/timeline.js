@@ -46,20 +46,35 @@
   /** 年表最早与最晚的年份，供界面提示「年表之外」 */
   TL.TL_SPAN = [1031, 1099];
 
-  // 游戏采用保守的组织出场年；不是经官方原文核定的成立年份。
-  // 来源与待核项见 docs/PRTS设定调研-2026-10-18.md。
-  TL.ORGANIZATION_ERAS = {
-    rhodes: { from: 1095, sourceType: 'project-rule', confidence: 'unverified' },
-    reunion: { from: 1094, sourceType: 'project-rule', confidence: 'unverified' }
-  };
-  TL.organizationAvailable = function (S, id) {
-    const era = TL.ORGANIZATION_ERAS[id];
-    return !!era && Number.isFinite(S.year) && S.year >= era.from;
-  };
+  // 组织出场年由 organizations.js 的注册表维护。这里保留一个只读
+  // 快照供年表/调试工具使用，避免旧代码继续依赖散落的 from 数字。
+  TL.ORGANIZATION_ERAS = {};
+  (TL.ORGANIZATION_LIST || []).forEach(id => {
+    const o = TL.ORGANIZATIONS[id];
+    TL.ORGANIZATION_ERAS[id] = {
+      from: o.fromYear == null ? 0 : o.fromYear,
+      recruitUntil: o.recruitUntil,
+      sourceType: o.sourceType,
+      confidence: o.confidence
+    };
+  });
+  if (!TL.organizationAvailable) {
+    TL.organizationAvailable = function (S, id) {
+      const era = TL.ORGANIZATION_ERAS[id];
+      return !!era && Number.isFinite(S.year) && S.year >= era.from;
+    };
+  }
   TL.contentAvailable = function (S, item) {
-    return !!item && !item.disabledReason &&
-      (!item.organization || TL.organizationAvailable(S, item.organization)) &&
-      (item.fromYear == null || S.year >= item.fromYear);
+    if (!item || item.disabledReason) return false;
+    let orgOK = true;
+    if (item.organization) {
+      const os = TL.organizationState ? TL.organizationState(S, item.organization) : null;
+      orgOK = os ? os.available :
+        TL.organizationAvailable(S, item.organization);
+      if (item.recruitment && os && !os.recruitment) orgOK = false;
+    }
+    return orgOK && (item.fromYear == null || S.year >= item.fromYear) &&
+      (item.untilYear == null || S.year <= item.untilYear);
   };
 
   /* ---------------------------------------------------------------------- */
@@ -213,7 +228,7 @@
     {
       id: 'urs_cherobog', year: 1096, title: '切尔诺伯格停泊事变', book: '天灾',
       scope: { nations: ['URS', 'YAN'], regions: [] },
-      here: '核心城的引擎被人自己关了。天灾就这么直接砸下来，整合运动随后进城。',
+      here: '整合运动攻入切尔诺伯格，天灾随后袭来，城市最终陷落。针对平民的杀戮与失控的暴力蔓延。',
       near: '切尔诺伯格没了。核心城后来被设定去撞龙门，最后废弃在荒野上。',
       far: '乌萨斯一座移动城市被攻占，险些引发与炎国的战争。',
       fx: {
@@ -223,9 +238,15 @@
       globals: { ori: 0.10, oriDur: 2 },
       at: [
         {
-          when: S => S.city && S.city.indexOf('切尔诺伯格') >= 0,
+          when: S => S.nation === 'URS' && !S.refugee && S.city && S.city.indexOf('切尔诺伯格') >= 0,
           die: 0.10, dieCause: 'cat', move: '流民', flag: 'cherobog', money: -4,
-          text: '引擎停下来的时候你在第七区。后来你只记得两件事：很静，然后不静。',
+          // 保留原有总直接风险，区分灾害与袭击；比例是游戏规则，不是设定统计。
+          fatalOutcomes: [
+            { cause: 'cat', text: '逃离切尔诺伯格时，天灾摧毁了你所在的街区。' },
+            { cause: 'hom', when: S => S.affiliation !== 'reunion',
+              text: '你没能躲过切尔诺伯格街区的整合运动武装。针对平民的袭击夺走了你的生命；这与是否接受过营地邀请无关。' }
+          ],
+          text: '你身在切尔诺伯格。天灾、整合运动的袭击和崩溃的秩序封住了街道，感染者身份也不能保证安全。',
           eff: { hl: -20, h: -18, so: -8 }
         },
         {
@@ -547,21 +568,21 @@
       fx: { SIR: { war: -0.15, warDur: 26, tol: -3, tolDur: 26, h: -2 } }
     },
     {
-      id: 'sir_newcourt', year: 1099, title: '沃尔西尼「新城」落成与血色家族解体', book: '叙拉古',
+      id: 'sir_newcourt', year: 1099, title: '新沃尔西尼建立与家族冲突', book: '叙拉古',
       scope: { nations: ['SIR'], regions: [] },
-      here: '新法庭的落成典礼上，两个家族开始互相灭门。典礼变成了别的东西。',
-      near: '叙拉古的家族体系垮了，据说是西西里夫人亲手拆的。',
-      far: '叙拉古废除旧家族法典，设立独立司法官。',
+      here: '围绕新沃尔西尼的家族争夺终于落幕。西西里夫人承认新城的特殊地位，伺夜等人取得管理权，家族不得介入这里。',
+      near: '新沃尔西尼开始尝试摆脱家族控制，但叙拉古其他城市的家族仍然存在。',
+      far: '叙拉古的新沃尔西尼确立了禁止家族介入的新秩序。',
       fx: { SIR: { war: 0.45, warDur: 2, tol: 5, tolDur: 20, money: -2, mort: 1.12, mortDur: 2 } },
       at: [
         {
-          when: S => S.city && S.city.indexOf('沃尔西尼') >= 0,
+          when: S => S.nation === 'SIR' && S.city && S.city.indexOf('沃尔西尼') >= 0,
           die: 0.05, dieCause: 'hom', flag: 'witness',
-          text: '你站在广场边上。你看见的第一个人倒下时，乐队还在演奏。'
+          text: '家族争夺的枪声在街区间回荡。你躲在墙后，等待一条能够离开的路。'
         },
         {
-          when: S => S.nation === 'SIR' && S.q >= 4,
-          text: '你家的名字在旧法典上。法典废了，名字还在。', money: -3, eff: { h: -10 }
+          when: S => S.nation === 'SIR' && /新沃尔西尼/.test(S.city || '') && S.q >= 4,
+          text: '在新沃尔西尼，你家过去依靠的家族关系不再是通行证。一些旧生意因此受损。', money: -3, eff: { h: -10 }
         }
       ]
     },
@@ -729,6 +750,7 @@
       if (S.flags[key]) continue;
       S.flags[key] = 1;
       TL.fireTimeline(S, ev, n);
+      if (S.phase !== 'life') break;
     }
   };
 
@@ -754,10 +776,24 @@
       if (at.text) TL.log(S, at.text, 'tl', { key: ev.id + '_at', tag: ev.title });
       if (at.eff) TL.eff(S, at.eff);
 
+      // 条件致死先于逃离；一次抽样，具体死因不额外增加死亡概率。
+      if (at.die && !died && TL.chance(at.die)) {
+        died = true;
+        const outcomes = (at.fatalOutcomes || []).filter(o => !o.when || o.when(S));
+        const outcome = outcomes.length ? TL.pick(outcomes) : null;
+        if (outcome) TL.log(S, outcome.text, 'tl', { key: ev.id + '_fatal', tag: ev.title });
+        TL.die(S, outcome ? outcome.cause : (at.dieCause || 'war'), 'timeline:' + ev.id);
+        break;
+      }
+
       // 迁徙：换一座城市，或直接沦为流民
       if (at.move) {
         S.flags.movedBy = ev.id;
-        if (at.move === '流民') { S.refugee = true; S.stratum = 'wild'; }
+        if (at.move === '流民') {
+          S.refugee = true; S.stratum = 'wild'; S.urban = false;
+          S.flags.displacedFrom = S.city; S.city = '荒野流民营地'; S.cityName = S.city;
+          S.flags.atHome = false;
+        }
         else {
           const c = TL.cityOf(S.nation);
           if (c) S.city = c;
@@ -766,13 +802,6 @@
         TL.log(S, TL.L`你搬走了。新地方的名字你念了三天才念顺。`, 'tl', { key: ev.id + '_move' });
       }
 
-      // 条件致死：只有确实在场的人才可能死
-      if (at.die && !died && TL.chance(at.die)) {
-        died = true;
-        TL.die(S, at.dieCause || 'war');
-        // 注意：TL.die 已经把 phase 切成 report，后面的循环不该再动状态
-        break;
-      }
     }
     return !died;
   };

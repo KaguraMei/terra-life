@@ -11,11 +11,11 @@ const ROOT = path.resolve(__dirname, '..');
 const FILES = [
   'js/engine/rng.js', 'js/engine/text.js','js/engine/region.js', 'js/engine/region.js',
   'js/data/nations.js', 'js/data/races.js', 'js/data/jobs.js', 'js/data/names.js','js/data/baseline.js',
-  'js/data/focus.js',
+  'js/data/focus.js', 'js/data/organizations.js',
   'js/engine/lifetable.js','js/engine/cohort.js', 'js/engine/cohort.js', 'js/engine/oripathy.js', 'js/engine/state.js',
   'js/engine/decision.js',
   'js/data/timeline.js','js/data/events.js', 'js/data/decisions.js',
-  'js/engine/year.js'
+  'js/engine/organization.js', 'js/data/organization-events.js', 'js/data/interviews.js', 'js/engine/interview.js', 'js/engine/year.js'
 ];
 
 // 构造一个最小的浏览器环境

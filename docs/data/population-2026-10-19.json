@@ -1,0 +1,45 @@
+{
+  "id": "terra-population-2026-10-19-v1",
+  "unit": "万人",
+  "scope": "当前可出生国家与地区；高卢单列为已灭国遗民，不计入抽签",
+  "source": {
+    "book": "《大地巡旅：〈明日方舟〉官方世界观设定集》",
+    "prts": "https://prts.wiki/w/大地巡旅",
+    "checkedAt": "2026-10-19",
+    "note": "页码使用设定集印刷页码；未给出明确数字的国家标为 inferred，不视为官方人口"
+  },
+  "excluded": [
+    {
+      "id": "GAU",
+      "name": "高卢",
+      "pop": 3000,
+      "sourcePages": ["p159"],
+      "sourceType": "official-setting",
+      "counted": false,
+      "note": "3000 万为高卢遗民/历史记载；高卢已灭国，不进入当前人口抽签"
+    }
+  ],
+  "nations": [
+    {"id":"YAN","name":"炎国","pop":30000,"b":268,"sourceYear":null,"sourceType":"official-setting","sourcePages":["p315"],"analogue":null,"confidence":"reported"},
+    {"id":"SRG","name":"萨尔贡","pop":10000,"b":178,"sourceYear":null,"sourceType":"official-setting","sourcePages":["p279注"],"analogue":null,"confidence":"reported"},
+    {"id":"URS","name":"乌萨斯","pop":8000,"b":102,"sourceYear":null,"sourceType":"official-setting","sourcePages":["p147"],"analogue":null,"confidence":"reported"},
+    {"id":"VIC","name":"维多利亚","pop":4000,"b":44,"sourceYear":null,"sourceType":"official-setting","sourcePages":["p118"],"analogue":null,"confidence":"reported"},
+    {"id":"LEI","name":"莱塔尼亚","pop":3200,"b":34,"sourceYear":null,"sourceType":"official-setting","sourcePages":["p137"],"analogue":null,"confidence":"reported"},
+    {"id":"RMB","name":"雷姆必拓","pop":2800,"b":46,"sourceYear":null,"sourceType":"official-setting","sourcePages":["p312"],"analogue":null,"confidence":"reported"},
+    {"id":"KAZ","name":"卡西米尔","pop":1800,"b":21,"sourceYear":null,"sourceType":"inferred","sourcePages":["p217-p227"],"analogue":"核心圈工业国家；沿用旧模型","confidence":"inferred"},
+    {"id":"HIG","name":"东国","pop":1600,"b":15,"sourceYear":null,"sourceType":"inferred","sourcePages":["p325-p332"],"analogue":"东方大型国家；沿用旧模型","confidence":"inferred"},
+    {"id":"CLB","name":"哥伦比亚","pop":1600,"b":24,"sourceYear":null,"sourceType":"official-setting","sourcePages":["p238"],"analogue":null,"confidence":"reported"},
+    {"id":"BLV","name":"玻利瓦尔","pop":1600,"b":32,"sourceYear":null,"sourceType":"official-setting","sourcePages":["p255"],"analogue":null,"confidence":"reported"},
+    {"id":"IBE","name":"伊比利亚","pop":1417,"b":13,"sourceYear":null,"sourceType":"inferred","sourcePages":["p182-p197"],"analogue":"大静谧后沿海国家规模；沿用旧模型","confidence":"inferred"},
+    {"id":"AEG","name":"阿戈尔","pop":9000,"b":60,"sourceYear":null,"sourceType":"inferred","sourcePages":["p198-p207"],"analogue":"深海文明的大型聚居网络；沿用旧模型","confidence":"inferred"},
+    {"id":"LAT","name":"拉特兰","pop":600,"b":6,"sourceYear":null,"sourceType":"official-setting","sourcePages":["p175"],"analogue":null,"confidence":"reported"},
+    {"id":"MIN","name":"米诺斯","pop":600,"b":8,"sourceYear":null,"sourceType":"inferred","sourcePages":["p284-p292"],"analogue":"多城邦农业/文化区；沿用旧模型","confidence":"inferred"},
+    {"id":"SIR","name":"叙拉古","pop":323,"b":4,"sourceYear":null,"sourceType":"inferred","sourcePages":["p261-p271"],"analogue":"家族城邦；沿用旧模型","confidence":"inferred"},
+    {"id":"KJR","name":"谢拉格","pop":300,"b":4,"sourceYear":null,"sourceType":"inferred","sourcePages":["p208-p216"],"analogue":"高山小国；沿用旧模型","confidence":"inferred"},
+    {"id":"KDZ","name":"卡兹戴尔","pop":300,"b":6,"sourceYear":null,"sourceType":"inferred","sourcePages":["p333-p345"],"analogue":"长期战争与流离人口；沿用旧模型","confidence":"inferred"},
+    {"id":"SAMI","name":"萨米","pop":250,"b":5,"sourceYear":null,"sourceType":"inferred","sourcePages":["p293-p304"],"analogue":"北境部落人口；沿用旧模型","confidence":"inferred"},
+    {"id":"DUR","name":"杜林","pop":900,"b":10,"sourceYear":null,"sourceType":"inferred","sourcePages":[],"analogue":"地下城邦总和；沿用旧模型","confidence":"inferred"},
+    {"id":"SST","name":"汐斯塔","pop":30,"b":1,"sourceYear":null,"sourceType":"official-setting","sourcePages":["p248"],"analogue":null,"confidence":"reported"},
+    {"id":"LMN","name":"龙门","pop":500,"b":5,"sourceYear":null,"sourceType":"inferred","sourcePages":["p322-p324"],"analogue":"龙门单城；沿用旧模型","confidence":"inferred"}
+  ]
+}

@@ -110,9 +110,9 @@ console.log(`· 定义了但未被 TL.t() 引用：zh ${onlyZh.length} 个、en 
 /* ---------------------------------------------------------------------- */
 const FILES = ['js/engine/rng.js', 'js/engine/text.js', 'js/engine/region.js',
   'js/data/nations.js', 'js/data/races.js', 'js/data/jobs.js', 'js/data/names.js',
-  'js/data/baseline.js', 'js/data/focus.js',
+  'js/data/baseline.js', 'js/data/focus.js', 'js/data/organizations.js',
   'js/engine/lifetable.js', 'js/engine/cohort.js', 'js/engine/oripathy.js', 'js/engine/state.js',
-  'js/engine/decision.js', 'js/data/timeline.js','js/data/events.js', 'js/data/decisions.js', 'js/engine/year.js'];
+  'js/engine/decision.js', 'js/data/timeline.js','js/data/events.js', 'js/data/decisions.js', 'js/engine/organization.js', 'js/data/organization-events.js', 'js/data/interviews.js', 'js/engine/interview.js', 'js/engine/year.js'];
 const ctx = vm.createContext({ window: {}, console, Math, JSON, Date, Intl,
   parseFloat, parseInt, isFinite, isNaN, Object, Array, String, Number, Boolean, Float64Array });
 for (const f of FILES) vm.runInContext(read(f), ctx, { filename: f });
@@ -191,8 +191,8 @@ if (!noRun.length && !noTitle.length) ok(`事件表结构完整（${Object.keys(
 const badDec = [];
 for (const id in TL.DECISIONS) {
   const d = TL.DECISIONS[id];
-  if (!d.options || !d.options.length) badDec.push(id + '（没有 options）');
-  else if (d.options.some(o => !o.label)) badDec.push(id + '（有选项缺 label）');
+  if (!d.options || (typeof d.options !== 'function' && !d.options.length)) badDec.push(id + '（没有 options）');
+  else if (typeof d.options !== 'function' && d.options.some(o => !o.label)) badDec.push(id + '（有选项缺 label）');
 }
 bad('抉择结构不完整', badDec);
 if (!badDec.length) ok(`抉择表结构完整（${Object.keys(TL.DECISIONS).length} 个抉择）`);

@@ -1,0 +1,336 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Terra Life interview pack v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "sourceType": {
+      "const": "project-rule"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/question"
+      }
+    },
+    "pools": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pool"
+      }
+    },
+    "extensions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/extension"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "schemaVersion",
+    "version",
+    "sourceType",
+    "questions",
+    "pools"
+  ],
+  "$defs": {
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "scores": {
+          "type": "object",
+          "minProperties": 3,
+          "maxProperties": 3,
+          "propertyNames": {
+            "enum": [
+              "teamwork",
+              "ethics",
+              "judgment",
+              "survival",
+              "solidarity",
+              "risk",
+              "research",
+              "evidence",
+              "independence",
+              "publicGood",
+              "discipline",
+              "reliability",
+              "adaptability",
+              "engineering",
+              "safety",
+              "innovation",
+              "negotiation",
+              "trust",
+              "contract",
+              "loyalty",
+              "command",
+              "faith",
+              "precision",
+              "publicProtection",
+              "combat",
+              "showmanship",
+              "discretion",
+              "observation",
+              "law"
+            ]
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          }
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "scores"
+      ]
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "organization": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "route": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "kind": {
+          "enum": [
+            "organization",
+            "role"
+          ]
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/option"
+          },
+          "minItems": 2,
+          "maxItems": 4
+        },
+        "fromYear": {
+          "type": "integer"
+        },
+        "untilYear": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "organization",
+        "kind",
+        "prompt",
+        "options"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "role"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "route"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "route"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "axis": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "enum": [
+            "teamwork",
+            "ethics",
+            "judgment",
+            "survival",
+            "solidarity",
+            "risk",
+            "research",
+            "evidence",
+            "independence",
+            "publicGood",
+            "discipline",
+            "reliability",
+            "adaptability",
+            "engineering",
+            "safety",
+            "innovation",
+            "negotiation",
+            "trust",
+            "contract",
+            "loyalty",
+            "command",
+            "faith",
+            "precision",
+            "publicProtection",
+            "combat",
+            "showmanship",
+            "discretion",
+            "observation",
+            "law"
+          ]
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 1
+        },
+        "minimum": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "id",
+        "weight",
+        "minimum"
+      ]
+    },
+    "pool": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "organization": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "route": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "axes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/axis"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "questionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "minItems": 3,
+          "uniqueItems": true
+        },
+        "draw": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "organization": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 5
+            },
+            "role": {
+              "const": 1
+            }
+          },
+          "required": [
+            "organization",
+            "role"
+          ]
+        },
+        "passScore": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "waitlistScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 99
+        }
+      },
+      "required": [
+        "id",
+        "organization",
+        "route",
+        "axes",
+        "questionIds",
+        "draw",
+        "passScore",
+        "waitlistScore"
+      ]
+    },
+    "extension": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pool": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "questionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "pool",
+        "questionIds"
+      ]
+    }
+  }
+}

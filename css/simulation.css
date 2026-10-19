@@ -137,7 +137,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 #modalHead { padding: 24px 24px 0; border: 0; background: transparent; }
 #modalHead .t { font: 700 26px/1.4 var(--sans); }
 #modalHead .s { font-size: 12px; margin-top: 8px; }
-#modalText { padding: 18px 24px; font-size: 15px; line-height: 1.85; }
+#modalText { padding: 18px 24px; font-size: 15px; line-height: 1.85; white-space: pre-line; }
 #modalOpts { padding: 0 24px 24px; }
 .opt { width: 100%; text-align: left; padding: 13px 15px; margin-bottom: 8px; border-radius: 4px; gap: 5px; }
 .opt:last-child { margin-bottom: 0; }

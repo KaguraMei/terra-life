@@ -1,7 +1,7 @@
 import fs from 'node:fs'; import path from 'node:path'; import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const FILES=['js/engine/rng.js','js/engine/text.js','js/engine/region.js','js/data/nations.js','js/data/races.js','js/data/jobs.js','js/data/names.js','js/data/baseline.js','js/data/focus.js','js/engine/lifetable.js','js/engine/cohort.js','js/engine/oripathy.js','js/engine/state.js','js/engine/decision.js','js/data/timeline.js','js/data/events.js','js/data/decisions.js','js/engine/year.js'];
+const FILES=['js/engine/rng.js','js/engine/text.js','js/engine/region.js','js/data/nations.js','js/data/races.js','js/data/jobs.js','js/data/names.js','js/data/baseline.js','js/data/focus.js', 'js/data/organizations.js','js/engine/lifetable.js','js/engine/cohort.js','js/engine/oripathy.js','js/engine/state.js','js/engine/decision.js','js/data/timeline.js','js/data/events.js','js/data/decisions.js','js/engine/organization.js', 'js/data/organization-events.js', 'js/data/interviews.js', 'js/engine/interview.js', 'js/engine/year.js'];
 const win={TL:{}}; win.window=win;
 const ctx=vm.createContext({window:win,console,Math,JSON,Date,Float64Array,Object,Array,Number,String,Boolean,isFinite,parseFloat,parseInt});
 for(const f of FILES) vm.runInContext(fs.readFileSync(path.join(ROOT,f),'utf8'),ctx,{filename:f});
