@@ -182,25 +182,20 @@
       }
     },
     {
-      id: 'urs_purge', year: 1077, title: '大叛乱与旧贵族清洗', book: '乌萨斯',
+      id: 'urs_purge', year: 1077, title: '石棺数据泄露与军方灭口', book: '乌萨斯',
       scope: { nations: ['URS'], regions: [] },
-      here: '内卫和纠察队上街了。名单是夜里定的，人是白天带走的。',
-      near: '乌萨斯在清洗自己的军官。逃过来的人里有一半穿着旧军装。',
-      far: '乌萨斯内乱，皇帝下令清洗军方。',
+      here: '大叛乱平息后，石棺数据泄露。军方灭口研究团队，接触名单也被重新清理。',
+      near: '乌萨斯大叛乱结束后，听说石棺数据泄露，军方杀了研究团队。',
+      far: '乌萨斯在大叛乱后发生石棺数据泄露事件，军方被指灭口研究团队。',
       fx: {
         URS: { war: 0.50, warDur: 3, tol: -8, tolDur: 10, mort: 1.30, mortDur: 3, money: -2, h: -10 }
       },
       at: [
         {
-          when: S => S.q >= 4 && !S.flags.exiled,
-          flag: 'exiled', move: '北原', money: -4,
-          text: '你家在名单上。列车往北开了六天，窗外的树越来越少，最后没有了。',
-          eff: { h: -18, so: -8 }
-        },
-        {
-          when: S => S.q < 4,
-          text: '你们那条街上被带走三户。第三户的门到现在还开着。',
-          eff: { h: -8 }
+          when: S => S.nation === 'URS' && S.city && S.city.indexOf('切尔诺伯格') >= 0 && ['scholar', 'engineer', 'doctor', 'oridoc'].indexOf(S.job) >= 0 && !S.flags.urs_purge_researcher,
+          flag: 'urs_purge_researcher',
+          text: '石棺数据泄露后的通报写着：研究团队已被军方灭口。你认识其中一个人的名字。',
+          eff: { h: -12, so: -6 }
         }
       ]
     },

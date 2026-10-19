@@ -18,6 +18,17 @@
   };
   TL.organizationAvailable = (S, id) => TL.organizationState(S, id).available &&
     (!TL.organizationDef(id).locationAllowed || TL.organizationDef(id).locationAllowed(S));
+  TL.organizationEmploymentModel = function (id) {
+    const o = TL.organizationDef(id);
+    const models = TL.EMPLOYMENT_MODELS || {};
+    return models[o && o.employmentModel] || models.contract || null;
+  };
+  TL.organizationBlocksEvent = function (S, eventId) {
+    if (!S || S.phase !== 'life' || !S.affiliation || S.job !== S.orgJob || !TL.isWorking(S) ||
+        !TL.organizationAvailable(S, S.affiliation)) return false;
+    const model = TL.organizationEmploymentModel(S.affiliation);
+    return !!(model && (model.protectedEvents || []).includes(eventId));
+  };
   TL.organizationAdmissionName = id => (TL.organizationDef(id) || {}).admission || '面试';
   TL.reunionContactCurrent = S => Number.isFinite(S.flags.reunionContactYear) &&
     S.year >= S.flags.reunionContactYear && S.year - S.flags.reunionContactYear <= 2;
@@ -99,9 +110,27 @@
     if (!S.affiliation) return false;
     const id = S.affiliation, h = activeHistory(S);
     if (h) Object.assign(h, { leftAt: S.age, leftYear: S.year, reason: reason || '离职' });
+    if ((options.retirement || reason === '退休') && !S.retirementPension) {
+      const policy = TL.organizationEmploymentModel(id)?.retirement;
+      if (policy && S.orgService >= policy.minServiceYears) {
+        const finalMonthlyPay = Math.max(0, Number.isFinite(S.income) ? S.income : 0);
+        const nation = TL.NATION_BY_ID[S.nation];
+        S.retirementPension = {
+          organization: id,
+          serviceYears: S.orgService,
+          rank: S.orgRank || 0,
+          retiredAt: S.age,
+          finalMonthlyPay,
+          replacementRate: policy.replacementRate,
+          minimumMonthlyAmount: nation.ppp * policy.minimumMonthlyRate,
+          monthlyAmount: Math.max(finalMonthlyPay * policy.replacementRate,
+            nation.ppp * policy.minimumMonthlyRate)
+        };
+      }
+    }
     delete S.flags['org_' + id];
     if (id === 'reunion') { S.flags.reunion = false; S.flags.reunionLeft = S.age; }
-    if (id === 'rhodes') { S.opClass = null; S.opRank = 0; }
+    if (id === 'rhodes' && !options.preserveOperatorRank) { S.opClass = null; S.opRank = 0; }
     if (!options.keepJob && S.job === S.orgJob) {
       S.flags.lastJob = S.job; S.job = 'seeking';
     }
@@ -139,8 +168,11 @@
       TL.leaveOrganization(S, '新沃尔西尼禁止家族入驻及介入'); return;
     }
     if (S.flags.retired || S.age >= 65 || !TL.isWorking(S) || S.school || S.serveLeft > 0) {
-      const reason = S.flags.retired || S.age >= 65 ? '退休' : S.serveLeft > 0 ? '应征服役' : '结束任职';
-      TL.leaveOrganization(S, reason, { keepJob: true }); return;
+      const retirement = !!(S.flags.retired || S.age >= 65);
+      const reason = retirement ? '退休' : S.serveLeft > 0 ? '应征服役' : '结束任职';
+      TL.leaveOrganization(S, reason, {
+        keepJob: true, retirement, preserveOperatorRank: retirement
+      }); return;
     }
     if (S.job !== S.orgJob && !(r.jobs || []).includes(S.job)) {
       TL.leaveOrganization(S, '转行或应征服役', { keepJob: true }); return;
@@ -160,7 +192,10 @@
     const next = r.ranks[(S.orgRank || 0) + 1];
     return !!next && S.orgService >= next.needYears && S.orgLastPromotionYear !== S.year;
   };
-  TL.promoteOrganization = function (S) {
+  TL.promoteOrganization = function (S, options) {
+    options = options || {};
+    // 年度结算显式传入 annualSettlement；普通脚本调用仍保留旧接口，
+    // 但组织随机事件不再调用此函数，避免快照与现金账本出现半年度工资。
     if (!TL.organizationPromotionReady(S)) return false;
     S.orgRank++; S.orgLastPromotionYear = S.year;
     if (S.affiliation === 'rhodes') S.opRank = S.orgRank;
@@ -181,8 +216,14 @@
     const h = activeHistory(S);
     if (h) h.serviceYears = S.orgService;
   };
-  TL.organizationPayMultiplier = S => TL.organizationUnpaid(S) ? 0 : S.affiliation && TL.isWorking(S) && !S.flags.retired &&
-    S.job === S.orgJob && S.affiliation !== 'rhodes' ? 1 + Math.min(3, S.orgRank || 0) * 0.08 : 1;
+  TL.organizationPayMultiplier = function (S) {
+    if (TL.organizationUnpaid(S)) return 0;
+    if (!S.affiliation || !TL.isWorking(S) || S.flags.retired || S.job !== S.orgJob) return 1;
+    const payroll = (TL.organizationEmploymentModel(S.affiliation) || {}).payroll || {};
+    if (payroll.scale !== 'service-rank') return 1;
+    const steps = Math.min(payroll.maxRankSteps || 0, Math.max(0, S.orgRank || 0));
+    return 1 + steps * (payroll.rankStep || 0);
+  };
   TL.organizationUnpaid = S => !!(S.affiliation && TL.organizationDef(S.affiliation)?.unpaid &&
     TL.organizationAvailable(S, S.affiliation) && S.job === S.orgJob && TL.isWorking(S) &&
     !S.school && !S.flags.retired && !S.serveLeft);

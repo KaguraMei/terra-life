@@ -78,19 +78,19 @@
     'soldier', 'guard', 'police', 'mercenary', 'bounty',
     'artsmith', 'caster', 'alchemist', 'witch', 'merchant', 'shopowner', 'noble'
   ];
-  function npcJob(nationId, sex) {
+  function npcJob(nationId, sex, raceId) {
     for (let i = 0; i < 24; i++) {
       const id = NPC_POOL[Math.floor(TL.rnd() * NPC_POOL.length)];
       const J = TL.JOBS[id];
       if (!J) continue;
+      if (!TL.jobAvailable(id, nationId, raceId)) continue;
       if (J.sex && J.sex !== sex) continue;
-      if (J.only && J.only.indexOf(nationId) < 0) continue;
       // 重装 / 战斗类职业对平民来说太少见了，降权
       if (J.sec === 'mil' && TL.rnd() < 0.82) continue;
       if (J.sec === 'art' && TL.rnd() < 0.7) continue;
       return id;
     }
-    return 'farmhand';
+    return TL.jobAvailable('vendor', nationId, raceId) ? 'vendor' : 'seeking';
   }
 
   /**
@@ -98,13 +98,13 @@
    * 家人与生活是常驻面板，职业必须随年龄自己变，
    * 否则会出现「兄弟姐妹 32 岁 · 幼儿」这种一眼假的条目。
    */
-  TL.ageJob = function (nationId, sex, age) {
+  TL.ageJob = function (nationId, sex, age, raceId) {
     if (age < 7) return 'child';
     if (age < 16) return 'student';
     if (age > 66 && TL.chance(0.7)) return 'retired';
-    return npcJob(nationId, sex);
+    return npcJob(nationId, sex, raceId);
   };
-  TL.npcJobOf = function (nationId, sex) { return npcJob(nationId, sex); };
+  TL.npcJobOf = function (nationId, sex, raceId) { return npcJob(nationId, sex, raceId); };
 
   TL.newLife = function (o) {
     o = o || {};
@@ -126,6 +126,15 @@
     /* --- ③ 种族 --- */
     const raceId = o.race && TL.RACE_BY_ID[o.race] ? o.race : TL.drawRace(nationId, TL.rnd);
     const r = TL.RACE_BY_ID[raceId];
+    const traits = Object.assign({}, o.traits || {});
+    if (raceId === 'aegir') {
+      const chance = r.traits?.underwaterBreathingChance ?? 0;
+      if (typeof traits.underwaterBreathing !== 'boolean') {
+        traits.underwaterBreathing = TL.chance(chance);
+      }
+    } else {
+      delete traits.underwaterBreathing;
+    }
 
     /* --- ④ 萨卡兹王庭 --- */
     const court = raceId === 'sarkaz' ? TL.drawCourt(TL.rnd) : null;
@@ -168,7 +177,7 @@
         name: TL.givenName(nationId, ssex, raceId),
         sex: ssex, rel: older ? 'elder' : 'younger',
         age: a, alive: true,
-        job: a >= 16 ? npcJob(nationId, ssex) : (a >= 6 ? 'student' : 'child')
+        job: a >= 16 ? npcJob(nationId, ssex, raceId) : (a >= 6 ? 'student' : 'child')
       });
     }
     sibs.sort((x, y) => y.age - x.age);
@@ -231,11 +240,12 @@
       pct: 0,             // 收入分位 0..1
       debt: 0,
       income: 0,
+      retirementPension: null,
 
       /* 家庭 */
       fam: {
-        mom: { alive: true, age: momAge, name: TL.givenName(nationId, 'F', raceId), job: npcJob(nationId, 'F') },
-        dad: { alive: true, age: dadAge, name: TL.givenName(nationId, 'M', raceId), job: npcJob(nationId, 'M') },
+        mom: { alive: true, age: momAge, name: TL.givenName(nationId, 'F', raceId), job: npcJob(nationId, 'F', raceId) },
+        dad: { alive: true, age: dadAge, name: TL.givenName(nationId, 'M', raceId), job: npcJob(nationId, 'M', raceId) },
         partner: null,
         married: false,
         kids: [],
@@ -275,7 +285,7 @@
       refugee: false,
       hobbies: [],
       conds: {},          // 慢性病
-      traits: {},
+      traits: traits,
 
       /* 记录 */
       log: [],
@@ -434,6 +444,11 @@
     if (TL.syncOrganization) TL.syncOrganization(S);
     const n = TL.NATION_BY_ID[S.nation];
     const J = TL.JOBS[S.job];
+    // 组织退休待遇是离职时锁定的税后月额，来源于最后一份合同薪资；
+    // 已含当时的职级、歧视和家境修正，因此不能再叠乘这些修正。
+    const pensionAmount = S.job === 'retired' && S.retirementPension &&
+      Number.isFinite(S.retirementPension.monthlyAmount)
+      ? Math.max(0, S.retirementPension.monthlyAmount) : null;
     let base;
     if (J) {
       // 职业收入区间：按学历与经验在 lo..hi 之间插值
@@ -445,17 +460,19 @@
       if (J.cls && S.opRank > 0) base *= TL.OP_RANKS[S.opRank].pay;
       if (TL.organizationPayMultiplier) base *= TL.organizationPayMultiplier(S);
     } else if (S.job === 'retired') {
-      base = n.ppp * 0.45;
+      base = pensionAmount == null ? n.ppp * 0.45 : pensionAmount;
     } else if (S.job === 'child' || S.job === 'student') {
       base = n.ppp * 0.10;
     } else {
       base = n.ppp * 0.25;
     }
     // 歧视折损：同样的工作，异族/感染者拿得更少
-    const d = TL.discrimination(S) + (S.ori && S.ori.stage > 0 ? 0.22 : 0);
-    base *= 1 - TL.clamp(d, 0, 0.75) * 0.42;
-    // 家境惯性：出身好的人起点高
-    base *= 1 + (S.q - 3) * 0.06;
+    if (pensionAmount == null) {
+      const d = TL.discrimination(S) + (S.ori && S.ori.stage > 0 ? 0.22 : 0);
+      base *= 1 - TL.clamp(d, 0, 0.75) * 0.42;
+      // 家境惯性：出身好的人起点高
+      base *= 1 + (S.q - 3) * 0.06;
+    }
     S.income = Math.max(0, base);
     S.subsistenceAnnual = TL.organizationSubsistence ? TL.organizationSubsistence(S) : 0;
     /* 分位：把月收入映射到 0..1。

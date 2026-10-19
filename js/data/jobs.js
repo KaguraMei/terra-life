@@ -25,12 +25,12 @@
 
   TL.JOBS = {
     /* ---------------- 农林牧渔 ---------------- */
-    farm:      { name: '自耕农', en: 'Farmer', sec: 'agr', edu: 0, lo: 0.35, hi: 0.95, art: 0, ori: 1.0, risk: {}, disc: 0.6 },
-    farmhand:  { name: '农庄雇工', en: 'Farmhand', sec: 'agr', edu: 0, lo: 0.28, hi: 0.70, art: 0, ori: 1.0, risk: {}, disc: 0.5 },
+    farm:      { name: '自耕农', en: 'Farmer', sec: 'agr', edu: 0, lo: 0.35, hi: 0.95, art: 0, ori: 1.0, risk: {}, disc: 0.6, notNations: ['AEG'] },
+    farmhand:  { name: '农庄雇工', en: 'Farmhand', sec: 'agr', edu: 0, lo: 0.28, hi: 0.70, art: 0, ori: 1.0, risk: {}, disc: 0.5, notNations: ['AEG'] },
     herder:    { name: '牧民', en: 'Herder', sec: 'agr', edu: 0, lo: 0.30, hi: 0.80, art: 0, ori: 1.0, risk: { cold: 2, inj: 1.3 }, disc: 0.5, only: ['SAMI', 'SRG', 'URS', 'KJR', 'MIN', 'YAN'] },
     fisher:    { name: '渔民', en: 'Fisher', sec: 'agr', edu: 0, lo: 0.34, hi: 0.88, art: 0, ori: 1.0, risk: { drown: 3.5, sea: 2 }, disc: 0.5, only: ['IBE', 'AEG', 'SST', 'LMN', 'HIG', 'YAN'] },
     hunter:    { name: '猎人', en: 'Hunter', sec: 'agr', edu: 0, lo: 0.30, hi: 0.85, art: 0.15, ori: 1.3, risk: { inj: 2.2, cold: 1.5 }, disc: 0.4, only: ['SAMI', 'SRG', 'KDZ', 'URS', 'KJR'] },
-    agbiz:     { name: '农庄经营', en: 'Farm owner', sec: 'agr', edu: 2, lo: 0.90, hi: 2.20, art: 0, ori: 1.0, risk: {}, disc: 0.3 },
+    agbiz:     { name: '农庄经营', en: 'Farm owner', sec: 'agr', edu: 2, lo: 0.90, hi: 2.20, art: 0, ori: 1.0, risk: {}, disc: 0.3, notNations: ['AEG'] },
 
     /* ---------------- 工业与矿业 ---------------- */
     miner:     { name: '矿工', en: 'Miner', sec: 'ind', edu: 0, lo: 0.55, hi: 1.30, art: 0, ori: 1.7, risk: { inj: 3, copd: 2, cat: 1.3 }, disc: 0.55, sex: 'M' },
@@ -97,6 +97,19 @@
     op_medic:     { name: '医疗干员', en: 'Medic', sec: 'op', cls: 'medic', edu: 4, lo: 1.60, hi: 3.40, art: 0.55, ori: 2.0, risk: { inf: 1.8, ori: 1.6 }, disc: 0.25 },
     op_supporter: { name: '辅助', en: 'Supporter', sec: 'op', cls: 'supporter', edu: 3, lo: 1.40, hi: 3.10, art: 0.70, ori: 2.2, risk: { art: 1.6, inj: 1.8 }, disc: 0.25 },
     op_specialist:{ name: '特种', en: 'Specialist', sec: 'op', cls: 'specialist', edu: 2, lo: 1.45, hi: 3.30, art: 0.45, ori: 1.9, risk: { inj: 4.0, fall: 2.5, war: 3 }, disc: 0.3 }
+  };
+
+  /** 国家与种族可参与的职业资格；所有职业抽签入口共用，避免只在 UI 过滤。 */
+  TL.jobAvailable = function (jobId, nationId, raceId) {
+    const J = TL.JOBS[jobId];
+    const nation = TL.NATION_BY_ID && TL.NATION_BY_ID[nationId];
+    if (!J) return false;
+    if (J.only && J.only.indexOf(nationId) < 0) return false;
+    if (J.notNations && J.notNations.indexOf(nationId) >= 0) return false;
+    if (J.notRaces && J.notRaces.indexOf(raceId) >= 0) return false;
+    if (J.onlyRegions && (!nation || J.onlyRegions.indexOf(nation.reg) < 0)) return false;
+    if (J.notRegions && nation && J.notRegions.indexOf(nation.reg) >= 0) return false;
+    return true;
   };
 
   /** 出身门槛：每个部门对「社会地位 + 学识」的最低要求 */

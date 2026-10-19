@@ -243,7 +243,9 @@
       TL.eff(S, { h: 8, sm: 2 });
       S.flags.promoted = (S.flags.promoted || 0) + 1;
       if (S.affiliation) {
-        return TL.promoteOrganization(S) ? '你的组织履历记录了这次晋升。' : '你获得了肯定，晋升还需要更多任职经历。';
+        // 组织晋升在年末合同结算后统一生效；事件只记录绩效，避免
+        // 当年现金账本按旧工资结算而快照却显示新工资。
+        return '你的组织履历记录了这次表现，晋升将在年度评审时处理。';
       }
       if (S.opClass) S.opRank = Math.min(4, S.opRank + 1);
       const J = TL.JOBS[S.job];
@@ -254,7 +256,7 @@
 
   def('job_lost', {
     title: '没了', book: '职业',
-    when: S => TL.isWorking(S) && S.age >= 18 && TL.chance(0.5),
+    when: S => TL.isWorking(S) && S.age >= 18 && !TL.organizationBlocksEvent?.(S, 'job_lost') && TL.chance(0.5),
     run(S) {
       // 歧视与感染者身份显著抬高被裁概率
       const d = TL.totalDiscrimination(S);
@@ -299,7 +301,7 @@
 
   def('wage_theft', {
     title: '扣工钱', book: '职业',
-    when: S => TL.isWorking(S) && S.q <= 3 && TL.chance(0.5),
+    when: S => TL.isWorking(S) && S.q <= 3 && !TL.organizationBlocksEvent?.(S, 'wage_theft') && TL.chance(0.5),
     run(S) {
       TL.eff(S, { h: -6, so: -2 });
       return TL.L`月底结账，数目对不上。你去问，对方说「规矩就是这样」。`;
@@ -537,6 +539,11 @@
     title: '不能干了', book: '矿石病',
     when: S => S.ori && S.ori.known && TL.isWorking(S) && S.age >= 16,
     run(S) {
+      const employment = S.affiliation && TL.organizationEmploymentModel?.(S.affiliation);
+      if (employment?.medicalAccommodation && S.job === S.orgJob) {
+        TL.eff(S, { h: -3, so: -1 });
+        return TL.L`组织启动了医疗安置流程，为你调整了工作区域并保留合同。`;
+      }
       const d = TL.oriStigma(S);
       if (TL.chance(d + 0.25)) {
         S.flags.lastJob = S.job;
@@ -2270,7 +2277,7 @@
     const pool = [];
     for (const id in TL.JOBS) {
       const J = TL.JOBS[id];
-      if (J.only && J.only.indexOf(S.nation) < 0) continue;
+      if (!TL.jobAvailable(id, S.nation, S.race)) continue;
       if (J.edu > S.eduLevel) continue;
       // 注意量纲：JOBS 里的 art 是 0..1 的门槛比例，S.arts 是 0..100 的适应性。
       // 早期版本直接写 `J.art > S.arts`，等于门槛永远不生效 ——
@@ -2300,7 +2307,7 @@
       if (n.med > 0.8 && J.sec === 'know') w *= 1.3;
       if (w > 0) pool.push({ id: id, w: w });
     }
-    if (!pool.length) return 'farm';
+    if (!pool.length) return TL.jobAvailable('vendor', S.nation, S.race) ? 'vendor' : 'seeking';
     return TL.wpickArr(pool).id;
   };
 

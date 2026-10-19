@@ -240,7 +240,7 @@
           if (!S.fam.partner) {
             const sex = S.sex === 'M' ? 'F' : 'M';
             const nm = TL.makeName(S.nation, sex, S.race);
-            S.fam.partner = { name: nm.given, sex: sex, age: S.age + Math.round(TL.range(-4, 4)), alive: true, ori: null, job: TL.npcJobOf(S.nation, sex) };
+            S.fam.partner = { name: nm.given, sex: sex, age: S.age + Math.round(TL.range(-4, 4)), alive: true, ori: null, job: TL.npcJobOf(S.nation, sex, S.race) };
           }
           S.fam.married = true;
           S.fam.marriedAt = S.age;
@@ -269,7 +269,7 @@
           if (!S.fam.partner) {
             const sex = S.sex === 'M' ? 'F' : 'M';
             const nm = TL.makeName(S.nation, sex, S.race);
-            S.fam.partner = { name: nm.given, sex: sex, age: S.age + Math.round(TL.range(-4, 4)), alive: true, ori: null, job: TL.npcJobOf(S.nation, sex) };
+            S.fam.partner = { name: nm.given, sex: sex, age: S.age + Math.round(TL.range(-4, 4)), alive: true, ori: null, job: TL.npcJobOf(S.nation, sex, S.race) };
           }
           if (TL.chance(0.55)) {
             S.fam.married = true; S.fam.marriedAt = S.age;
@@ -614,6 +614,7 @@
   D('ori_job_loss', {
     title: '他们知道了',
     text: () => TL.L`你的感染状态被公开了。`,
+    when: S => !TL.organizationBlocksEvent?.(S, 'ori_job_loss'),
     options: [
       {
         label: '接受处理', eff: { h: -12, so: -6 },

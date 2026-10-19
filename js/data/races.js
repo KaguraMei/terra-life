@@ -83,8 +83,10 @@
     },
     {
       id: 'aegir', name: '阿戈尔', en: 'Ægir', mod: { hl: 5, h: 0, sm: 9, so: -1, art: -2 }, stand: 0.8, disc: 0.30, ori: 0.3, life: 2.5,
+      // 仅为本作的稀有个体特质；官方资料没有给出具备水下呼吸能力的比例。
+      traits: { underwaterBreathingChance: 0.05 },
       where: ['AEG', 'IBE', 'HIG', 'SST'],
-      desc: '来自海面之下。不依赖源石的科技体系，让他们在陆地上显得既先进又可疑。'
+      desc: '阿戈尔分布于沿海与内陆水域附近，不同支系的体质各异；多数不具备水下呼吸能力。'
     },
     {
       id: 'durin', name: '杜林', en: 'Durin', mod: { hl: 3, h: 3, sm: 6, so: 1, art: 3 }, stand: 0.6, disc: 0.06, ori: 0.4, life: 1.8,

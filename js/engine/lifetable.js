@@ -166,6 +166,8 @@
   /* 死亡率                                                                  */
   /* ---------------------------------------------------------------------- */
   TL.deathProb = function (S) {
+    // 100% 结晶率是本模拟的终末阈值：抵达时在当年结算中必然死亡。
+    if (S.ori && S.ori.stage > 0 && S.ori.crystal >= 100) return 1;
     const n = TL.NATION_BY_ID[S.nation];
     const lt = TL.LT(S);
     const a = S.age;
@@ -474,6 +476,10 @@
     /* 旧 CT 表的残差桶必须在最终抽取前展开，避免“其他原因”。 */
     TL.expandResidualCauseWeights(w, S, a);
 
+    // 只有具备水下呼吸这一稀有个体特质的阿戈尔免于溺水死因；
+    // 不能把水生适应性推广为全族豁免。
+    if (S.race === 'aegir' && S.traits?.underwaterBreathing) delete w.drown;
+
     for (const k in w) if (!(w[k] > 0)) delete w[k];
     return w;
   };
@@ -488,6 +494,7 @@
   };
 
   TL.pickCause = function (S, a, other) {
+    if (!other && S.ori && S.ori.stage > 0 && S.ori.crystal >= 100) return 'ori';
     return TL.wpick(TL.causeWeights(S, a, other));
   };
 

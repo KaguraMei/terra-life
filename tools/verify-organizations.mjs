@@ -33,6 +33,10 @@ function chooseLabel(S, text) {
 }
 let routeCount = 0, scheduledRoutes = 0;
 for (const [id, o] of Object.entries(TL.ORGANIZATIONS)) {
+  for (const contact of o.contacts || []) {
+    assert.ok(contact.interaction && contact.interaction.trim(),
+      `contact has specific interaction: ${id}/${contact.id}`);
+  }
   for (const [route, r] of Object.entries(o.routes)) {
     routeCount++;
     assert.ok(TL.organizationInterviewSpec(id, route)?.questionPool);
@@ -65,6 +69,78 @@ for (const [id, o] of Object.entries(TL.ORGANIZATIONS)) {
     scheduledRoutes++;
   }
 }
+
+{
+  const S = join('rhodes');
+  const before = { job: S.job, income: S.income, rank: S.opRank, affiliation: S.affiliation };
+  const chance = TL.chance; TL.chance = () => true;
+  try {
+    for (const id of ['job_lost', 'wage_theft']) {
+      TL.fire(S, { type: 'ev', id });
+      assert.equal(S.job, before.job, `${id} cannot silently remove a protected operator`);
+      assert.equal(S.affiliation, before.affiliation);
+      assert.equal(S.opRank, before.rank);
+      assert.equal(S.income, before.income);
+    }
+  } finally { TL.chance = chance; }
+  assert.equal(S.evCount.job_lost || 0, 0, 'blocked layoff is not counted as an event');
+  assert.equal(S.evCount.wage_theft || 0, 0, 'blocked payroll event is not counted');
+  TL.infect(S,true); S.ori.known=true;
+  const chanceForAccommodation=TL.chance; TL.chance=()=>true;
+  try { TL.fire(S,{type:'ev',id:'ori_work_ban'}); } finally { TL.chance=chanceForAccommodation; }
+  assert.equal(S.job,before.job,'medical accommodation preserves the stable role');
+  assert.ok(S.log.some(entry=>entry.text.includes('医疗安置')),
+    'stable employer responds to infection with accommodation');
+  TL.openDecision(S,'ori_job_loss');
+  assert.equal(S.pending,null,'protected employment does not offer the dismissal decision');
+
+  // The same generic layoff remains available for a precarious contract.
+  const T = join('sarkaz_mercs', 'contract');
+  TL.chance = () => true;
+  try { TL.fire(T, { type: 'ev', id: 'job_lost' }); } finally { TL.chance = chance; }
+  assert.equal(T.affiliation, null, 'contract model retains ordinary layoff risk');
+  assert.equal(T.job, 'seeking');
+}
+{
+  const S = join('rhodes');
+  S.age = 64; S.year = 1100; S.bornYear = S.year - S.age;
+  S.orgService = 6; S.orgLastServiceYear = S.year; S.orgRank = 3; S.opRank = 3;
+  S.orgLastPromotionYear = S.year;
+  TL.computeIncome(S);
+  const finalMonthlyPay = S.income;
+  const chance = TL.chance; TL.chance = () => false;
+  try { TL.endYear(S); } finally { TL.chance = chance; }
+  assert.equal(S.age, 65);
+  assert.equal(S.job, 'retired');
+  assert.equal(S.affiliation, null);
+  assert.equal(S.opClass, 'guard', 'retirement preserves earned operator class');
+  assert.equal(S.opRank, 3, 'retirement preserves earned operator rank');
+  assert.equal(S.retirementPension.organization, 'rhodes');
+  assert.equal(S.retirementPension.serviceYears, 6);
+  const expectedPension = Math.max(finalMonthlyPay * 0.65, TL.NATION_BY_ID[S.nation].ppp * 0.50);
+  assert.ok(Math.abs(S.income - expectedPension) < 1e-9,
+    'retirement income is one monthly benefit, without duplicate modifiers');
+  const pension = S.income;
+  TL.computeIncome(S);
+  assert.equal(S.income, pension, 'recomputing income does not overwrite or add to pension');
+  assert.equal(S.stats.years.at(-1).income, Math.round(finalMonthlyPay),
+    'annual snapshot records income used for that year’s cash settlement');
+}
+{
+  const S = join('rhodes');
+  S.orgService = 5; S.orgLastServiceYear = S.year; S.orgRank = 1; S.opRank = 1;
+  const oldRank = S.orgRank, oldPay = S.income;
+  const chance = TL.chance; TL.chance = () => true;
+  try { TL.fire(S, { type: 'ev', id: 'job_promote' }); } finally { TL.chance = chance; }
+  assert.equal(S.orgRank, oldRank, 'random performance event does not promote outside annual review');
+  assert.equal(S.opRank, oldRank);
+  assert.equal(S.income, oldPay);
+  assert.ok(S.log.at(-1).text.includes('年度评审'));
+}
+assert.equal(TL.organizationDef('penguin_logistics').fromYear, 1093);
+assert.ok(TL.organizationDef('penguin_logistics').nations.includes('LMN'));
+assert.ok(TL.organizationDef('penguin_logistics').nations.includes('CLB'));
+assert.equal(TL.organizationEmploymentModel('karlan_trade').retirement.replacementRate, 0.60);
 
 for (const mutate of [S=>S.nation='YAN', S=>S.year=1084, S=>S.age=15,
   S=>S.school='university', S=>S.flags.retired=true, S=>S.serveLeft=1,

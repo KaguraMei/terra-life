@@ -447,9 +447,51 @@
   // 组织表证实存在不等于证实成立年。未有年表依据的窗口均为项目规则。
   // 1110 是人物互动的保守游戏截断线，不是设定中的死亡年份。
   const O = TL.ORGANIZATIONS;
+
+  // 企业与长期编制共用同一套雇佣模型。职业区间提供岗位底薪，晋升
+  // 通过职级倍率调整；正式雇主保证工资结算、不会因普通随机事件开除，
+  // 并为足够年资的成员提供退休金。数值属于玩法模型，不冒充官方工资表。
+  TL.EMPLOYMENT_MODELS = {
+    contract: {
+      payroll: { period: 'monthly', basis: 'nation-ppp', scale: 'service-rank', rankStep: 0.08, maxRankSteps: 3 },
+      protectedEvents: [], medicalAccommodation: false, retirement: null
+    },
+    stable: {
+      payroll: { period: 'monthly', basis: 'nation-ppp', scale: 'service-rank', rankStep: 0.08, maxRankSteps: 3 },
+      protectedEvents: ['job_lost', 'wage_theft', 'ori_job_loss'], medicalAccommodation: true,
+      retirement: { minServiceYears: 5, replacementRate: 0.60, minimumMonthlyRate: 0.45 }
+    },
+    rhodes: {
+      payroll: { period: 'monthly', basis: 'nation-ppp', scale: 'operator-rank' },
+      protectedEvents: ['job_lost', 'wage_theft', 'ori_job_loss'], medicalAccommodation: true,
+      retirement: { minServiceYears: 5, replacementRate: 0.65, minimumMonthlyRate: 0.50 }
+    },
+    unpaid: {
+      payroll: { period: 'monthly', basis: 'subsistence', scale: 'subsistence' },
+      protectedEvents: [], medicalAccommodation: true, retirement: null
+    }
+  };
+  for (const o of Object.values(O)) {
+    o.employmentModel = o.unpaid ? 'unpaid' : 'contract';
+  }
+  O.rhodes.employmentModel = 'rhodes';
+  for (const id of [
+    'rhine_life', 'melander', 'blacksteel', 'penguin_logistics', 'karlan_trade',
+    'raythean', 'laterano_gunknights', 'laterano_guard', 'kaz_knights',
+    'lungmen_guard', 'yan_sishuitai', 'sir_newcourt'
+  ]) O[id].employmentModel = 'stable';
+
   Object.assign(O.blacksteel, { fromYear: 1090, nations: ['CLB', 'BLV'] });
-  Object.assign(O.penguin_logistics, { fromYear: 1094, nations: ['LMN'] });
+  // PRTS records its founding in 1093 and a later move to Lungmen; the city is
+  // a core business area, not an exclusive limit on contracts or recruitment.
+  Object.assign(O.penguin_logistics, { fromYear: 1093, nations: ['CLB', 'LMN', 'BLV'] });
   O.karlan_trade.fromYear = 1095;
+  O.karlan_trade.governance = {
+    owner: '谢拉格国营企业', actualController: '银灰',
+    scope: ['对外贸易', '工业', '军事领域'], sourceType: 'prts', confidence: 'documented'
+  };
+  O.karlan_trade.employmentModel = 'stable';
+  O.karlan_trade.employmentModelSource = 'project-rule';
   O.melander.en = 'Maylander Foundation';
   O.melander.contacts = [{ id: 'maylander_liaison', name: '基金会项目联络员', chance: 0.035, minRank: 1 }];
   O.laterano_guard.name = '拉特兰戍卫队';
@@ -491,6 +533,22 @@
   const interactions = {
     doctor: '博士让你在行动图上指出撤离路线，随后补上了你遗漏的医疗接应点。',
     amiya: '阿米娅听完了你的任务报告，也问了你最近是否休息得好。',
+    franka: '芙兰卡把护具检查变成了一场小测验。你逐项复核完毕，她才与你讨论下一次行动的分工。',
+    liskarm: '雷蛇逐项核对通讯、护具和撤离方案，最后把备用计划交给你保管。',
+    emperor: '大帝听完你的交付汇报，夸张地点评了节奏，随后亲自确认货物、交接地点和风险清单。',
+    texas: '德克萨斯听你复述运输路线，指出最容易被忽略的交接点，并把备用路线标在地图上。',
+    exusiai: '能天使和你核对货物封装与签收单。确认没有遗漏后，她提议把收尾工作当作一次计时练习。',
+    merc_captain: '佣兵队长逐项讲清合同里的撤离条件，最后与你确认集合暗号和失联后的处理方式。',
+    manfred: '曼弗雷德只问了队伍如何完成撤离。你说明补给缺口和风险后，他把两项都记进了命令。',
+    military_officer: '军官核对调令与补给清单，提醒你把命令来源和现场观察分别记录。',
+    silverash: '银灰询问商路调整对沿途居民和补给的影响，听完风险清单后才决定下一步安排。',
+    dengen: '锏带你复核雪线行程的负重与补给。她走在队伍前面，也按约定的节奏等你跟上。',
+    raythean_director: '项目主管要求你记录装备失效的边界条件，并把测试结果和未解决的风险一并列入交付清单。',
+    theresa: '特蕾西娅听你讲完沿途遇见的人，随后与你一起检查行动方案会把代价留给谁。',
+    gunknight: '铳骑教官让你按步骤复核装备、姿势与弹药登记；检查稳定后，才开始情景训练。',
+    guard_officer: '戍卫队军官安排你和同伴疏导庆典散场，先为居民与来访者留出安全通道。',
+    knight_association: '骑士协会代表与你逐条核对赞助条款、赛程和公开披露要求，确认你清楚合同的边界。',
+    redpine: '红松骑士团成员与你交换训练安排，先确认彼此能提供的支援，再商议接下来的赛程。',
     chen: '陈逐条核对你的现场记录，要求你把猜测与证据分开。',
     hoshi: '星熊带你复盘了一次街区巡逻，提醒你先看清群众的退路。',
     swire: '诗怀雅和你核对了警力安排，把遗漏的后勤预算补进计划。',
@@ -500,7 +558,11 @@
     doro: '多萝西与你讨论受试者的感受，记录下你在现场听到的意见。',
     zuo_le: '左乐与你交换外勤见闻，将尚不能确认的异象单独封存。',
     vigil: '伺夜与你讨论新城的公共事务，旧家族关系不再是办事的通行证。',
-    penance: '拉维妮娅要求补齐证据链。她提醒你，判决不能只凭家族的说法。'
+    penance: '拉维妮娅要求补齐证据链。她提醒你，判决不能只凭家族的说法。',
+    sicily: '西西里夫人只问你三件事：谁替你引荐、你愿意承担什么，以及你是否想过如何抽身。',
+    maylander_liaison: '基金会联络员把预算、现场记录与受助者反馈摆在一起；你们先核对物资去向，再讨论下一阶段。',
+    selene: '梅兰德·塞勒涅听完你的项目记录，追问资助如何转化为可核验的现场结果。',
+    mayor: '市政官员与你逐项核对公开会议的记录，确认反对意见和未解决的问题都留在案卷里。'
   };
   for (const [id, o] of Object.entries(O)) {
     o.source = o.source || 'https://prts.wiki/w/泰拉大典:组织';

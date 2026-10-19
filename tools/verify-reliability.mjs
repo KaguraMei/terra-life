@@ -36,6 +36,51 @@ for (const age of [0, 2, 8, 24, 55, 83]) {
 }
 assert.notEqual(T.causeName('ocd', 24), '其他原因', 'legacy reports have a meaningful fallback label');
 
+// Aegir share a strong relationship with water, but underwater breathing is an
+// individual rare trait; ordinary Aegir retain drowning risk. This is not a
+// dehydration or hydration mechanic.
+const aegirNonBreather = T.newLife({seed:41001,nation:'AEG',race:'aegir',traits:{underwaterBreathing:false}});
+const aegirBreather = T.newLife({seed:41001,nation:'AEG',race:'aegir',traits:{underwaterBreathing:true}});
+for (const person of [aegirNonBreather,aegirBreather]) {
+  person.job='fisher'; person.stratum='wild'; person.age=25;
+}
+assert.ok(T.causeWeights(aegirNonBreather,25,false).drown > 0,
+  'most Aegir can still die by drowning');
+assert.equal(T.causeWeights(aegirBreather,25,false).drown, undefined,
+  'underwater-breathing individuals are excluded from drowning deaths');
+assert.equal(T.newLife({seed:41001,nation:'AEG',race:'aegir'}).traits.underwaterBreathing,
+  T.newLife({seed:41001,nation:'AEG',race:'aegir'}).traits.underwaterBreathing,
+  'individual water adaptation is reproducible from a seed');
+const ordinaryRace = T.newLife({seed:41001,nation:'AEG',race:'feline',traits:{underwaterBreathing:true}});
+assert.equal(ordinaryRace.traits.underwaterBreathing, undefined,
+  'Aegir-specific water adaptation is not assigned to other races');
+for (const job of ['farm','farmhand','agbiz']) {
+  assert.equal(T.jobAvailable(job,'AEG','aegir'),false,job+' is unavailable in the Aegir homeland');
+  assert.equal(T.jobAvailable(job,'CLB','aegir'),true,job+' remains possible for Aegir living in a land region');
+}
+
+// Ursus' internal purge must be lived in Ursus; other nations only hear about it.
+const ursusPurge = T.TL_BY_ID.urs_purge;
+const localWitness = T.newLife({seed:41003,nation:'URS',race:'ursus',bornYear:1052});
+Object.assign(localWitness,{age:25,year:1077,city:'切尔诺伯格',job:'scholar'});
+T.timelineYear(localWitness);
+assert.ok(localWitness.log.some(entry=>entry.key==='urs_purge_at'),
+  'an eligible local researcher can experience the purge investigation');
+const foreignWitness = T.newLife({seed:41004,nation:'YAN',race:'feline',bornYear:1052});
+Object.assign(foreignWitness,{age:25,year:1077,city:'切尔诺伯格',job:'scholar'});
+T.timelineYear(foreignWitness);
+assert.ok(foreignWitness.log.some(entry=>entry.key==='urs_purge' && /听说|被指/.test(entry.text)),
+  'foreign characters receive rumor text for the Ursus event');
+assert.equal(foreignWitness.log.some(entry=>entry.key==='urs_purge_at'),false,
+  'foreign characters do not receive a local personal consequence');
+
+const terminalOripathy = T.newLife({seed:41002,nation:'YAN'});
+T.infect(terminalOripathy,true);
+terminalOripathy.ori.crystal=100; terminalOripathy.ori.stage=3;
+assert.equal(T.deathProb(terminalOripathy),1,'100% crystal rate is terminal');
+assert.equal(T.pickCause(terminalOripathy,terminalOripathy.age,false),'ori',
+  'terminal crystal death is attributed to oripathy');
+
 // Fast-forward stops at death even if no choice remains.
 S = T.newLife({seed:5});
 const death = T.deathProb, schedule = T.scheduleEvents;

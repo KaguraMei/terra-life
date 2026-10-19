@@ -86,6 +86,9 @@
     try {
       if (e.type === 'ev') {
         const ev = TL.EVMAP[e.id];
+        // 正式编制的薪酬与任用保障属于组织雇佣模型；通用随机裁员、克扣
+        // 和感染者禁工不能绕过模型直接改写成员的职业状态。
+        if (TL.organizationBlocksEvent && TL.organizationBlocksEvent(S, e.id)) return;
         if (!TL.contentAvailable(S, ev)) return;
         if (ev.when && !ev.when(S)) return;
         /* 一生次数上限必须在这里拦 —— 这里是所有事件的唯一入口。
@@ -178,6 +181,9 @@
 
     /* ---------- ④ 收入与资产 ---------- */
     TL.computeIncome(S);
+    // 月收入在这里代表刚结算的年度合同工资。后续年末晋升会更新 S.income
+    // 为下一年度薪资，但本年度快照必须记录 finances 实际使用的数值。
+    const settledMonthlyIncome = S.income;
     TL.finances(S);
 
     /* ---------- ⑤ 体质回归 ---------- */
@@ -237,7 +243,7 @@
        处理一次晋升；面试系统将来只负责入职前的多轮答题。 */
     if (TL.organizationYear) {
       TL.organizationYear(S);
-      if (TL.promoteOrganization) TL.promoteOrganization(S);
+      if (TL.promoteOrganization) TL.promoteOrganization(S, { annualSettlement: true });
     }
 
     /* ---------- ⑩ 记录本年快照 ---------- */
@@ -245,7 +251,7 @@
       age: a,
       hl: Math.round(st.hl), h: Math.round(st.h),
       sm: Math.round(st.sm), so: Math.round(st.so),
-      pct: S.pct, income: Math.round(S.income),
+      pct: S.pct, income: Math.round(settledMonthlyIncome),
       nw: Math.round(TL.netWorth(S)),
       ori: S.ori ? S.ori.crystal : 0,
       stage: S.ori ? S.ori.stage : 0,
@@ -476,7 +482,7 @@
       if (!k.alive) continue;
       k.age++;
       // 与兄弟姐妹同一套规则：职业随年龄自动更新
-      if (k.age === 7 || k.age === 16 || k.age === 67) k.job = TL.ageJob(S.nation, k.sex, k.age);
+      if (k.age === 7 || k.age === 16 || k.age === 67) k.job = TL.ageJob(S.nation, k.sex, k.age, S.race);
       if (k.age < 18) {
         const lt = TL.lifeTable(TL.NATION_BY_ID[S.nation], k.sex);
         const q = k.age >= lt.maxAge ? 1 : lt.q[k.age] * (k.ori ? 2.2 : 1);
@@ -492,17 +498,17 @@
       if (!s.alive) continue;
       s.age++;
       // 职业随年龄自然变化（7 岁前幼儿 / 16 岁前在学 / 之后就业 / 老年退休）
-      if (s.age === 7 || s.age === 16 || s.age === 67) s.job = TL.ageJob(S.nation, s.sex, s.age);
+      if (s.age === 7 || s.age === 16 || s.age === 67) s.job = TL.ageJob(S.nation, s.sex, s.age, S.race);
       const lt = TL.lifeTable(TL.NATION_BY_ID[S.nation], s.sex);
       const q = s.age >= lt.maxAge ? 1 : lt.q[Math.floor(s.age)];
       if (TL.chance(q)) { s.alive = false; TL.eff(S, { h: -5, so: -4 }); }
     }
     // 伴侣的职业同样会变（换工作 / 退休）
     if (F.partner && F.partner.alive && !F.partner.job) {
-      F.partner.job = TL.ageJob(S.nation, F.partner.sex, F.partner.age);
+      F.partner.job = TL.ageJob(S.nation, F.partner.sex, F.partner.age, S.race);
     }
     if (F.partner && F.partner.alive && F.partner.age === 67) {
-      F.partner.job = TL.ageJob(S.nation, F.partner.sex, F.partner.age);
+      F.partner.job = TL.ageJob(S.nation, F.partner.sex, F.partner.age, S.race);
     }
     // 子女出生（婚内）
     TL.tryBirth(S);
