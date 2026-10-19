@@ -199,7 +199,10 @@
     const lt = S.lt;
     $('rTitle').textContent = TL.L`${rep.name}的一生`;
     const rel = rep.delta >= 0 ? '多活了' : '少活了';
-    $('rDead').innerHTML = TL.L`卒于 ${rep.age} 岁 · ${rep.causeName} · ${rep.nation} ${rep.city}
+    const deathMode = rep.deathTrigger === 'annual'
+      ? TL.L`年度风险判定 ${TL.fmt.pct(rep.deathRisk || 0, 2)}`
+      : TL.L`事件直接致死`;
+    $('rDead').innerHTML = TL.L`卒于 ${rep.age} 岁 · ${rep.causeName} · ${deathMode} · ${rep.nation} ${rep.city}
       <br><span style="color:var(--fg3);font-size:12px">同为${rep.nation}${rep.sex === 'M' ? '男' : '女'}性的模拟人生，平均活到 ${rep.lifeExp} 岁（四分位 ${rep.baseP25}–${rep.baseP75}）——你${rel} ${Math.abs(rep.delta).toFixed(1)} 年</span>
       <br><span style="color:var(--fg3);font-size:12px">该国的统计预期寿命为 ${rep.statLE} 岁</span>`;
 

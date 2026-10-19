@@ -8,7 +8,7 @@
  *   name  中文名
  *   en    英文名（界面语言为 en 时显示；官方英文译名优先）
  *   reg   区域（决定死因基线 CT、收入弹性 MORT_G）
- *   pop   人口（万人），当前为待逐项核验的旧版模型权重
+ *   pop   人口（万人），来自《大地巡旅》页码或明确标注的推断值
  *   b     年出生权重（万人/年）—— 抽签用「此刻出生的婴儿」
  *   le    预期寿命（岁，两性均值）
  *   gap   性别寿命差（女 - 男）
@@ -207,7 +207,7 @@
       tag: '被称作「哀愁之地」，只是大地上一个模糊的小圆圈。它被毁灭过很多次，也重建过很多次。'
     },
     {
-      id: 'SST', name: '汐斯塔', en: 'Siesta', reg: 'sea', pop: 80, b: 1, le: 78.0, gap: 3.8,
+      id: 'SST', name: '汐斯塔', en: 'Siesta', reg: 'sea', pop: 30, b: 1, le: 78.0, gap: 3.8,
       im: 4.4, u5: 5.8, med: 0.84, ppp: 1.34, gi: 0.38, urb: 88, edu: 14.0, ter: 56,
       ori: 1.0, cat: 0.2, war: 0, hom: 2.4, road: 9, mat: 20, alc: 1.5, smk: 25,
       net: 88, art: 0.50,
@@ -244,19 +244,64 @@
     }
   ];
 
-  // 本轮冻结旧版权重，不把缺乏原文页码的数值认定为官方人口。
+  /* ---------------------------------------------------------------------- */
+  /* 人口快照                                                               */
+  /* ---------------------------------------------------------------------- */
+  /*
+   * 单位统一为“万人”。带页码的值来自用户核对的《大地巡旅》设定集；
+   * 书中未给出明确数字的国家保留可复现的推断值，并把来源类型写进状态，
+   * 避免把推断误当成官方统计。高卢虽然有“3000 万遗民”的记载，但已灭国，
+   * 不进入当前可出生国家和人口抽签。
+   */
+  TL.POPULATION_SNAPSHOT = 'terra-population-2026-10-19-v1';
+  TL.POPULATION_REFERENCE = 'docs/data/population-2026-10-19.json';
+  TL.POPULATION_DATA = {
+    VIC:  { pop: 4000, sourceType: 'official-setting', sourcePages: ['p118'], confidence: 'reported', note: '《大地巡旅》p118' },
+    LEI:  { pop: 3200, sourceType: 'official-setting', sourcePages: ['p137'], confidence: 'reported', note: '《大地巡旅》p137' },
+    URS:  { pop: 8000, sourceType: 'official-setting', sourcePages: ['p147'], confidence: 'reported', note: '《大地巡旅》p147' },
+    LAT:  { pop: 600,  sourceType: 'official-setting', sourcePages: ['p175'], confidence: 'reported', note: '《大地巡旅》p175' },
+    CLB:  { pop: 1600, sourceType: 'official-setting', sourcePages: ['p238'], confidence: 'reported', note: '《大地巡旅》p238' },
+    SST:  { pop: 30,   sourceType: 'official-setting', sourcePages: ['p248'], confidence: 'reported', note: '《大地巡旅》p248' },
+    BLV:  { pop: 1600, sourceType: 'official-setting', sourcePages: ['p255'], confidence: 'reported', note: '《大地巡旅》p255' },
+    SRG:  { pop: 10000, sourceType: 'official-setting', sourcePages: ['p279注'], confidence: 'reported', note: '《大地巡旅》p279 注' },
+    RMB:  { pop: 2800, sourceType: 'official-setting', sourcePages: ['p312'], confidence: 'reported', note: '《大地巡旅》p312' },
+    YAN:  { pop: 30000, sourceType: 'official-setting', sourcePages: ['p315'], confidence: 'reported', note: '《大地巡旅》p315' },
+
+    /* 章节已查阅但未找到人口数字：保留既有模型值，明确标为推断。 */
+    IBE:  { pop: 1417, sourceType: 'inferred', sourcePages: ['p182-p197'], analogue: '大静谧后沿海国家规模；沿用旧模型', confidence: 'inferred', note: '章节未见可核对人口数字' },
+    AEG:  { pop: 9000, sourceType: 'inferred', sourcePages: ['p198-p207'], analogue: '深海文明的大型聚居网络；沿用旧模型', confidence: 'inferred', note: '章节未见可核对人口数字' },
+    KJR:  { pop: 300, sourceType: 'inferred', sourcePages: ['p208-p216'], analogue: '高山小国；沿用旧模型', confidence: 'inferred', note: '章节未见可核对人口数字' },
+    KAZ:  { pop: 1800, sourceType: 'inferred', sourcePages: ['p217-p227'], analogue: '核心圈工业国家；沿用旧模型', confidence: 'inferred', note: '章节未见可核对人口数字' },
+    SIR:  { pop: 323, sourceType: 'inferred', sourcePages: ['p261-p271'], analogue: '家族城邦；沿用旧模型', confidence: 'inferred', note: '章节未见可核对人口数字' },
+    MIN:  { pop: 600, sourceType: 'inferred', sourcePages: ['p284-p292'], analogue: '多城邦农业/文化区；沿用旧模型', confidence: 'inferred', note: '章节未见可核对人口数字' },
+    SAMI: { pop: 250, sourceType: 'inferred', sourcePages: ['p293-p304'], analogue: '北境部落人口；沿用旧模型', confidence: 'inferred', note: '章节未见可核对人口数字' },
+
+    /* 本轮没有提供页码的既有地区，继续作为推断值参与抽签。 */
+    HIG:  { pop: 1600, sourceType: 'inferred', sourcePages: ['p325-p332'], analogue: '东方大型国家；沿用旧模型', confidence: 'inferred', note: '本轮未核对人口数字' },
+    KDZ:  { pop: 300, sourceType: 'inferred', sourcePages: ['p333-p345'], analogue: '长期战争与流离人口；沿用旧模型', confidence: 'inferred', note: '本轮未核对人口数字' },
+    DUR:  { pop: 900, sourceType: 'inferred', sourcePages: [], analogue: '地下城邦总和；沿用旧模型', confidence: 'inferred', note: '本轮未核对人口数字' },
+    LMN:  { pop: 500, sourceType: 'inferred', sourcePages: ['p322-p324'], analogue: '龙门单城；沿用旧模型', confidence: 'inferred', note: '本轮未核对人口数字' }
+  };
+
+  TL.EXCLUDED_POPULATIONS = [
+    { id: 'GAU', name: '高卢', pop: 3000, unit: '万人', sourcePages: ['p159'], counted: false, note: '高卢已灭国；遗民不作为当前国家人口计入抽签' }
+  ];
+
   // sourceYear 表示统计/设定对应年份，未知必须为 null；不是下载年份。
-  TL.POPULATION_SNAPSHOT = 'terra-population-2026-10-18-v1';
   for (const n of TL.NATIONS) {
-    n.sourceYear = null;
-    n.sourceType = 'legacy-model';
-    n.analogue = null;
-    n.confidence = 'unverified';
+    const p = TL.POPULATION_DATA[n.id] || {};
+    if (Number.isFinite(p.pop)) n.pop = p.pop;
+    n.sourceYear = p.sourceYear == null ? null : p.sourceYear;
+    n.sourceType = p.sourceType || 'inferred';
+    n.analogue = p.analogue || null;
+    n.confidence = p.confidence || 'inferred';
+    n.sourcePages = p.sourcePages || [];
     n.populationSource = {
       snapshot: TL.POPULATION_SNAPSHOT,
-      reference: 'docs/data/population-2026-10-18.json',
+      reference: TL.POPULATION_REFERENCE,
       birthWeightType: 'model-weight',
-      note: '既有值保留用于可复现抽签，官方原文与社区推算出处待逐项核定'
+      pages: n.sourcePages,
+      note: p.note || '本轮未核对人口数字'
     };
   }
 

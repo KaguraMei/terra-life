@@ -249,7 +249,7 @@
     S.lastQ = q;
     if (TL.chance(q)) {
       const cause = TL.pickCause(S, a, false);
-      TL.die(S, cause);
+      TL.die(S, cause, 'annual');
       return;
     }
 
@@ -538,10 +538,11 @@
   /* ---------------------------------------------------------------------- */
   /* 死亡（对应原作 die）                                                     */
   /* ---------------------------------------------------------------------- */
-  TL.die = function (S, cause) {
+  TL.die = function (S, cause, trigger) {
     S.phase = 'dead';
     S.deathAge = S.age;
     S.deathCause = cause;
+    S.deathTrigger = trigger || 'event';
 
     const info = { name: TL.causeName(cause, S.age) };
     const n = TL.NATION_BY_ID[S.nation];
@@ -558,7 +559,7 @@
     else if (S.age >= 80) line = TL.L`你在睡眠中离开了。活了 ${S.age} 年，比这个国家大多数人都长。`;
     else line = TL.L`${info.name}带走了你。那年你 ${S.age} 岁。`;
 
-    TL.log(S, line, 'death', { cause: cause });
+    TL.log(S, line, 'death', { cause: cause, trigger: S.deathTrigger, risk: S.lastQ || null });
     TL.finalizeLife(S);
   };
 
@@ -605,6 +606,8 @@
       age: S.age,
       cause: S.deathCause,
       causeName: TL.causeName(S.deathCause, S.age),
+      deathTrigger: S.deathTrigger || 'event',
+      deathRisk: Number.isFinite(S.lastQ) ? S.lastQ : null,
       lifeExp: baseLE,
       statLE: Math.round(lt.e0 * 10) / 10,
       delta: Math.round((S.age - baseLE) * 10) / 10,

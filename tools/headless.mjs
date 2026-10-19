@@ -94,7 +94,7 @@ for (let i = 0; i < N; i++) {
       console.log('\n================ 第 ' + (i + 1) + ' 局 ================');
       console.log(`${S.fullName} · ${TL.NATION_BY_ID[S.nation].name} ${S.city} · ${TL.RACE_BY_ID[S.race].name}${S.courtName ? '/' + S.courtName : ''} · ${S.sex === 'M' ? '男' : '女'}`);
       console.log(`家境分位 q=${S.q} 城乡=${S.urban ? '城' : '乡'} 技艺=${S.arts}(${TL.artRankName(TL.artRank(S))})`);
-      console.log(`卒于 ${S.deathAge} 岁 · ${(TL.CAUSES[S.deathCause] || {}).name} · 该国预期寿命 ${S.lt.e0.toFixed(1)}`);
+      console.log(`卒于 ${S.deathAge} 岁 · ${TL.causeName(S.deathCause, S.deathAge)} · 该国预期寿命 ${S.lt.e0.toFixed(1)}`);
       if (S.ori) console.log(`矿石病：${S.ori.at} 岁感染 · ${TL.oriStageName(S.ori.stage)} · 结晶率 ${S.ori.crystal.toFixed(1)}% · ${S.ori.treated ? '治疗中(' + S.ori.provider + ')' : '未治疗'} · ${S.ori.known ? '已登记' : '未公开'}`);
       console.log(`抉择 ${decisionsSeen.length} 次：${[...new Set(decisionsSeen)].join(', ')}`);
       console.log('--- 大事记 ---');

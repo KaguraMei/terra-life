@@ -24,6 +24,18 @@ function firstChoice(fast) {
 }
 assert.equal(firstChoice(true),firstChoice(false));
 
+// The old residual `ocd` bucket used to be shown as “其他原因” for deaths
+// below age 50. It is now expanded into concrete age/environment causes
+// before the annual death draw, so reports must never receive `ocd`.
+S = T.newLife({seed:12345,nation:'YAN'});
+for (const age of [0, 2, 8, 24, 55, 83]) {
+  S.age = age; S.year = S.bornYear + age;
+  const weights = T.causeWeights(S, age, false);
+  assert.equal(weights.ocd, undefined, 'residual cause bucket is expanded at age ' + age);
+  assert.notEqual(T.pickCause(S, age, false), 'ocd', 'residual cause is not reported at age ' + age);
+}
+assert.notEqual(T.causeName('ocd', 24), '其他原因', 'legacy reports have a meaningful fallback label');
+
 // Fast-forward stops at death even if no choice remains.
 S = T.newLife({seed:5});
 const death = T.deathProb, schedule = T.scheduleEvents;

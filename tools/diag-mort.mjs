@@ -38,16 +38,20 @@ for (let i = 0; i < N; i++) {
     // 拆解当前年龄的乘数
     const a = S.age, st = S.st;
     const n = TL.NATION_BY_ID[S.nation];
-    const off = 6 + (a < 15 ? n.u5 / 20 : 0) + (a > 50 ? (a - 50) * 0.08 : 0);
+    // 与 lifetable.js 的当前 deathProb 保持一致；旧脚本写成 6 会把健康
+    // 惩罚高估，导致诊断结果与实际模拟不一致。
+    const off = 13 + (a < 15 ? n.u5 / 20 : 0) + (a > 50 ? (a - 50) * 0.08 : 0);
     const fHealth = Math.max(0.5, Math.exp((TL.expHealth(a) - off - st.hl) * (a < 5 ? 0.02 : 0.03)));
     acc.health += Math.log(fHealth);
     acc.ties += Math.log(TL.tiesK(S));
     acc.race += Math.log(TL.raceMortK(S));
     acc.ori += Math.log(TL.oriMortK(S, a));
     const g = TL.MORT_G[n.reg];
-    const qe = a < 18 ? S.q : TL.clamp(Math.max(S.pct, S.flags.careerPct || 0) * 5 + 0.5, 0.5, 5.5);
-    const norm = [1,2,3,4,5].reduce((s,k)=>s+Math.exp(-g*(k-3)),0)/5;
-    acc.income += Math.log(Math.exp(-g * (qe - 3)) / norm);
+    const qe = a < 18 ? S.q : TL.clamp(Math.max(S.pct, S.flags.careerPct || 0) * 5, 0, 5);
+    let norm = 0;
+    for (let kk = 0; kk <= 5; kk += 0.5) norm += Math.exp(-g * (kk - 2.5));
+    norm /= 11;
+    acc.income += Math.log(Math.exp(-g * (qe - 2.5)) / norm);
     if (S.smoker) acc.habits += Math.log(1.7);
     if (S.alc && a >= 18) acc.habits += Math.log(1.5);
     for (const k in S.conds) if (!S.conds[k].treated) acc.conds += Math.log(1.3);

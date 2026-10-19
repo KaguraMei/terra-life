@@ -274,14 +274,93 @@
     exec:  { name: '纠察队处决', short: '处决' },
     starv: { name: '饥荒', short: '饥荒' },
     beast: { name: '野兽与荒原盗匪', short: '荒原' },
-    ocd:   { name: '多器官衰竭', short: '衰竭' }
+    /*
+     * `ocd` 是旧版区域表留下的“其余死因”桶，不应直接展示给玩家。
+     * causeWeights() 会在抽取前把它拆到下面的具体疾病/意外类别；保留
+     * 这个键只是为了兼容旧存档和旧版统计数据。
+     */
+    ocd:   { name: '未分类疾病', short: '未分类' }
   };
 
-  /** 死因显示名：ocd 是残差类别，老年段的实际含义是「多器官衰竭」 */
+  /**
+   * 旧存档可能仍然保存 `ocd`。新的人生不会再抽到它，但这里保留一个
+   * 有年龄语义的兼容名称，避免历史报告继续显示“其他原因”。
+   */
   TL.causeName = function (cause, age) {
-    if (cause === 'ocd') return (age != null && age >= 50) ? '多器官衰竭' : '其他原因';
+    if (cause === 'ocd') {
+      if (age != null && age < 1) return '新生儿并发症';
+      if (age != null && age < 5) return '儿童感染与营养疾病';
+      if (age != null && age < 15) return '儿童疾病或意外';
+      if (age != null && age < 50) return '未分类疾病';
+      return '多器官衰竭';
+    }
     const c = TL.CAUSES[cause];
     return c ? c.name : '未知';
+  };
+
+  /*
+   * 区域表里的 ocd 原本只是为了让每个年龄段的权重加总为 100 的残差项。
+   * 它在 5–14 岁和 15–49 岁仍占很大比重，直接抽取就会造成“突然死亡 ·
+   * 其他原因”。这里把残差按年龄段拆到模型已经支持的具体死因上，再叠加
+   * 国家/阶层的环境修正。这样死亡仍由年度风险判定，但报告能说明死于
+   * 哪一类疾病或事故。
+   */
+  const RESIDUAL_CAUSE_BASE = [
+    { neo: 42, con: 24, inf: 12, lri: 10, nut: 7, diar: 5 },
+    { inf: 28, lri: 20, diar: 16, nut: 12, con: 12, inj: 12 },
+    { inj: 28, inf: 20, con: 14, can: 12, lri: 10, mal: 8, nut: 8 },
+    { can: 24, ihd: 18, inf: 14, inj: 14, copd: 10, cir: 7, dia: 6, kid: 4, str: 3 },
+    { ihd: 28, can: 22, str: 16, copd: 10, cir: 8, kid: 7, dia: 5, dem: 4 },
+    { ihd: 30, str: 23, dem: 20, can: 12, copd: 8, kid: 4, cir: 3 }
+  ];
+
+  TL.residualCauseWeights = function (S, a) {
+    const n = TL.NATION_BY_ID[S.nation];
+    const out = {};
+    const base = RESIDUAL_CAUSE_BASE[TL.band(a)] || RESIDUAL_CAUSE_BASE[5];
+    for (const k in base) out[k] = base[k];
+
+    /* 环境只改变“残差里具体是什么”，不额外创造一份死亡风险。 */
+    if (n.reg === 'south' && a < 70) {
+      out.inf = (out.inf || 0) * 1.45;
+      out.heat = (out.heat || 0) + 7;
+    }
+    if (n.reg === 'north' && a >= 1 && a < 70) {
+      out.cold = (out.cold || 0) + 7;
+    }
+    if (n.reg === 'waste') {
+      out.inj = (out.inj || 0) * 1.25;
+      out.cat = (out.cat || 0) + 7;
+    }
+    if (n.reg === 'sea') {
+      out.drown = (out.drown || 0) + 6;
+      if (a >= 15 && a < 70) out.sea = (out.sea || 0) + 4;
+    }
+    if (S.stratum === 'wild') {
+      out.inj = (out.inj || 0) * 1.25;
+      out.inf = (out.inf || 0) * 1.20;
+    } else if (S.stratum === 'core') {
+      out.ihd = (out.ihd || 0) * 1.20;
+      out.can = (out.can || 0) * 1.10;
+    }
+    return out;
+  };
+
+  TL.expandResidualCauseWeights = function (w, S, a) {
+    const residual = w.ocd;
+    if (!(residual > 0)) return;
+    delete w.ocd;
+    const parts = TL.residualCauseWeights(S, a);
+    let total = 0;
+    for (const k in parts) total += Math.max(0, parts[k]);
+    if (!(total > 0)) {
+      w.inj = (w.inj || 0) + residual;
+      return;
+    }
+    for (const k in parts) {
+      const share = Math.max(0, parts[k]) / total;
+      if (share > 0) w[k] = (w[k] || 0) + residual * share;
+    }
   };
 
   TL.causeWeights = function (S, a, other) {
@@ -391,6 +470,9 @@
       } else delete w.art;
       if (a < 15) TL.povCause(w, S.q, S);
     }
+
+    /* 旧 CT 表的残差桶必须在最终抽取前展开，避免“其他原因”。 */
+    TL.expandResidualCauseWeights(w, S, a);
 
     for (const k in w) if (!(w[k] > 0)) delete w[k];
     return w;

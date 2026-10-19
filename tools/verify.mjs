@@ -153,7 +153,7 @@ for (const f of FILES) {
 bad('状态字段或职业引用错误', obsolete);
 if (!obsolete.length) ok('教育/王庭字段与直接赋值职业引用正确');
 
-const snapshot = JSON.parse(read('docs/data/population-2026-10-18.json'));
+const snapshot = JSON.parse(read('docs/data/population-2026-10-19.json'));
 const populationErrors = [];
 if (snapshot.id !== TL.POPULATION_SNAPSHOT || snapshot.nations.length !== TL.NATIONS.length)
   populationErrors.push('快照版本或国家数量不同');
@@ -162,9 +162,19 @@ for (const n of TL.NATIONS) {
   for (const key of ['pop', 'b', 'sourceYear', 'sourceType', 'analogue', 'confidence']) {
     if (!saved || saved[key] !== n[key]) populationErrors.push(n.id + '.' + key);
   }
+  if (JSON.stringify(saved && saved.sourcePages || []) !== JSON.stringify(n.sourcePages || [])) {
+    populationErrors.push(n.id + '.sourcePages');
+  }
 }
 bad('人口快照与运行时不一致', populationErrors);
 if (!populationErrors.length) ok('21 国人口/出生权重及来源字段与冻结快照一致');
+
+const excludedGaul = (snapshot.excluded || []).find(v => v.id === 'GAU');
+if (!excludedGaul || excludedGaul.counted !== false || excludedGaul.pop !== 3000) {
+  bad('已灭国人口未正确排除', ['GAU']);
+} else {
+  ok('高卢 3000 万遗民已记录但不进入当前抽签');
+}
 
 /* 每个事件都必须能返回一句文本（或 {t}），否则 fire() 会静默什么都不记 */
 const noRun = [], noTitle = [];
