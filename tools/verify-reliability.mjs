@@ -77,9 +77,140 @@ assert.equal(foreignWitness.log.some(entry=>entry.key==='urs_purge_at'),false,
 const terminalOripathy = T.newLife({seed:41002,nation:'YAN'});
 T.infect(terminalOripathy,true);
 terminalOripathy.ori.crystal=100; terminalOripathy.ori.stage=3;
-assert.equal(T.deathProb(terminalOripathy),1,'100% crystal rate is terminal');
+assert.ok(T.deathProb(terminalOripathy)<1,'100% fusion is not an automatic same-year death');
+assert.ok(terminalOripathy.ori.bloodDensity>0 && terminalOripathy.ori.bloodDensity<1,
+  'infection records a separate blood crystal density');
+assert.equal(T.oriStageOf(0.24), 1, 'high fusion with 0.24u/L blood density remains mild');
+assert.equal(T.oriStageOf(0.33), 2, '0.33u/L blood density enters the moderate blood-density band');
+assert.equal(T.oriStageOf(0.40), 2, 'the 0.40u/L boundary remains moderate');
+assert.equal(T.oriStageOf(0.41), 3, 'blood density above 0.40u/L is severe');
+terminalOripathy.ori.crystal = 16; terminalOripathy.ori.bloodDensity = 0.24;
+terminalOripathy.ori.stage = T.oriStageOf(terminalOripathy.ori.bloodDensity);
+assert.equal(terminalOripathy.ori.stage, 1, 'fusion percentage does not override clinical blood staging');
+terminalOripathy.ori.bloodDensity = 0.55;
+terminalOripathy.ori.stage = T.oriStageOf(terminalOripathy.ori.bloodDensity);
+terminalOripathy.st.hl=5;
 assert.equal(T.pickCause(terminalOripathy,terminalOripathy.age,false),'ori',
-  'terminal crystal death is attributed to oripathy');
+  'advanced disease with critical health is attributed to oripathy');
+
+// Source arts are offered by situation and profile, not by a universal annual
+// cast button.  A constructed high-control infected profile must be able to
+// survive a matched fall while paying the explicit last-stand costs.
+const artsSaved = T.newLife({seed:41005,nation:'YAN',race:'feline'});
+artsSaved.age = 32; artsSaved.year = artsSaved.bornYear + artsSaved.age;
+artsSaved.arts = 96;
+artsSaved.artsProfile = {
+  primary:'gravity', secondary:null, affinity:0.98,
+  training:{gravity:100}, control:100, fatigue:0, uses:0,
+  lastType:null, lastAge:null
+};
+T.infect(artsSaved,true,{bloodDensity:0.24});
+artsSaved.ori.stage = T.oriStageOf(artsSaved.ori.bloodDensity);
+artsSaved.flags.artsRescueContext = {cause:'fall', trigger:'test', situation:'fall'};
+const bloodBeforeStand = artsSaved.ori.bloodDensity;
+const nerveBeforeStand = artsSaved.ori.organLoad.nerve;
+const standText = T.resolveArtsRescue(artsSaved,true);
+assert.equal(artsSaved.phase,'life','a successful last stand keeps the life active');
+assert.equal(artsSaved.flags.artsLastStandAt,artsSaved.age,'last stand records its age');
+assert.ok(artsSaved.ori.bloodDensity > bloodBeforeStand,'last stand raises blood density');
+assert.ok(artsSaved.ori.organLoad.nerve > nerveBeforeStand,'last stand raises nerve burden');
+assert.match(String(standText),/生路|活下来/,'successful last stand returns survival text');
+
+// Exercise the real timeline death hook: the Urus Koval mine riot must offer
+// the event-specific rescue scene, stop before finalizing death, then resume
+// the event after the player survives.
+const timelineRescue = T.newLife({seed:41008,nation:'URS',race:'ursus',bornYear:1059});
+Object.assign(timelineRescue,{age:30,year:1089,job:'miner',city:'北原矿区'});
+timelineRescue.arts=96;
+timelineRescue.artsProfile={primary:'gravity',secondary:null,affinity:0.98,
+  training:{gravity:100},control:100,fatigue:0,uses:0};
+T.infect(timelineRescue,true,{bloodDensity:0.24});
+const originalChance=T.chance; T.chance=()=>true;
+try { T.fireTimeline(timelineRescue,T.TL_BY_ID.urs_koval); }
+finally { T.chance=originalChance; }
+assert.equal(timelineRescue.pending?.id,'arts_rescue','a fatal timeline event opens the rescue choice');
+assert.equal(timelineRescue.flags.artsRescueContext.situation,'mine_riot',
+  'the accident trigger selects a mine-riot-specific technique scene');
+assert.equal(timelineRescue.phase,'life','timeline death pauses before finalization');
+T.choose(timelineRescue,0);
+assert.equal(timelineRescue.phase,'life','a successful event-scene rescue returns to the active life');
+assert.equal(timelineRescue.pending,null,'the rescue choice is consumed exactly once');
+
+// Cherobog's fatal condition also carries displacement. The deferred move must
+// still occur exactly once after a successful rescue.
+const cherobogRescue=T.newLife({seed:41010,nation:'URS',race:'ursus',bornYear:1066});
+Object.assign(cherobogRescue,{age:30,year:1096,job:'miner',city:'切尔诺伯格'});
+cherobogRescue.arts=96;
+cherobogRescue.artsProfile={primary:'gravity',secondary:null,affinity:0.98,
+  training:{gravity:100},control:100,fatigue:0,uses:0};
+T.infect(cherobogRescue,true,{bloodDensity:0.24});
+const cherobogChance=T.chance; T.chance=()=>true;
+try { T.fireTimeline(cherobogRescue,T.TL_BY_ID.urs_cherobog); }
+finally { T.chance=cherobogChance; }
+assert.equal(cherobogRescue.pending?.id,'arts_rescue','a Cherobog fatal outcome offers an event-specific rescue');
+T.choose(cherobogRescue,0);
+assert.equal(cherobogRescue.refugee,true,'the interrupted Cherobog migration effect resumes after rescue');
+assert.equal(cherobogRescue.city,'荒野流民营地','the survivor is displaced to the refugee camp');
+assert.equal(cherobogRescue.pending,null,'the resumed Cherobog event leaves no stale choice');
+
+// If resumed timeline processing reaches another fatal condition, its new
+// rescue choice must survive completion of the first choice.
+const kovalEvent=T.TL_BY_ID.urs_koval;
+const originalKovalAt=kovalEvent.at;
+kovalEvent.at=originalKovalAt.concat([{when:S=>!S.flags.testSecondFatal,
+  die:1,dieCause:'inj',flag:'testSecondFatal'}]);
+const chainedTimelineRescue=T.newLife({seed:41009,nation:'URS',race:'ursus',bornYear:1059});
+Object.assign(chainedTimelineRescue,{age:30,year:1089,job:'miner',city:'北原矿区'});
+chainedTimelineRescue.arts=96;
+chainedTimelineRescue.artsProfile={primary:'gravity',secondary:null,affinity:0.98,
+  training:{gravity:100},control:100,fatigue:0,uses:0};
+T.infect(chainedTimelineRescue,true,{bloodDensity:0.24});
+const chainedChance=T.chance; T.chance=()=>true;
+try {
+  T.fireTimeline(chainedTimelineRescue,kovalEvent);
+  T.choose(chainedTimelineRescue,0);
+  assert.equal(chainedTimelineRescue.pending?.id,'arts_rescue',
+    'a second fatal timeline condition can open a follow-up rescue choice');
+  assert.equal(chainedTimelineRescue.flags.artsRescueContext.continuation.atIndex,2,
+    'the follow-up rescue resumes at its own timeline condition');
+  T.choose(chainedTimelineRescue,0);
+  assert.equal(chainedTimelineRescue.pending,null,'the follow-up rescue choice is consumed once');
+  assert.equal(chainedTimelineRescue.phase,'life','both successful rescues preserve the active life');
+} finally {
+  T.chance=chainedChance;
+  kovalEvent.at=originalKovalAt;
+}
+
+// A matched but untrained profile must still be able to fail, and failure
+// consumes the infected branch's extra blood burden before death is finalized.
+const artsFailed = T.newLife({seed:41006,nation:'YAN',race:'feline'});
+artsFailed.age = 32; artsFailed.year = artsFailed.bornYear + artsFailed.age;
+artsFailed.arts = 4;
+artsFailed.artsProfile = {
+  primary:'gravity', secondary:null, affinity:0.18,
+  training:{gravity:0}, control:18, fatigue:0, uses:0,
+  lastType:null, lastAge:null
+};
+T.infect(artsFailed,true,{bloodDensity:0.24});
+artsFailed.ori.stage = T.oriStageOf(artsFailed.ori.bloodDensity);
+artsFailed.flags.artsRescueContext = {cause:'fall', trigger:'test', situation:'fall'};
+const bloodBeforeFailed = artsFailed.ori.bloodDensity;
+// The failure branch is deterministic here: the score is far below the
+// situation threshold, regardless of the seeded ±8 roll.
+const failedText = T.resolveArtsRescue(artsFailed,true);
+assert.equal(artsFailed.phase,'report','failed last stand finalizes the death report');
+assert.ok(artsFailed.ori.bloodDensity > bloodBeforeFailed,'failed last stand still raises blood density');
+assert.match(String(failedText),/施术|技艺/,'failed last stand returns failure text');
+
+// The old 100% compatibility value is clamped on the next disease advance;
+// no simulated living infected person can grow beyond the documented 19% cap.
+const capped = T.newLife({seed:41007,nation:'YAN'});
+T.infect(capped,true,{bloodDensity:0.24});
+capped.ori.crystal = 100;
+capped.ori.stage = T.oriStageOf(capped.ori.bloodDensity);
+T.oriYear(capped);
+assert.equal(capped.ori.crystal,T.ORI_FUSION_MAX,'legacy fusion values are migrated to the 19% cap');
+assert.ok(capped.ori.crystal <= 19,'fusion cannot exceed the evidence-backed cap');
 
 // Fast-forward stops at death even if no choice remains.
 S = T.newLife({seed:5});

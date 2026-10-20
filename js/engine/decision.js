@@ -91,8 +91,12 @@
       result: typeof result === 'string' ? result : null
     });
 
-    S.pending = null;
-    S.paused = false;
+    // A choice can trigger a follow-up choice (for example, a second fatal
+    // condition while resuming a timeline event). Preserve the new pending
+    // object instead of clearing it with the choice that just completed.
+    const nextPending = S.pending !== p ? S.pending : null;
+    S.pending = nextPending;
+    S.paused = !!nextPending;
     if (TL.syncOrganization) TL.syncOrganization(S);
     // 面试等多轮流程可在旧题清空后排下一题，避免 run() 内打开的题被覆盖。
     if (TL.afterDecision) TL.afterDecision(S, p, index);
@@ -179,6 +183,7 @@
       if (a >= 15 && TL.reunionContactCurrent(S)) add('reunion_invite', 0.6);
       if (S.ori.stage >= 2) add('ori_despair', 0.6);
       if (S.ori.stage >= 3) add('ori_last', 0.7);
+      if (S.nation === 'RMB' && a >= 16 && S.ori.known && !S.flags.oriCareRoute) add('ori_care_route', 0.58);
     }
 
     /* --- 天灾 --- */

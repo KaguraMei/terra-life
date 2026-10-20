@@ -213,6 +213,26 @@
         S.orgLastServiceYear >= S.year || S.orgTransition) return;
     S.orgLastServiceYear = S.year;
     S.orgService++;
+    // OCR 中黑钢有新兵中心、装备技术部门和专门的矿石病/生化响应单位；
+    // 按路线授予相应训练，装备只能降低暴露，不能给绝对免疫。
+    if (S.affiliation === 'blacksteel') {
+      if (S.orgRoute === 'biosecurity') {
+        S.flags.protectionPractice = TL.clamp((S.flags.protectionPractice || 0) + 0.12, 0, 0.35);
+        S.flags.protectiveGear = TL.clamp((S.flags.protectiveGear || 0) + 0.06, 0, 0.25);
+        if (TL.trainArts) TL.trainArts(S, S.artsProfile && S.artsProfile.primary, 0.8);
+      } else if (S.orgRoute === 'security') {
+        S.flags.protectionPractice = TL.clamp((S.flags.protectionPractice || 0) + 0.08, 0, 0.35);
+        S.flags.protectiveGear = TL.clamp((S.flags.protectiveGear || 0) + 0.04, 0, 0.25);
+        if (TL.trainArts) TL.trainArts(S, S.artsProfile && S.artsProfile.primary, 0.6);
+      } else if (S.orgRoute === 'engineering') {
+        S.flags.protectionPractice = TL.clamp((S.flags.protectionPractice || 0) + 0.04, 0, 0.35);
+        S.flags.protectiveGear = TL.clamp((S.flags.protectiveGear || 0) + 0.06, 0, 0.25);
+      }
+    } else if (S.affiliation === 'rhodes') {
+      S.flags.protectionPractice = TL.clamp((S.flags.protectionPractice || 0) + 0.03, 0, 0.35);
+      // 外勤部负责能力评估与作战训练，适应性仍是先天值，成长的是具体方向熟练度。
+      if (TL.trainArts) TL.trainArts(S, S.artsProfile && S.artsProfile.primary, 1.1);
+    }
     const h = activeHistory(S);
     if (h) h.serviceYears = S.orgService;
   };

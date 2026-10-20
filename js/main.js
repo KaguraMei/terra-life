@@ -244,7 +244,9 @@
     }
     if (rep.ori) {
       cells.push(['感染年龄', rep.ori.at + ' 岁', 'red']);
-      cells.push(['离世时结晶率', Math.round(rep.ori.crystal) + '%', 'red']);
+      cells.push(['离世时体细胞融合率', Math.round(rep.ori.crystal) + '%', 'red']);
+      cells.push(['离世时血液结晶密度', Number(rep.ori.bloodDensity).toFixed(2) + 'u/L', 'red']);
+      cells.push(['离世时临床分期', TL.oriStageName(rep.ori.stage), 'red']);
       cells.push(['是否接受治疗', rep.ori.treated ? (rep.ori.provider === 'rhodes' ? '罗德岛方案' : '民间诊所') : '从未治疗', rep.ori.treated ? 'teal' : 'red']);
     }
     $('rGrid').innerHTML = cells.map(c =>

@@ -37,8 +37,8 @@
 
   /* ---------------------------------------------------------------------- */
   /* 源石技艺适应性 arts（0-100）                                            */
-  /* 泰拉特有的天赋维度：决定你能不能成为术师/医疗/辅助，也决定感染后       */
-  /* 恶化得更快还是更慢。原作没有这一维，是本作的核心扩展。                  */
+  /* 泰拉特有的天赋维度：决定技艺的广度、学习速度与使用上限；先天适应性     */
+  /* 不等同于病情，感染后进展另由血液负担、治疗和健康状态共同决定。          */
   /* ---------------------------------------------------------------------- */
   TL.drawArts = function (nationId, raceId, rnd) {
     const n = TL.NATION_BY_ID[nationId];
@@ -50,6 +50,88 @@
     // 极小概率的「天生异禀」
     if (rnd() < 0.012) base += 28 + rnd() * 20;
     return Math.round(TL.clamp(base, 2, 99));
+  };
+
+  /* ---------------------------------------------------------------------- */
+  /* 源石技艺原型                                                            */
+  /* ---------------------------------------------------------------------- */
+  /*
+   * PRTS 的干员技艺名称极多，但在人生模拟里不需要为每位干员复制一套
+   * 规则。这里保存“能量/作用原型”：具体技艺只需映射到一个或两个原型，
+   * 事件再用场景标签寻找可用的原型。这样既保留点火、反重力、电、铝热
+   * 剑等差异，也不会把事件表膨胀成干员名单。
+   */
+  TL.ARTS_TYPES = {
+    // school 对应《源石技艺》列出的宽泛理论派系；type 是可以继续扩充的
+    // 实际能力原型。新增干员技艺时，优先复用 tags，而不是新增专属规则。
+    ignition:       { name: '点火与热能', en: 'Ignition / heat', school: 'conversion', tags: ['heat', 'burn', 'area'] },
+    gravity:        { name: '重力与反重力', en: 'Gravity / anti-gravity', school: 'conjuration', tags: ['force', 'mobility', 'control'] },
+    electricity:    { name: '电与电磁', en: 'Electricity / electromagnetic', school: 'conversion', tags: ['electric', 'stun', 'power'] },
+    thermite_blade: { name: '铝热切割', en: 'Thermite cutting', school: 'conversion', tags: ['heat', 'cut', 'armor'] },
+    barrier:        { name: '屏障与防护', en: 'Barrier / protection', school: 'conjuration', tags: ['defense', 'barrier'] },
+    perception:     { name: '感知与侦测', en: 'Perception / detection', school: 'telepathy', tags: ['detect', 'scouting'] },
+    kinetic:        { name: '动能与冲击', en: 'Kinetic force', school: 'conjuration', tags: ['force', 'impact', 'repel'] },
+    restoration:    { name: '恢复与疗愈', en: 'Restoration / healing', school: 'healing', tags: ['heal', 'stabilize'] },
+    frost:          { name: '冷却与冻结', en: 'Cooling / frost', school: 'conversion', tags: ['cold', 'slow', 'control'] },
+    transmutation:  { name: '塑形与重构', en: 'Shaping / transmutation', school: 'shaping', tags: ['shape', 'repair', 'material'] },
+    physiology:     { name: '生理强化与调节', en: 'Physiology / enhancement', school: 'physiology', tags: ['body', 'reflex', 'stabilize'] }
+  };
+  TL.ARTS_TYPE_IDS = Object.keys(TL.ARTS_TYPES);
+
+  function pickArtsType(rnd, nationId, raceId) {
+    const n = TL.NATION_BY_ID[nationId] || {};
+    const r = TL.RACE_BY_ID[raceId] || {};
+    const bias = [];
+    for (const id of TL.ARTS_TYPE_IDS) {
+      let w = 1;
+      if (id === 'perception' || id === 'transmutation') w += (n.edu || 0) / 20;
+      if (id === 'ignition' || id === 'frost') w += (n.cat || 0) * 0.8;
+      if (id === 'gravity' || id === 'kinetic') w += Math.max(0, (r.mod && r.mod.hl) || 0) / 30;
+      if (id === 'electricity') w += (n.art || 0) * 0.25;
+      bias.push({ id, w });
+    }
+    const total = bias.reduce((s, x) => s + x.w, 0);
+    let x = rnd() * total;
+    for (const item of bias) { x -= item.w; if (x <= 0) return item.id; }
+    return bias[bias.length - 1].id;
+  }
+
+  TL.drawArtsProfile = function (nationId, raceId, arts, rnd) {
+    rnd = rnd || TL.rnd;
+    const primary = pickArtsType(rnd, nationId, raceId);
+    let secondary = null;
+    if (rnd() < 0.30) {
+      secondary = pickArtsType(rnd, nationId, raceId);
+      if (secondary === primary) secondary = TL.ARTS_TYPE_IDS[(TL.ARTS_TYPE_IDS.indexOf(primary) + 1) % TL.ARTS_TYPE_IDS.length];
+    }
+    const affinity = TL.clamp(0.18 + (arts || 0) / 125, 0.18, 0.98);
+    const training = {};
+    for (const id of TL.ARTS_TYPE_IDS) training[id] = 0;
+    training[primary] = Math.round(6 + affinity * 18);
+    if (secondary) training[secondary] = Math.round(3 + affinity * 10);
+    return {
+      primary, secondary, affinity,
+      training,
+      control: Math.round(TL.clamp(28 + affinity * 22 + rnd() * 18, 18, 82)),
+      fatigue: 0,
+      uses: 0,
+      lastType: null,
+      lastAge: null
+    };
+  };
+
+  TL.ensureArtsProfile = function (S) {
+    if (S.artsProfile && S.artsProfile.primary && S.artsProfile.training) return S.artsProfile;
+    S.artsProfile = TL.drawArtsProfile(S.nation, S.race, S.arts || 0, TL.rnd);
+    return S.artsProfile;
+  };
+
+  TL.trainArts = function (S, type, amount) {
+    const p = TL.ensureArtsProfile(S);
+    const id = TL.ARTS_TYPES[type] ? type : p.primary;
+    p.training[id] = TL.clamp((p.training[id] || 0) + (amount || 0), 0, 100);
+    p.control = TL.clamp((p.control || 0) + Math.max(0, amount || 0) * 0.12, 0, 100);
+    return p.training[id];
   };
 
   /* ---------------------------------------------------------------------- */
@@ -155,6 +237,7 @@
 
     /* --- ⑧ 天赋 --- */
     const arts = TL.drawArts(nationId, raceId, TL.rnd);
+    const artsProfile = TL.drawArtsProfile(nationId, raceId, arts, TL.rnd);
 
     /* --- ⑨ 父母 --- */
     const momAge = Math.round(TL.clamp(
@@ -233,7 +316,10 @@
       /* 四维 + 天赋 */
       st: st,
       arts: arts,
-      ori: null,          // 矿石病 {at, stage, crystal, treated, known, art}
+      // arts 是历史兼容的总体技艺值；affinity 是出生时抽定的先天亲和度，
+      // training/control 则记录具体方向的后天训练与操控能力。
+      artsProfile: artsProfile,
+      ori: null,          // 矿石病 {at, stage(按血液密度), crystal(融合率), bloodDensity, exposure, organLoad, treated, known, art}
 
       /* 经济 */
       money: 0,

@@ -29,8 +29,8 @@ function bestOption(a) {
   const values=q.options.map(o=>a.session.pool.axes.reduce((s,x)=>s+o.scores[x.id]*x.weight,0));
   return values.indexOf(Math.max(...values));
 }
-assert.equal(Object.keys(TL.INTERVIEW_QUESTIONS).length,106);
-assert.equal(Object.keys(TL.INTERVIEW_POOLS).length,34);
+assert.equal(Object.keys(TL.INTERVIEW_QUESTIONS).length,107);
+assert.equal(Object.keys(TL.INTERVIEW_POOLS).length,35);
 let evaluated=0;
 for(const [id,p] of Object.entries(TL.INTERVIEW_POOLS)) {
   for(const style of ['best','worst']) {
@@ -189,4 +189,4 @@ for(const mutate of [
   ids.forEach((id,i)=>{TL.INTERVIEW_QUESTIONS[id]=before[i];});
 }
 assert.equal(errors.length,0,errors.join('\n'));
-console.log(`PASS: 106 questions / 34 pools; ${evaluated} paper-answer combinations; all-route pass/fail, transfer, legacy entry, cooldown, stale/duplicate result, auto mode and DLC validation.`);
+console.log(`PASS: 107 questions / 35 pools; ${evaluated} paper-answer combinations; all-route pass/fail, transfer, legacy entry, cooldown, stale/duplicate result, auto mode and DLC validation.`);

@@ -173,6 +173,16 @@
       S.focusW = {};
     }
 
+    // 防护训练把 OCR 中的“通风、滤网与作业规程”变成长期能力。
+    // 它不会治疗感染，只降低以后暴露转化为感染的概率，并且会随离开高危环境略微衰减。
+    const protectionShare = S.focusW.protection || 0;
+    if (protectionShare > 0) {
+      S.flags.protectionPractice = TL.clamp((S.flags.protectionPractice || 0) + 0.18 * protectionShare, 0, 0.35);
+      S.flags.protectiveGear = TL.clamp((S.flags.protectiveGear || 0) + 0.08 * protectionShare, 0, 0.25);
+    } else if (!(S.affiliation === 'blacksteel' || S.affiliation === 'rhodes')) {
+      S.flags.protectionPractice = Math.max(0, (S.flags.protectionPractice || 0) - 0.015);
+    }
+
     /* ---------- ② 爱好成长 ---------- */
     for (const hb of S.hobbies) hb.lv += 0.35;
 
@@ -254,6 +264,8 @@
       pct: S.pct, income: Math.round(settledMonthlyIncome),
       nw: Math.round(TL.netWorth(S)),
       ori: S.ori ? S.ori.crystal : 0,
+      bloodDensity: S.ori ? Number((S.ori.bloodDensity || 0).toFixed(3)) : 0,
+      exposure: S.ori ? S.ori.exposure : null,
       stage: S.ori ? S.ori.stage : 0,
       job: S.job
     });
@@ -273,6 +285,7 @@
     /* ---------- ⑭ 进入下一年 ---------- */
     S.age = a + 1;
     S.year = S.bornYear + S.age;      // 泰拉历
+    if (S.artsProfile) S.artsProfile.fatigue = Math.max(0, (S.artsProfile.fatigue || 0) - 8);
     S.t = 0;
     S.queue = [];
     S.fT = {};
@@ -343,6 +356,7 @@
     const talent = 1 + (r.mod.art || 0) * 0.04;
     const k = Math.pow(1 - S.arts / 100, 0.85);
     S.arts = TL.clamp(S.arts + amt * (0.25 + 0.75 * k) * talent, 0, 100);
+    if (TL.trainArts) TL.trainArts(S, S.artsProfile && S.artsProfile.primary, amt * 0.8);
   };
 
   /** 学识的年度自然变化：在校期间增长，长期不用则衰退 */
@@ -541,7 +555,9 @@
     if ((S.sex === 'F' && S.ori && S.ori.stage > 0) ||
         (S.sex === 'M' && F.partner.ori && F.partner.ori.stage > 0)) {
       if (TL.chance(0.12)) {
-        kid.ori = { at: 0, stage: 1, crystal: TL.range(3, 9), treated: false, known: false, art: false, congenital: true };
+        kid.ori = { at: 0, stage: 1, crystal: TL.range(3, 9), bloodDensity: TL.range(0.16, 0.24),
+          organLoad: { skin: 0.08, limb: 0.02, lung: 0.01, nerve: 0.01, core: 0.01 },
+          treated: false, known: false, art: false, congenital: true };
       }
     }
     F.kids.push(kid);
@@ -558,6 +574,26 @@
   /* 死亡（对应原作 die）                                                     */
   /* ---------------------------------------------------------------------- */
   TL.die = function (S, cause, trigger) {
+    /* 具体致命事件可以给角色一次场景匹配的技艺交互。它只在有可用原型时
+       打开短决策；没有能力、玩家放弃或判定失败时，仍走原来的死亡流程。 */
+    if (!S.flags.artsRescueResolving && !S.flags.artsRescueOffered &&
+        TL.artsRescueAvailable && TL.artsRescueAvailable(S, cause, trigger) && TL.openDecision) {
+      const situation = TL.artsSituationForCause(cause, trigger);
+      const scene = TL.ARTS_SCENES && TL.ARTS_SCENES[situation];
+      const candidates = TL.artsCandidates ? TL.artsCandidates(S, situation) : [];
+      candidates.sort((a, b) => (b.training + (b.primary ? 9 : 0)) - (a.training + (a.primary ? 9 : 0)));
+      const bestArts = candidates[0] && TL.ARTS_TYPES[candidates[0].id];
+      S.flags.artsRescueOffered = S.age;
+      S.flags.artsRescueContext = {
+        cause, trigger: trigger || 'event', situation,
+        title: scene ? scene.title : (cause === 'ori' ? '病程急剧恶化' : '最后的脱险机会'),
+        text: TL.L`${scene ? scene.prompt : '危险已经逼到眼前。'}你最熟悉的方向是${bestArts ? bestArts.name : '源石技艺'}，能不能把它用在眼前的困境里，取决于你的亲和、训练和控制。`
+      };
+      TL.openDecision(S, 'arts_rescue');
+      if (S.pending) return false;
+      delete S.flags.artsRescueContext;
+      delete S.flags.artsRescueOffered;
+    }
     if (TL.syncOrganization) TL.syncOrganization(S);
     S.phase = 'dead';
     if (S.orgApplication && S.orgApplication.session && TL.finishOrganizationInterview) {
@@ -661,12 +697,31 @@
         contacts: Object.assign({}, S.orgContacts || {})
       } : null,
       ori: S.ori ? {
-        at: S.ori.at, stage: S.ori.stage, crystal: Math.round(S.ori.crystal),
+        at: S.ori.at, stage: S.ori.stage,
+        // 兼容旧存档的异常值，但对外报告遵守档案样本所见的 19% 上限。
+        crystal: Math.round(TL.clamp(Number(S.ori.crystal) || 0, 0, TL.ORI_FUSION_MAX || 19)),
+        fusionMax: TL.ORI_FUSION_MAX || 19,
+        bloodDensity: Number(S.ori.bloodDensity == null ? 0.12 + S.ori.crystal * 0.003 : S.ori.bloodDensity).toFixed(2),
+        organLoad: Object.assign({}, S.ori.organLoad || {}), exposure: S.ori.exposure || 'legacy-unknown',
         treated: S.ori.treated, known: S.ori.known, provider: S.ori.provider
       } : null,
       arts: S.arts,
       artsRank: TL.artRank(S),
       artsRankName: TL.artRankName(TL.artRank(S)),
+      artsProfile: S.artsProfile ? {
+        primary: S.artsProfile.primary,
+        secondary: S.artsProfile.secondary,
+        affinity: Number(S.artsProfile.affinity || 0),
+        control: Number(S.artsProfile.control || 0),
+        training: Object.assign({}, S.artsProfile.training || {}),
+        uses: Number(S.artsProfile.uses || 0),
+        successes: Number(S.artsProfile.successes || 0),
+        failures: Number(S.artsProfile.failures || 0),
+        lastType: S.artsProfile.lastType || null,
+        lastAge: S.artsProfile.lastAge == null ? null : S.artsProfile.lastAge
+      } : null,
+      artsRescueAttempts: Number(S.artsProfile && S.artsProfile.uses || 0),
+      artsRescueSuccesses: Number(S.artsProfile && S.artsProfile.successes || 0),
       avg: avg,
       final: { hl: Math.round(st.hl), h: Math.round(st.h), sm: Math.round(st.sm), so: Math.round(st.so) },
       peakNetWorth: peak,
