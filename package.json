@@ -1,0 +1,29 @@
+{
+  "name": "terra-life",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0 <23 || >=24.0.0"
+  },
+  "scripts": {
+    "prepare": "npm run build:runtime",
+    "dev": "vite --host 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "build:runtime": "node tools/build-runtime.mjs",
+    "build": "npm run typecheck && npm run build:runtime && vite build",
+    "build:offline": "npm run typecheck && npm run build:runtime && node tools/build-offline.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "npm run build:runtime && node --test tests/*.test.mjs",
+    "verify": "node tools/verify.mjs && node tools/verify-birth.mjs && node tools/verify-reliability.mjs && node tools/verify-organizations.mjs && node tools/verify-interviews.mjs && node tools/verify-faction-boundaries.mjs && node tools/validate-interview-pack.mjs docs/examples/dlc-blacksteel-interviews.json",
+    "check": "npm run typecheck && npm test && npm run verify",
+    "simulate": "node tools/headless.mjs"
+    ,"test:browser": "node tools/verify-browser.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "playwright": "1.61.1",
+    "typescript": "7.0.2",
+    "vite": "8.3.4"
+  }
+}

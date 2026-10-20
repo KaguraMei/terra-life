@@ -7,9 +7,9 @@ export const read = f => fs.readFileSync(path.join(root, f), 'utf8');
 export function simulation(log = console) {
   const window = {};
   const context = vm.createContext({window, console:log, Math, JSON, Date, Intl, Float64Array});
-  for (const [,file] of read('index.html').matchAll(/<script src="([^"]+)"/g)) {
-    if (file.includes('/ui/') || file === 'js/main.js') continue;
-    vm.runInContext(read(file), context, {filename:file});
-  }
+  const file = 'js/generated/simulation.js';
+  if (!fs.existsSync(path.join(root,file))) throw new Error('Run npm ci or npm run build:runtime first.');
+  vm.runInContext(read(file), context, {filename:file});
+  window.TL = context.TerraSimulation.createSimulation();
   return {TL:window.TL, context, window};
 }

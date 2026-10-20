@@ -2,6 +2,8 @@ name: Deploy GitHub Pages
 
 on:
   push:
+    branches: [main, refactor-ts]
+  pull_request:
     branches: [main]
   workflow_dispatch:
 
@@ -9,7 +11,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -19,20 +21,28 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Assemble static site
-        shell: bash
-        run: |
-          site_dir="$RUNNER_TEMP/terra-life-pages"
-          mkdir -p "$site_dir"
-          cp index.html favicon.svg "$site_dir/"
-          cp -R css js assets "$site_dir/"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build
+      - run: npm run build:offline
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+        env:
+          TERRA_BROWSER_CHANNEL: chromium
 
       - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ runner.temp }}/terra-life-pages
+          path: dist
 
   deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

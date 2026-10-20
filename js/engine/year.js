@@ -20,113 +20,13 @@
   /* ---------------------------------------------------------------------- */
   /* tick：每帧推进                                                          */
   /* ---------------------------------------------------------------------- */
-  TL.tick = function (S, dtSec) {
-    if (!S || S.phase !== 'life' || S.pending || S.paused) return;
-    // dt = 真实秒 × 倍速 ÷ 每年所需秒数
-    const dt = dtSec * S.speed / S.yearSec;
-    const nt = Math.min(S.t + dt, 1);
-    const accrue = to => {
-      if (S.focus) S.fT[S.focus] = (S.fT[S.focus] || 0) + Math.max(0, to - S.t);
-      S.t = to;
-    };
-
-    // 触发队列中所有已到期的事件
-    while (S.queue.length && S.queue[0].at <= nt) {
-      const e = S.queue.shift();
-      accrue(e.at);
-      TL.fire(S, e);
-      if (S.pending || S.phase !== 'life') return;
-    }
-
-    accrue(nt);
-    if (S.t >= 1) TL.endYear(S);
-  };
-
-  // 小步跨年快转，不跳过中间事件，也不提前结算抉择之后的重心时间。
-  // 有限步数让 UI 可以分帧执行；不替玩家选重心或回答抉择。
-  TL.advanceToDecision = function (S, budget = 256) {
-    if (!S || S.phase !== 'life') return 'ended';
-    const speed = S.speed;
-    S.speed = 1;
-    try {
-      for (let i = 0; i < budget && S.phase === 'life' && !S.pending; i++) {
-        S.paused = false;
-        const at = S.queue.length ? S.queue[0].at : 1;
-        TL.tick(S, (Math.max(0, at - S.t) + 1e-10) * S.yearSec);
-      }
-    } finally {
-      S.speed = speed;
-      S.paused = true;
-    }
-    return S.pending ? 'decision' : S.phase === 'life' ? 'searching' : 'ended';
-  };
-
-  /* ---------------------------------------------------------------------- */
-  /* 事件队列                                                               */
-  /* ---------------------------------------------------------------------- */
-  /** 排入一个事件 */
-  TL.queueEvent = function (S, at, type, id, p) {
-    S.queue.push({ at: TL.clamp(at, 0, 1), type: type, id: id, p: p });
-    S.queue.sort((a, b) => a.at - b.at);
-  };
-
-  /** 在年内随机位置排入若干事件 */
-  TL.queueRandom = function (S, n, type, picker) {
-    for (let i = 0; i < n; i++) {
-      const id = picker();
-      if (id) TL.queueEvent(S, TL.rnd(), type, id);
-    }
-  };
-
-  /* ---------------------------------------------------------------------- */
-  /* fire：派发事件                                                          */
-  /* ---------------------------------------------------------------------- */
-  TL.fire = function (S, e) {
-    S.actEvent = null;
-    try {
-      if (e.type === 'ev') {
-        const ev = TL.EVMAP[e.id];
-        // 正式编制的薪酬与任用保障属于组织雇佣模型；通用随机裁员、克扣
-        // 和感染者禁工不能绕过模型直接改写成员的职业状态。
-        if (TL.organizationBlocksEvent && TL.organizationBlocksEvent(S, e.id)) return;
-        if (!TL.contentAvailable(S, ev)) return;
-        if (ev.when && !ev.when(S)) return;
-        /* 一生次数上限必须在这里拦 —— 这里是所有事件的唯一入口。
-           只在 pickFrom 里拦是不够的：scheduleEvents 里那些「强制排入」的
-           事件（阶层天灾、纠察队、矿坑）根本不走选池，于是 cat_city
-           能在一条命里刷二十几次，同一句话重复到读者出戏。 */
-        if ((S.evCount[e.id] || 0) >= (ev.max == null ? 2 : ev.max)) return;
-        const last = S.flags['ev_' + e.id];
-        const cooldown = ev.cd == null ? 4 : ev.cd;
-        if (last != null && S.age - last < cooldown) return;
-        S.actEvent = e.id;
-        const before = TL.netWorth(S);
-        const r = ev.run(S, e.p);
-        TL.bookSince(S, before, ev.book || ev.title || '其他');
-        if (r) {
-          if (typeof r === 'string') TL.log(S, r, 'ev', { key: e.id });
-          else TL.log(S, r.t, r.k || 'ev', { key: e.id, f: r.f });
-        }
-        S.actEvent = null;
-        S.flags['ev_' + e.id] = S.age;
-        if (!S.evCount) S.evCount = {};
-        S.evCount[e.id] = (S.evCount[e.id] || 0) + 1;
-        S.recent.push(e.id);
-        if (S.recent.length > 14) S.recent.shift();
-      } else if (e.type === 'ms') {
-        TL.milestone(S);
-      } else if (e.type === 'dec') {
-        TL.openDecision(S, e.id, e.p);
-      } else if (e.type === 'cat') {
-        TL.catastrophe(S, e.p);
-      }
-    } catch (err) {
-      // 单个事件出错不应毁掉整局
-      if (typeof console !== 'undefined') console.error('[ev]', e.id, err);
-    } finally {
-      if (S.phase === 'life' && TL.syncOrganization) TL.syncOrganization(S);
-    }
-  };
+  // The typed kernel owns time, queue ordering and dispatch.
+  // Annual domain settlement below is intentionally unchanged in this phase.
+  TL.tick = (S, dtSec) => TL.kernel.events.tick(S, dtSec);
+  TL.advanceToDecision = (S, budget) => TL.kernel.events.advance(S, budget);
+  TL.queueEvent = (S, at, type, id, p) => TL.kernel.events.queue(S, at, type, id, p);
+  TL.queueRandom = (S, n, type, picker) => TL.kernel.events.queueRandom(S, n, type, picker);
+  TL.fire = (S, e) => TL.kernel.events.fire(S, e);
 
   /* ---------------------------------------------------------------------- */
   /* 记账（对应原作 bookSince / book）                                        */

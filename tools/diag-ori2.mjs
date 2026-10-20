@@ -1,3 +1,4 @@
+import {simulation} from './sim-context.mjs';
 /* ==========================================================================
  * 诊断：矿石病感染是从哪条路来的
  * --------------------------------------------------------------------------
@@ -10,19 +11,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const FILES = ['js/engine/rng.js', 'js/engine/text.js', 'js/engine/region.js',
-  'js/data/nations.js', 'js/data/races.js', 'js/data/jobs.js', 'js/data/names.js',
-  'js/data/baseline.js', 'js/data/focus.js', 'js/data/organizations.js',
-  'js/engine/lifetable.js', 'js/engine/cohort.js', 'js/engine/oripathy.js', 'js/engine/state.js',
-  'js/engine/decision.js', 'js/data/timeline.js','js/data/events.js', 'js/data/decisions.js', 'js/engine/organization.js', 'js/data/organization-events.js', 'js/data/interviews.js', 'js/engine/interview.js', 'js/engine/year.js'];
-
-const ctx = { console, window: {}, Math, Date, JSON, Intl, parseFloat, parseInt, isFinite, isNaN };
-ctx.globalThis = ctx;
-vm.createContext(ctx);
-for (const f of FILES) {
-  vm.runInContext(fs.readFileSync(f, 'utf8'), ctx, { filename: f });
-}
-const TL = ctx.window.TL;
+const {TL} = simulation();
 
 const N = parseInt(process.argv[2] || '400', 10);
 

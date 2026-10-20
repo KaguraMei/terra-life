@@ -1,3 +1,4 @@
+import {simulation} from './sim-context.mjs';
 /* 无头测试台：在 Node 里加载全部游戏脚本，批量跑人生，统计分布。
    用法：node tools/headless.mjs [局数] [--verbose]                    */
 import fs from 'node:fs';
@@ -8,33 +9,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
-const FILES = [
-  'js/engine/rng.js', 'js/engine/text.js','js/engine/region.js', 'js/engine/region.js',
-  'js/data/nations.js', 'js/data/races.js', 'js/data/jobs.js', 'js/data/names.js','js/data/baseline.js',
-  'js/data/focus.js', 'js/data/organizations.js',
-  'js/engine/lifetable.js','js/engine/cohort.js', 'js/engine/cohort.js', 'js/engine/oripathy.js', 'js/engine/state.js',
-  'js/engine/decision.js',
-  'js/data/timeline.js','js/data/events.js', 'js/data/decisions.js',
-  'js/engine/organization.js', 'js/data/organization-events.js', 'js/data/interviews.js', 'js/engine/interview.js', 'js/engine/year.js'
-];
-
-// 构造一个最小的浏览器环境
-const win = { TL: {} };
-win.window = win;
-const ctx = vm.createContext({
-  window: win, console, Math, JSON, Date, Float64Array, Object, Array, Number, String, Boolean, isFinite, parseFloat, parseInt
-});
-
-for (const f of FILES) {
-  const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
-  try {
-    vm.runInContext(src, ctx, { filename: f });
-  } catch (e) {
-    console.error('!! 加载失败', f, e.message);
-    process.exit(1);
-  }
-}
-const TL = win.TL;
+const {TL} = simulation();
 
 /* ---------------------------------------------------------------------- */
 /* 跑一局：自动替你选抉择，目标是把人生活完                                */

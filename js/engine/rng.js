@@ -10,45 +10,26 @@
   TL.lerp = function (a, b, t) { return a + (b - a) * t; };
 
   /* ---------------- 可复现随机数（mulberry32） ---------------- */
-  let _rnd = Math.random;
-  let _seed = null;
-
-  /** 用种子重置随机源，使同一局可复现 */
-  TL.seedRng = function (seed) {
-    _seed = seed >>> 0;
-    let a = _seed;
-    _rnd = function () {
-      a |= 0; a = (a + 0x6D2B79F5) | 0;
-      let t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  };
-
-  /** 回到真随机 */
-  TL.unseedRng = function () { _rnd = Math.random; _seed = null; };
-
-  TL.rnd = function () { return _rnd(); };
-  TL.seed = function () { return _seed; };
+  // Instance RNG is installed by src/legacy/kernel-adapter.ts.
 
   /** 概率命中 */
-  TL.chance = function (p) { return _rnd() < p; };
+  TL.chance = function (p) { return TL.rnd() < p; };
 
   /** 区间均匀 */
-  TL.range = function (lo, hi) { return lo + _rnd() * (hi - lo); };
+  TL.range = function (lo, hi) { return lo + TL.rnd() * (hi - lo); };
 
   /** 整数区间 [lo, hi] */
-  TL.irange = function (lo, hi) { return lo + Math.floor(_rnd() * (hi - lo + 1)); };
+  TL.irange = function (lo, hi) { return lo + Math.floor(TL.rnd() * (hi - lo + 1)); };
 
   /** 数组取一 */
-  TL.pick = function (arr) { return arr[Math.floor(_rnd() * arr.length)]; };
+  TL.pick = function (arr) { return arr[Math.floor(TL.rnd() * arr.length)]; };
 
   /** 加权取一（原作 wpick：遍历对象，权重取 max(0, w)） */
   TL.wpick = function (o) {
     let t = 0;
     for (const k in o) t += Math.max(0, o[k]);
     if (t <= 0) return Object.keys(o)[0];
-    let r = _rnd() * t;
+    let r = TL.rnd() * t;
     for (const k in o) { r -= Math.max(0, o[k]); if (r <= 0) return k; }
     const ks = Object.keys(o);
     return ks[ks.length - 1];
@@ -59,7 +40,7 @@
     key = key || 'w';
     let t = 0; for (const a of arr) t += Math.max(0, a[key]);
     if (t <= 0) return arr[0];
-    let r = _rnd() * t;
+    let r = TL.rnd() * t;
     for (const a of arr) { r -= Math.max(0, a[key]); if (r <= 0) return a; }
     return arr[arr.length - 1];
   };

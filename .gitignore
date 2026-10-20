@@ -1,6 +1,9 @@
 # ── 验证与截图（本地生成，不入库）──────────────────────────
 shots/
 dist/
+dist-runtime/
+dist-offline/
+js/generated/
 _site/
 site/
 coverage/

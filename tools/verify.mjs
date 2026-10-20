@@ -1,3 +1,5 @@
+import {simulation} from './sim-context.mjs';
+import {runtimeFiles} from './runtime-files.mjs';
 /* ==========================================================================
  * 结构自检：把「只有在特定路径上才会炸」的错误提前抓出来
  * --------------------------------------------------------------------------
@@ -108,15 +110,8 @@ console.log(`· 定义了但未被 TL.t() 引用：zh ${onlyZh.length} 个、en 
 /* ---------------------------------------------------------------------- */
 /* ③ 事件池里的 id                                                         */
 /* ---------------------------------------------------------------------- */
-const FILES = ['js/engine/rng.js', 'js/engine/text.js', 'js/engine/region.js',
-  'js/data/nations.js', 'js/data/races.js', 'js/data/jobs.js', 'js/data/names.js',
-  'js/data/baseline.js', 'js/data/focus.js', 'js/data/organizations.js',
-  'js/engine/lifetable.js', 'js/engine/cohort.js', 'js/engine/oripathy.js', 'js/engine/state.js',
-  'js/engine/decision.js', 'js/data/timeline.js','js/data/events.js', 'js/data/decisions.js', 'js/engine/organization.js', 'js/data/organization-events.js', 'js/data/interviews.js', 'js/engine/interview.js', 'js/engine/year.js'];
-const ctx = vm.createContext({ window: {}, console, Math, JSON, Date, Intl,
-  parseFloat, parseInt, isFinite, isNaN, Object, Array, String, Number, Boolean, Float64Array });
-for (const f of FILES) vm.runInContext(read(f), ctx, { filename: f });
-const TL = ctx.window.TL;
+const FILES = runtimeFiles;
+const {TL} = simulation();
 
 /* 事件 id：只看两处真正会「指名道姓」的地方 ——
    pool = [...] 的数组字面量，以及 TL.queueEvent(..., 'ev', 'x') 的第四个参数。

@@ -1,3 +1,4 @@
+import {simulation} from './sim-context.mjs';
 /* 生成「模拟基线寿命表」：对每个国家跑若干局标准人生，取平均死亡年龄。
    这张表用于人生报告里的对比 —— 因为国家的 le 在本作里应当读作
    「这个国家移动城市里的社会预期寿命」，一个荒野人口占多数的国家
@@ -10,16 +11,7 @@ import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const FILES = ['js/engine/rng.js','js/engine/text.js','js/engine/region.js','js/data/nations.js','js/data/races.js',
-  'js/data/jobs.js','js/data/names.js','js/data/focus.js', 'js/data/organizations.js','js/engine/lifetable.js','js/engine/cohort.js',
-  'js/engine/oripathy.js','js/engine/state.js','js/engine/decision.js','js/data/timeline.js','js/data/events.js',
-  'js/data/decisions.js','js/engine/organization.js', 'js/data/organization-events.js', 'js/data/interviews.js', 'js/engine/interview.js', 'js/engine/year.js'];
-
-const win = { TL: {} }; win.window = win;
-const ctx = vm.createContext({ window: win, console, Math, JSON, Date, Float64Array, Object,
-  Array, Number, String, Boolean, isFinite, parseFloat, parseInt });
-for (const f of FILES) vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), ctx, { filename: f });
-const TL = win.TL;
+const {TL} = simulation();
 
 const PER = parseInt(process.argv[2] || '320', 10);
 if (!Number.isInteger(PER) || PER < 1 || PER > 100000) throw new Error('invalid sample count');

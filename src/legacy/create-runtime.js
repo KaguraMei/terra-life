@@ -1,0 +1,54 @@
+// Transitional assembly: every initializer closes over this instance, never window.TL.
+import { installKernel } from './kernel-adapter';
+import initialize0 from '../../js/engine/rng.js?legacy';
+import initialize1 from '../../js/engine/text.js?legacy';
+import initialize2 from '../../js/engine/region.js?legacy';
+import initialize3 from '../../js/data/nations.js?legacy';
+import initialize4 from '../../js/data/races.js?legacy';
+import initialize5 from '../../js/data/jobs.js?legacy';
+import initialize6 from '../../js/data/names.js?legacy';
+import initialize7 from '../../js/data/baseline.js?legacy';
+import initialize8 from '../../js/data/focus.js?legacy';
+import initialize9 from '../../js/data/organizations.js?legacy';
+import initialize10 from '../../js/engine/lifetable.js?legacy';
+import initialize11 from '../../js/engine/cohort.js?legacy';
+import initialize12 from '../../js/engine/oripathy.js?legacy';
+import initialize13 from '../../js/engine/state.js?legacy';
+import initialize14 from '../../js/engine/decision.js?legacy';
+import initialize15 from '../../js/data/timeline.js?legacy';
+import initialize16 from '../../js/data/events.js?legacy';
+import initialize17 from '../../js/data/decisions.js?legacy';
+import initialize18 from '../../js/engine/organization.js?legacy';
+import initialize19 from '../../js/data/organization-events.js?legacy';
+import initialize20 from '../../js/data/interviews.js?legacy';
+import initialize21 from '../../js/engine/interview.js?legacy';
+import initialize22 from '../../js/engine/year.js?legacy';
+
+export default function createLegacyRuntime() {
+  const runtime = {};
+  installKernel(runtime);
+  initialize0(runtime);
+  initialize1(runtime);
+  initialize2(runtime);
+  initialize3(runtime);
+  initialize4(runtime);
+  initialize5(runtime);
+  initialize6(runtime);
+  initialize7(runtime);
+  initialize8(runtime);
+  initialize9(runtime);
+  initialize10(runtime);
+  initialize11(runtime);
+  initialize12(runtime);
+  initialize13(runtime);
+  initialize14(runtime);
+  initialize15(runtime);
+  initialize16(runtime);
+  initialize17(runtime);
+  initialize18(runtime);
+  initialize19(runtime);
+  initialize20(runtime);
+  initialize21(runtime);
+  initialize22(runtime);
+  return runtime;
+}

@@ -1,0 +1,45 @@
+flowchart LR
+    subgraph Entry["入口与装配"]
+        Boot["Bootstrap<br/>选择版本与启用内容"]
+        Web["Web UI<br/>DOM / Canvas"]
+        CLI["CLI / 回归模拟"]
+    end
+    subgraph AppLayer["应用层"]
+        App["GameSession<br/>命令、播放、交互仲裁"]
+        View["Selectors / ViewModel<br/>只读派生视图"]
+        Ports["存储与诊断端口"]
+    end
+    subgraph Runtime["模拟内核"]
+        Sim["Simulation<br/>实例状态、RNG、事务"]
+        Sched["Scheduler<br/>固定阶段、事件预算"]
+        Domains["领域模块<br/>健康、经济、组织、面试<br/>家庭、历史、任务、关系"]
+    end
+    subgraph ContentLayer["内容装载"]
+        Packs["核心内容 / DLC 数据包"]
+        Trusted["受审查的机制模块"]
+        Host["PluginHost<br/>依赖、校验、冲突检查"]
+        Registry["FrozenRegistry<br/>版本锁与派生索引"]
+    end
+    subgraph Platform["平台适配"]
+        Store["localStorage / IndexedDB"]
+        Diag["诊断日志 / 回归报告"]
+    end
+    Boot --> Host
+    Boot --> App
+    Packs --> Host
+    Trusted --> Host
+    Host --> Registry
+    Web --> App
+    CLI --> App
+    App --> Sim
+    App --> View
+    App --> Ports
+    View --> Sim
+    View --> Registry
+    Sim --> Sched
+    Sched --> Domains
+    Sim --> Registry
+    Domains --> Registry
+    Sim -. 提交后的领域消息 .-> App
+    Ports --> Store
+    Ports --> Diag
