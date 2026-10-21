@@ -66,6 +66,7 @@
   }
   TL.contentAvailable = function (S, item) {
     if (!item || item.disabledReason) return false;
+    if (TL.localContentAvailable && !TL.localContentAvailable(S, item)) return false;
     let orgOK = true;
     if (item.organization) {
       const os = TL.organizationState ? TL.organizationState(S, item.organization) : null;
@@ -807,10 +808,10 @@
           S.flags.atHome = false;
         }
         else {
-          const c = TL.cityOf(S.nation);
-          if (c) S.city = c;
+          TL.moveResidence(S, S.nation);
           S.flags.atHome = false;
         }
+        TL.syncResidence(S);
         TL.log(S, TL.L`你搬走了。新地方的名字你念了三天才念顺。`, 'tl', { key: ev.id + '_move' });
       }
 

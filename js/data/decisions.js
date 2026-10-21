@@ -64,7 +64,7 @@
         run(S) {
           S.job = 'courier';
           // 行商的路很长，认识的人一路换
-          if (TL.chance(0.35)) { S.flags.migrations = (S.flags.migrations || 0) + 1; S.city = TL.cityOf(S.nation); }
+          if (TL.chance(0.35)) TL.moveResidence(S, S.nation);
           return TL.L`你跟着一支商队上了路。原来世界比${S.city}大得多，也比它危险得多。`;
         }
       },
@@ -122,10 +122,8 @@
         eff: { sm: 3, so: -4, h: 2 },
         run(S) {
           const big = { YAN: 'LMN', VIC: 'VIC', CLB: 'CLB', LEI: 'LEI', URS: 'URS' }[S.nation] || S.nation;
-          S.flags.migratedTo = big;
-          S.city = TL.cityOf(big);
-          S.flags.migrations = (S.flags.migrations || 0) + 1;
-          return TL.L`你去了${TL.cityOf(big)}。房租比想象中贵。`;
+          TL.moveResidence(S, big);
+          return TL.placeHas(S, 'materialGuarantee') ? `你到了${S.city}的新生活区，开始熟悉周围的设施。` : TL.L`你去了${S.city}。房租比想象中贵。`;
         }
       },
       {
@@ -566,8 +564,7 @@
         label: '去', hint: '收入↑ 羁绊↓',
         eff: { so: -6, sm: 2, money: 2 },
         run(S) {
-          S.city = TL.cityOf(S.nation);
-          S.flags.migrations = (S.flags.migrations || 0) + 1;
+          TL.moveResidence(S, S.nation);
           const j = TL.rollJob(S);
           if (j) S.job = j;
           return TL.L`你去了${S.city}。新工钱确实高了一些。`;
@@ -627,10 +624,7 @@
         run(S) {
           const opts = S.race === 'sarkaz' ? ['KDZ', 'CLB', 'LEI'] : ['CLB', 'VIC', 'YAN', 'LMN', 'LEI', 'KAZ', 'SST'];
           const dest = TL.pick(opts.filter(x => x !== S.nation)) || 'CLB';
-          S.nation = dest;
-          S.city = TL.cityOf(dest);
-          S.flags.migrations = (S.flags.migrations || 0) + 1;
-          TL.applyPace(S, S.paceKey);
+          TL.moveResidence(S, dest);
           return TL.L`你去了${TL.NATION_BY_ID[dest].name}。语言不太一样，别的都得重新学。`;
         }
       },

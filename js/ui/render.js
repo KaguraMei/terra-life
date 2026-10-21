@@ -403,7 +403,17 @@
         esc(TL.fmt.pct(S.pct, 0)));
     if (S.debt > 0) add(TL.lang === 'zh' ? '负债' : 'Debt', esc(TL.moneyStr(S.debt)), 'neg');
     add(TL.t('livingWithParents'),
-        (S.age < 18 || S.flags.atHome) ? `<span style="color:var(--amber)">${TL.t('yes')}</span>` : TL.t('no'));
+        ((S.age < 18 && S.fam.care?.mode !== 'nursery') || S.flags.atHome) ? `<span style="color:var(--amber)">${TL.t('yes')}</span>` : TL.t('no'));
+    if (S.upbringing) {
+      add('成长环境', esc(TL.careLabel(S)));
+      const learned = Object.entries(S.upbringing.skills).filter(([, v]) => v > 0)
+        .map(([k, v]) => (TL.GROWTH_SKILLS[k] || k) + ' ' + Math.round(v));
+      if (learned.length) add('成长训练', esc(learned.join(' · ')));
+      const histories = S.upbringing.history.filter(h => h.accepted);
+      if (histories.length) add('经历', esc(histories.map(h => h.title).join(' · ')));
+      if (S.equipment?.guardianGun) add('守护铳', S.equipment.guardianGun.received ? '已领取，自行保管' : '资格登记，暂缓领取');
+      if (S.equipment?.launcher) add('发射器', '受指导的榴弹发射器训练');
+    }
     if (S.school) add(TL.lang === 'zh' ? '在校' : 'In school', TL.L`还剩 ${S.schoolLeft} 年`);
     if (S.serveLeft > 0) add(TL.lang === 'zh' ? '服役' : 'In service', TL.L`还剩 ${S.serveLeft} 年`);
       if (S.ori && S.ori.stage > 0) {
@@ -543,6 +553,9 @@
     if (f.mom) add(TL.t('mother'), f.mom.name, f.mom.age, f.mom.job ? TL.jobLabel(f.mom.job) : '—', f.mom.alive);
     if (f.dad) add(TL.t('father'), f.dad.name, f.dad.age, f.dad.job ? TL.jobLabel(f.dad.job) : '—', f.dad.alive);
     (f.sibs || []).forEach(s => add(TL.t('siblings'), s.name, s.age, s.job ? TL.jobLabel(s.job) : '—', s.alive));
+    for (const p of [...(f.care?.caregivers || []), ...(f.care?.peers || [])]) {
+      add(p.role + (p.remote ? '（异地）' : ''), p.name, p.age, p.job ? TL.jobLabel(p.job) : '—', p.alive);
+    }
     if (f.partner) add(TL.t('partner'), f.partner.name, f.partner.age,
                        f.partner.job ? TL.jobLabel(f.partner.job) : '—', f.partner.alive !== false);
     (f.kids || []).forEach(k => add(TL.t('children'), k.name, k.age,

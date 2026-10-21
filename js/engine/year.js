@@ -82,6 +82,7 @@
   /* fire：派发事件                                                          */
   /* ---------------------------------------------------------------------- */
   TL.fire = function (S, e) {
+    if (TL.syncResidence) TL.syncResidence(S);
     S.actEvent = null;
     try {
       if (e.type === 'ev') {
@@ -187,6 +188,7 @@
     for (const hb of S.hobbies) hb.lv += 0.35;
 
     /* ---------- ③ 教育 ---------- */
+    if (TL.growthYear) TL.growthYear(S);
     TL.schoolYear(S);
 
     /* ---------- ④ 收入与资产 ---------- */
@@ -382,6 +384,7 @@
   TL.schoolYear = function (S) {
     const a = S.age;
     const n = TL.NATION_BY_ID[S.nation];
+    if (S.flags.schoolInterruptedUntil > a) return;
     if (S.school) {
       S.schoolLeft = (S.schoolLeft || 0) - 1;
       if (S.schoolLeft <= 0) {
@@ -443,7 +446,8 @@
     // 慢性病
     cost += Object.keys(S.conds).length * n.ppp * 0.28;
 
-    const support = TL.organizationSubsistence ? TL.organizationSubsistence(S) : 0;
+    const support = TL.placeHas?.(S, 'materialGuarantee') ? cost :
+      (TL.organizationSubsistence ? TL.organizationSubsistence(S) : 0);
     const net = inc - Math.max(0, cost - support);
     S.money += net;
     if (S.money < 0) {
@@ -660,6 +664,7 @@
       nation: n.name,
       nationId: n.id,
       city: S.city,
+      upbringing: TL.upbringingReport ? TL.upbringingReport(S) : null,
       race: r.name,
       raceId: r.id,
       court: S.courtName,

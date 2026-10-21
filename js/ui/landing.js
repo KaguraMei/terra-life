@@ -77,6 +77,7 @@
       $('certPace').textContent = `走到预期寿命约需 ${TL.PACES[S.paceKey].min} 分钟（1 年 ≈ ${S.yearSec.toFixed(0)} 秒）。准备好之后，开始这一生。`;
       const fields = [['性别', S.sex === 'M' ? '男性' : '女性'], ['出生国家 / 地区',n.name], ['出生地',S.city],
         ['种族',r.name + (S.courtName && S.court !== 'none' ? ' · ' + S.courtName : '')], ['出身阶层',S.stratumName], ['家境','●'.repeat(S.q) + '○'.repeat(5-S.q) + ' 第' + S.q + '分位'],
+        ['养育安排',TL.careLabel ? TL.careLabel(S) : '原生家庭照护'],
         ['父母年龄',`母亲 ${S.fam.mom.age} 岁 · 父亲 ${S.fam.dad.age} 岁`], ['父母的工作',`母亲：${TL.jobLabel(S.fam.mom.job)}；父亲：${TL.jobLabel(S.fam.dad.job)}`], ['源石技艺适应性',TL.artRankName(TL.artRank(S))],
         ['社会预期寿命',S.lt.e0.toFixed(1) + ' 岁'], ['种族生理寿命区间',S.lifeMax.join('–') + ' 岁'], ['矿石病','未感染']];
       $('certFields').innerHTML = fields.map(([k,v]) => `<div><dt>${escape(k)}</dt><dd>${escape(v)}</dd></div>`).join('');

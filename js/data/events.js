@@ -1102,11 +1102,10 @@
     when: S => S.age >= 16 && S.age <= 45,
     run(S) {
       // 不要把「搬到 A」写成「搬到 A」—— 换一个和当前不同的城市
-      const pool = (TL.CITIES[S.nation] || []).filter(c => c !== S.city);
-      S.city = pool.length ? TL.pick(pool) : TL.cityOf(S.nation);
-      S.flags.migrations = (S.flags.migrations || 0) + 1;
+      const pool = Object.values(TL.PLACES).filter(p => p.nation === S.nation && p.id !== S.residence?.placeId);
+      TL.moveResidence(S, S.nation, pool.length ? TL.pick(pool).id : undefined);
       TL.eff(S, { h: -5, so: -8, sm: 2 });
-      const why = TL.pick([
+      const why = TL.placeHas(S, 'materialGuarantee') ? '你申请换了住处' : TL.pick([
         '房东把房子卖了',
         '原来那条街要拆',
         '有一份活在这边',
@@ -2111,8 +2110,11 @@
   /* 排程：每年该发生什么（对应原作的事件调度）                                */
   /* ====================================================================== */
   TL.scheduleEvents = function (S) {
+    if (TL.syncResidence) TL.syncResidence(S);
     const a = S.age;
     const n = TL.NATION_BY_ID[S.nation];
+    if (S.age >= 10 && TL.placeHas(S, 'emergencyTerminal') && TL.chance(0.035)) TL.queueEvent(S, 0.8, 'ev', 'aeg_equipment_fault');
+    if (S.age === 20 && TL.currentPlace(S)?.regime === 'coalition') TL.queueEvent(S, 0.35, 'dec', 'blv_professional_army');
     if (TL.organizationScheduledDecisions) {
       for (const d of TL.organizationScheduledDecisions(S)) TL.queueEvent(S, d.at, 'dec', d.id);
     }
@@ -2265,7 +2267,7 @@
   /* ====================================================================== */
   TL.catastrophe = function (S, p) {
     const e = TL.EVMAP['cat_warning'];
-    if (e) e.run(S, p);
+    if (e && TL.contentAvailable(S, e)) e.run(S, p);
   };
 
   /* ====================================================================== */
@@ -2297,6 +2299,7 @@
         if (TL.combatValue(S) < 45) continue;
       }
       let w = 1;
+      if (TL.growthJobWeight) w *= TL.growthJobWeight(S, id);
       // 学识匹配度
       w *= 0.4 + J.hi;
       // 歧视：越体面的工作越排斥异族与感染者

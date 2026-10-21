@@ -83,6 +83,8 @@
     let score = 0;
     score += TL.clamp(Number(S.flags && S.flags.protectionPractice) || 0, 0, 0.35);
     score += TL.clamp(Number(S.flags && S.flags.protectiveGear) || 0, 0, 0.25);
+    // 儿时学到的规程须配合实际防护装备；知识本身不提供感染免疫。
+    if (S.flags.protectiveGear > 0 && TL.growthSkill) score += Math.min(0.08, TL.growthSkill(S, 'protection') / 100);
     if (S.affiliation === 'blacksteel' && TL.isWorking && TL.isWorking(S)) score += 0.22;
     if (S.affiliation === 'rhodes' && TL.isWorking && TL.isWorking(S)) score += 0.14;
     return TL.clamp(score, 0, 0.62);
@@ -435,6 +437,7 @@
     let v = ar * 22 + S.st.hl * 0.35 + S.st.sm * 0.15;
     if (S.ori && S.ori.stage > 0) v += S.ori.stage * 9;
     if (S.opRank) v += TL.OP_RANKS[S.opRank].need * 1.2;
+    if (TL.growthSkill) v += Math.min(5, (TL.growthSkill(S, 'shooting') + TL.growthSkill(S, 'launcher')) * 0.12);
     return Math.round(v);
   };
 

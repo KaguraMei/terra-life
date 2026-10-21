@@ -479,7 +479,7 @@
 
     const S = TL.S;
     const info = S ? `
-      <div class="row"><span class="rk">出生地</span><span class="rv">${esc(TL.NATION_BY_ID[S.nation].name)} · ${esc(S.stratumName)}</span></div>
+      <div class="row"><span class="rk">出生地</span><span class="rv">${esc(TL.NATION_BY_ID[S.birthNation || S.nation].name)} · ${esc(S.birthPlace?.name || S.city)}</span></div>
       <div class="row"><span class="rk">社会预期寿命</span><span class="rv">${S.lt.e0.toFixed(1)} 岁</span></div>
       <div class="row"><span class="rk">生理极限</span><span class="rv">${S.lifeMax[0]}–${S.lifeMax[1]} 岁</span></div>
       <div class="row"><span class="rk">种子</span><span class="rv">${TL.seed() == null ? '真随机' : TL.seed()}</span></div>

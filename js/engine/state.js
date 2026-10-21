@@ -13,6 +13,8 @@
   /* 原作里 q 由「种族地位 + 王庭 + 种姓」共同决定，本作加上「矿石病身份」    */
   /* ---------------------------------------------------------------------- */
   TL.drawWealth = function (nationId, raceId, rnd) {
+    // 用户约定：正常阿戈尔海底城均富。种族不会把公共保障挤回贫富两端。
+    if (nationId === 'AEG') return 4;
     const n = TL.NATION_BY_ID[nationId];
     const r = TL.RACE_BY_ID[raceId];
     // 国家基尼越高，两极越厚、中间越薄
@@ -43,8 +45,8 @@
   TL.drawArts = function (nationId, raceId, rnd) {
     const n = TL.NATION_BY_ID[nationId];
     const r = TL.RACE_BY_ID[raceId];
-    // 基线：国家普及度 × 30，种族天赋加成
-    let base = n.art * 34 + (r.mod.art || 0) * 3.0;
+    // 国别影响教育机会；先天适应性不因国籍直接增加。
+    let base = 20 + (r.mod.art || 0) * 3.0;
     // 个体差异：三均匀分布近似正态
     base += (rnd() + rnd() + rnd() - 1.5) * 22;
     // 极小概率的「天生异禀」
@@ -224,8 +226,11 @@
     /* --- ⑤ 阶层 / 居住区域 --- */
     // 这是泰拉最残酷的分野：在城墙的哪一侧，比你生在哪个国家更决定命运。
     // 宏观上约 45% 的人住在移动城市里，55% 在荒野。
+    const bornYear = (o.bornYear && o.bornYear > 900) ? (o.bornYear | 0)
+      : (TL.drawBirthYear ? TL.drawBirthYear(TL.rnd) : 1085);
+    const place = TL.drawPlace(nationId, bornYear, TL.rnd, o.placeId);
     const q0 = TL.drawWealth(nationId, raceId, TL.rnd);
-    const stratum = TL.drawStratum(nationId, q0, TL.rnd);
+    const stratum = TL.placeStratum(place, q0, TL.rnd);
     const urban = TL.stratum(stratum).urban;
 
     /* --- ⑥ 家庭财富分位 --- */
@@ -233,7 +238,7 @@
 
     /* --- ⑦ 姓名与城市 --- */
     const nm = TL.makeName(nationId, sex, raceId);
-    const city = TL.cityOf(nationId);
+    const city = TL.placeName(place, bornYear);
 
     /* --- ⑧ 天赋 --- */
     const arts = TL.drawArts(nationId, raceId, TL.rnd);
@@ -287,6 +292,9 @@
     const S = {
       /* 身份 */
       nation: nationId,
+      birthNation: nationId,
+      birthPlace: TL.placeSnapshot(place, bornYear),
+      residence: TL.placeSnapshot(place, bornYear),
       race: raceId,
       court: court ? court.id : null,
       courtName: court ? court.name : null,
@@ -393,9 +401,9 @@
     S.cityName = city;                     // 兼容旧字段名
     /* 泰拉历：出生年份从年表区间里抽，不是固定值。
        你没法选择自己生在哪个时代 —— 这本来就是这游戏的第一条规则。 */
-    S.bornYear = (o.bornYear && o.bornYear > 900) ? (o.bornYear | 0)
-      : (TL.drawBirthYear ? TL.drawBirthYear(TL.rnd) : 1085);
+    S.bornYear = bornYear;
     S.year = S.bornYear;
+    if (TL.initUpbringing) TL.initUpbringing(S);
     if (TL.timelineBackstory) TL.timelineBackstory(S);
     if (TL.timelineLegend) TL.timelineLegend(S);
     // 像素场景的种子：同一个人的场景在一生中保持同一套构图，
@@ -558,6 +566,10 @@
       base *= 1 - TL.clamp(d, 0, 0.75) * 0.42;
       // 家境惯性：出身好的人起点高
       base *= 1 + (S.q - 3) * 0.06;
+    }
+    // 均富城市：公共供给之外仍有个人资源差异，但不沿用贫富悬殊的工资倍率。
+    if (TL.placeHas?.(S, 'materialGuarantee') && !S.affiliation && pensionAmount == null) {
+      base = n.ppp * (S.age < 18 ? 0.1 : TL.clamp(base / n.ppp, 0.45, 0.65));
     }
     S.income = Math.max(0, base);
     S.subsistenceAnnual = TL.organizationSubsistence ? TL.organizationSubsistence(S) : 0;
