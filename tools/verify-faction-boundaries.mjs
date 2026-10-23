@@ -32,7 +32,7 @@ for(const year of [1093,1094,1095,1096,1097,1100]) {
   }
 }
 for(const mutate of [S=>S.ori=null,S=>S.age=14,S=>S.school='university',S=>S.job='prison',
-  S=>S.serveLeft=1,S=>S.flags.retired=true,S=>S.age=65]) {
+  S=>S.serveLeft=1,S=>{S.flags.retired=true;S.job='retired';},S=>S.age=65]) {
   const S=fixture();mutate(S);assert.equal(TL.reunionCanContact(S),false);
   S.flags.reunionContactYear=S.year;assert.equal(TL.canJoinOrganization(S,'reunion','infected'),false);
 }

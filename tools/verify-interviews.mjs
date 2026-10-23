@@ -108,7 +108,7 @@ assert.deepEqual(paper(100),paper(100));assert.notDeepEqual(paper(100),paper(101
   assert.equal(TL.completeOrganizationInterview(S,{token:a.token,status:'passed'}),false);
   TL.choose(S,0);assert.equal(S.pending,null);assert.equal(S.orgApplication,null);
 }
-for(const mutate of [S=>S.year++,S=>S.flags.retired=true,S=>S.nation='YAN',S=>S.school='university',
+for(const mutate of [S=>S.year++,S=>{S.flags.retired=true;S.job='retired';},S=>S.nation='YAN',S=>S.school='university',
   S=>TL.joinOrganization(S,'melander','investigation')]) {
   const S=fixture();begin(S);mutate(S);TL.choose(S,0);
   assert.equal(S.orgInterviewResult.status,'ineligible');assert.notEqual(S.affiliation,'rhine_life');

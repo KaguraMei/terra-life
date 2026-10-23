@@ -1,0 +1,137 @@
+{
+  "note": "Direct writes to the life state in the legacy content layer. Counts may only go down; re-record with --write and say why.",
+  "total": 312,
+  "files": {
+    "js/data/decisions.js": {
+      "city": 4,
+      "debt": 1,
+      "fam": 7,
+      "flags": 37,
+      "job": 8,
+      "money": 6,
+      "nation": 1,
+      "orgApplication": 3,
+      "orgCooldowns": 2,
+      "ori": 7,
+      "refugee": 1,
+      "school": 1,
+      "serveLeft": 2,
+      "st": 1,
+      "stats": 1
+    },
+    "js/data/events.js": {
+      "alc": 1,
+      "city": 1,
+      "flags": 42,
+      "job": 5,
+      "money": 17,
+      "opRank": 1,
+      "orgApplication": 1,
+      "ori": 13,
+      "refugee": 1,
+      "serveLeft": 3,
+      "smoker": 2
+    },
+    "js/data/jobs.js": {
+      "flags": 1
+    },
+    "js/data/organization-events.js": {
+      "orgTransition": 2
+    },
+    "js/data/timeline.js": {
+      "city": 2,
+      "cityName": 1,
+      "flags": 5,
+      "money": 2,
+      "refugee": 1,
+      "stratum": 1,
+      "urban": 1
+    },
+    "js/engine/decision.js": {
+      "paused": 2,
+      "pending": 2
+    },
+    "js/engine/interview.js": {
+      "orgApplication": 2,
+      "orgInterviewHistory": 1,
+      "orgInterviewResult": 2
+    },
+    "js/engine/organization.js": {
+      "affiliation": 2,
+      "arts": 1,
+      "city": 1,
+      "cityName": 1,
+      "flags": 16,
+      "job": 7,
+      "opClass": 2,
+      "opRank": 3,
+      "orgApplication": 2,
+      "orgApplicationSerial": 1,
+      "orgContacts": 1,
+      "orgCooldowns": 1,
+      "orgHistory": 1,
+      "orgJob": 3,
+      "orgJoinedAt": 2,
+      "orgLastPromotionYear": 1,
+      "orgLastServiceYear": 2,
+      "orgRank": 5,
+      "orgRoute": 2,
+      "orgSchema": 1,
+      "orgService": 3,
+      "orgTransition": 2,
+      "retirementPension": 3
+    },
+    "js/engine/oripathy.js": {
+      "arts": 1,
+      "flags": 2,
+      "money": 1,
+      "ori": 2
+    },
+    "js/engine/state.js": {
+      "bornYear": 1,
+      "cityName": 1,
+      "paceKey": 1,
+      "sceneSeed": 1,
+      "stratumCode": 1,
+      "stratumName": 1,
+      "year": 1,
+      "yearSec": 1
+    },
+    "js/engine/year.js": {
+      "actDec": 1,
+      "actEvent": 1,
+      "age": 1,
+      "deathAge": 1,
+      "deathCause": 1,
+      "deathTrigger": 1,
+      "eduLevel": 1,
+      "fT": 1,
+      "flags": 1,
+      "focus": 1,
+      "job": 2,
+      "lastQ": 1,
+      "orgInterviewResult": 1,
+      "pending": 1,
+      "phase": 2,
+      "queue": 2,
+      "report": 1,
+      "school": 2,
+      "schoolLeft": 2,
+      "stats": 1,
+      "t": 1,
+      "year": 1
+    },
+    "js/main.js": {
+      "focus": 2,
+      "paused": 5,
+      "pending": 1,
+      "speed": 2
+    },
+    "js/ui/landing.js": {
+      "paused": 2
+    },
+    "js/ui/render.js": {
+      "focus": 2
+    }
+  }
+}

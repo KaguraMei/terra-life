@@ -1,0 +1,137 @@
+{
+  "long-life": {
+    "seed": "rep-5",
+    "expected": {
+      "age": 92,
+      "organization": null,
+      "infected": false
+    },
+    "markup": {
+      "rTitle": {
+        "html": "",
+        "text": "刘砚青的一生",
+        "class": ""
+      },
+      "rDead": {
+        "html": "卒于 92 岁 · 慢性肺病 · 年度风险判定 9.48% · 炎国 朔方\n      <br></br><span  style=\"color:var(--fg3);font-size:12px\">同为炎国男性的模拟人生，平均活到 58.8 岁（四分位 25–84）——你多活了 33.2 年</span>\n      <br></br><span  style=\"color:var(--fg3);font-size:12px\">该国的统计预期寿命为 90.3 岁</span>",
+        "text": "",
+        "class": ""
+      },
+      "rGrid": {
+        "html": "<div  class=\"rcell amber\"><div  class=\"k\">享年</div><div  class=\"v\">92 岁</div></div><div  class=\"rcell red\"><div  class=\"k\">死因</div><div  class=\"v\">慢性肺病</div></div><div  class=\"rcell \"><div  class=\"k\">种族</div><div  class=\"v\">瓦伊凡</div></div><div  class=\"rcell \"><div  class=\"k\">源石技艺</div><div  class=\"v\">微弱 (28)</div></div><div  class=\"rcell teal\"><div  class=\"k\">最高职业</div><div  class=\"v\">贵族</div></div><div  class=\"rcell \"><div  class=\"k\">学历</div><div  class=\"v\">高等</div></div><div  class=\"rcell \"><div  class=\"k\">终生平均·体质</div><div  class=\"v\">74</div></div><div  class=\"rcell \"><div  class=\"k\">终生平均·心境</div><div  class=\"v\">63</div></div><div  class=\"rcell \"><div  class=\"k\">终生平均·学识</div><div  class=\"v\">70</div></div><div  class=\"rcell \"><div  class=\"k\">终生平均·羁绊</div><div  class=\"v\">58</div></div><div  class=\"rcell amber\"><div  class=\"k\">峰值净资产</div><div  class=\"v\">152.0 万</div></div><div  class=\"rcell \"><div  class=\"k\">子女</div><div  class=\"v\">2 / 3 在世</div></div>",
+        "text": "",
+        "class": ""
+      },
+      "rChartLbl": {
+        "html": "",
+        "text": "一生曲线 · 体质 / 心境 / 学识 / 羁绊 / 结晶率",
+        "class": ""
+      },
+      "rWealthLbl": {
+        "html": "",
+        "text": "净资产",
+        "class": ""
+      },
+      "rLogLbl": {
+        "html": "",
+        "text": "一生纪要",
+        "class": ""
+      },
+      "reportLog": {
+        "html": "<div  class=\"entry birth\"><span  class=\"age\">0岁</span><span  class=\"txt\">你出生在炎国的云中。</span></div><div  class=\"entry birth\"><span  class=\"age\">0岁</span><span  class=\"txt\">你是瓦伊凡，男孩。家里殷实。</span></div><div  class=\"entry dec\"><span  class=\"age\">6岁</span><span  class=\"txt\">【该不该去学堂】你选择了：去上学</span></div><div  class=\"entry mil\"><span  class=\"age\">6岁</span><span  class=\"txt\">你进入初等学堂。</span></div><div  class=\"entry dec\"><span  class=\"age\">12岁</span><span  class=\"txt\">【中等学堂的方向】你选择了：继续读书</span></div><div  class=\"entry mil\"><span  class=\"age\">12岁</span><span  class=\"txt\">你结束了初等学业。</span></div><div  class=\"entry mil\"><span  class=\"age\">15岁</span><span  class=\"txt\">你进入高等学堂。</span></div><div  class=\"entry dec\"><span  class=\"age\">15岁</span><span  class=\"txt\">【十五岁】你选择了：读下去</span></div><div  class=\"entry dec\"><span  class=\"age\">17岁</span><span  class=\"txt\">【源石技艺】你选择了：专门去学</span></div><div  class=\"entry mil\"><span  class=\"age\">17岁</span><span  class=\"txt\">你结束了高等学业。</span></div><div  class=\"entry dec\"><span  class=\"age\">18岁</span><span  class=\"txt\">【毕业之后】你选择了：留在本地</span></div><div  class=\"entry dec\"><span  class=\"age\">18岁</span><span  class=\"txt\">【离开这里】你选择了：留下</span></div><div  class=\"entry dec\"><span  class=\"age\">20岁</span><span  class=\"txt\">【别的机会】你选择了：留下</span></div><div  class=\"entry dec\"><span  class=\"age\">22岁</span><span  class=\"txt\">【二十二岁】你选择了：广交朋友</span></div><div  class=\"entry dec\"><span  class=\"age\">24岁</span><span  class=\"txt\">【要不要在一起】你选择了：结婚</span></div><div  class=\"entry dec\"><span  class=\"age\">25岁</span><span  class=\"txt\">【买房子】你选择了：买</span></div><div  class=\"entry fam\"><span  class=\"age\">25岁</span><span  class=\"txt\">听澜生下了一个男孩，取名怀瑾。</span></div><div  class=\"entry dec\"><span  class=\"age\">26岁</span><span  class=\"txt\">【要不要孩子】你选择了：要</span></div><div  class=\"entry dec\"><span  class=\"age\">30岁</span><span  class=\"txt\">【撑不住了】你选择了：请一段时间假</span></div><div  class=\"entry fam\"><span  class=\"age\">30岁</span><span  class=\"txt\">听澜生下了一个男孩，取名怀瑾。</span></div><div  class=\"entry dec\"><span  class=\"age\">31岁</span><span  class=\"txt\">【要不要孩子】你选择了：要</span></div><div  class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【别的机会】你选择了：留下</span></div><div  class=\"entry fam\"><span  class=\"age\">33岁</span><span  class=\"txt\">听澜生下了一个女孩，取名流徽。</span></div><div  class=\"entry dec\"><span  class=\"age\">36岁</span><span  class=\"txt\">【离开这里】你选择了：留下</span></div><div  class=\"entry dec\"><span  class=\"age\">36岁</span><span  class=\"txt\">【要不要孩子】你选择了：要</span></div><div  class=\"entry fam\"><span  class=\"age\">38岁</span><span  class=\"txt\">你的母亲去世了，享年 80 岁。</span></div><div  class=\"entry dec\"><span  class=\"age\">41岁</span><span  class=\"txt\">【要不要孩子】你选择了：要</span></div><div  class=\"entry fam\"><span  class=\"age\">43岁</span><span  class=\"txt\">流徽没能长大。他/她只活了 10 岁。</span></div><div  class=\"entry fam\"><span  class=\"age\">46岁</span><span  class=\"txt\">你的父亲去世了，享年 93 岁。</span></div><div  class=\"entry dec\"><span  class=\"age\">62岁</span><span  class=\"txt\">【留下什么】你选择了：写下来</span></div><div  class=\"entry fam\"><span  class=\"age\">87岁</span><span  class=\"txt\">听澜走了。你们一起过了 63 年。</span></div><div  class=\"entry death\"><span  class=\"age\">92岁</span><span  class=\"txt\">你在睡眠中离开了。活了 92 年，比这个国家大多数人都长。</span></div>",
+        "text": "",
+        "class": ""
+      }
+    }
+  },
+  "organization": {
+    "seed": "life-16",
+    "expected": {
+      "age": 30,
+      "organization": "raythean",
+      "infected": false
+    },
+    "markup": {
+      "rTitle": {
+        "html": "",
+        "text": "露丝·海耶斯的一生",
+        "class": ""
+      },
+      "rDead": {
+        "html": "卒于 30 岁 · 意外伤害 · 事件直接致死 · 哥伦比亚 铁砧堡\n      <br></br><span  style=\"color:var(--fg3);font-size:12px\">同为哥伦比亚女性的模拟人生，平均活到 70.5 岁（四分位 66–86）——你少活了 40.5 年</span>\n      <br></br><span  style=\"color:var(--fg3);font-size:12px\">该国的统计预期寿命为 80.2 岁</span>",
+        "text": "",
+        "class": ""
+      },
+      "rGrid": {
+        "html": "<div  class=\"rcell amber\"><div  class=\"k\">享年</div><div  class=\"v\">30 岁</div></div><div  class=\"rcell red\"><div  class=\"k\">死因</div><div  class=\"v\">意外伤害</div></div><div  class=\"rcell \"><div  class=\"k\">种族</div><div  class=\"v\">卡特斯</div></div><div  class=\"rcell \"><div  class=\"k\">源石技艺</div><div  class=\"v\">微弱 (23)</div></div><div  class=\"rcell teal\"><div  class=\"k\">最高职业</div><div  class=\"v\">士兵</div></div><div  class=\"rcell \"><div  class=\"k\">学历</div><div  class=\"v\">大学</div></div><div  class=\"rcell \"><div  class=\"k\">终生平均·体质</div><div  class=\"v\">79</div></div><div  class=\"rcell \"><div  class=\"k\">终生平均·心境</div><div  class=\"v\">65</div></div><div  class=\"rcell \"><div  class=\"k\">终生平均·学识</div><div  class=\"v\">63</div></div><div  class=\"rcell \"><div  class=\"k\">终生平均·羁绊</div><div  class=\"v\">60</div></div><div  class=\"rcell amber\"><div  class=\"k\">峰值净资产</div><div  class=\"v\">16.9 万</div></div><div  class=\"rcell \"><div  class=\"k\">子女</div><div  class=\"v\">1 / 1 在世</div></div><div  class=\"rcell green\"><div  class=\"k\">组织</div><div  class=\"v\">雷神工业</div></div><div  class=\"rcell teal\"><div  class=\"k\">组织路线</div><div  class=\"v\">外场测试 · 高级测试员</div></div><div  class=\"rcell teal\"><div  class=\"k\">组织履历</div><div  class=\"v\">1063–至终年 雷神工业 · 外场测试 · 高级测试员</div></div><div  class=\"rcell \"><div  class=\"k\">面试记录</div><div  class=\"v\">1063 · 雷神工业 · 外场测试 · 面试：录用（65.9）</div></div>",
+        "text": "",
+        "class": ""
+      },
+      "rChartLbl": {
+        "html": "",
+        "text": "一生曲线 · 体质 / 心境 / 学识 / 羁绊 / 结晶率",
+        "class": ""
+      },
+      "rWealthLbl": {
+        "html": "",
+        "text": "净资产",
+        "class": ""
+      },
+      "rLogLbl": {
+        "html": "",
+        "text": "一生纪要",
+        "class": ""
+      },
+      "reportLog": {
+        "html": "<div  class=\"entry birth\"><span  class=\"age\">0岁</span><span  class=\"txt\">你出生在哥伦比亚的铁砧堡。</span></div><div  class=\"entry birth\"><span  class=\"age\">0岁</span><span  class=\"txt\">你是卡特斯，女孩。家里尚能温饱。</span></div><div  class=\"entry dec\"><span  class=\"age\">6岁</span><span  class=\"txt\">【该不该去学堂】你选择了：去上学</span></div><div  class=\"entry mil\"><span  class=\"age\">6岁</span><span  class=\"txt\">你进入初等学堂。</span></div><div  class=\"entry dec\"><span  class=\"age\">12岁</span><span  class=\"txt\">【中等学堂的方向】你选择了：继续读书</span></div><div  class=\"entry mil\"><span  class=\"age\">12岁</span><span  class=\"txt\">你结束了初等学业。</span></div><div  class=\"entry mil\"><span  class=\"age\">15岁</span><span  class=\"txt\">你进入高等学堂。</span></div><div  class=\"entry dec\"><span  class=\"age\">15岁</span><span  class=\"txt\">【十五岁】你选择了：读下去</span></div><div  class=\"entry dec\"><span  class=\"age\">17岁</span><span  class=\"txt\">【源石技艺】你选择了：只当个爱好</span></div><div  class=\"entry mil\"><span  class=\"age\">17岁</span><span  class=\"txt\">你结束了高等学业。</span></div><div  class=\"entry dec\"><span  class=\"age\">18岁</span><span  class=\"txt\">【毕业之后】你选择了：留在本地</span></div><div  class=\"entry dec\"><span  class=\"age\">18岁</span><span  class=\"txt\">【离开这里】你选择了：留下</span></div><div  class=\"entry mil\"><span  class=\"age\">18岁</span><span  class=\"txt\">你进入大学。</span></div><div  class=\"entry dec\"><span  class=\"age\">22岁</span><span  class=\"txt\">【二十二岁】你选择了：广交朋友</span></div><div  class=\"entry mil\"><span  class=\"age\">22岁</span><span  class=\"txt\">你结束了大学学业。</span></div><div  class=\"entry dec\"><span  class=\"age\">23岁</span><span  class=\"txt\">【雷神工业·面试】你选择了：接受招募考核</span></div><div  class=\"entry dec\"><span  class=\"age\">23岁</span><span  class=\"txt\">【雷神工业 · 面试 1 / 4】你选择了：删除那次记录，按正常产品验收</span></div><div  class=\"entry dec\"><span  class=\"age\">23岁</span><span  class=\"txt\">【雷神工业 · 面试 2 / 4】你选择了：分析载荷与失效模式，再设计验证实验</span></div><div  class=\"entry dec\"><span  class=\"age\">23岁</span><span  class=\"txt\">【雷神工业 · 面试 3 / 4】你选择了：保留成熟方案交付，新方案继续研发</span></div><div  class=\"entry dec\"><span  class=\"age\">23岁</span><span  class=\"txt\">【雷神工业 · 面试 4 / 4】你选择了：说明测试目的，建立受控验证与停机条件</span></div><div  class=\"entry org\"><span  class=\"age\">23岁</span><span  class=\"txt\">你加入了雷神工业，负责外场测试。</span></div><div  class=\"entry org\"><span  class=\"age\">23岁</span><span  class=\"txt\">雷神工业面试结果：录用。回答满足岗位要求，你已正式加入。</span></div><div  class=\"entry dec\"><span  class=\"age\">23岁</span><span  class=\"txt\">【面试结果】你选择了：继续人生</span></div><div  class=\"entry dec\"><span  class=\"age\">24岁</span><span  class=\"txt\">【要不要在一起】你选择了：结婚</span></div><div  class=\"entry dec\"><span  class=\"age\">24岁</span><span  class=\"txt\">【别的机会】你选择了：留下</span></div><div  class=\"entry dec\"><span  class=\"age\">25岁</span><span  class=\"txt\">【买房子】你选择了：买</span></div><div  class=\"entry dec\"><span  class=\"age\">26岁</span><span  class=\"txt\">【要不要孩子】你选择了：要</span></div><div  class=\"entry dec\"><span  class=\"age\">26岁</span><span  class=\"txt\">【下一段职业生涯】你选择了：继续任职</span></div><div  class=\"entry org\"><span  class=\"age\">26岁</span><span  class=\"txt\">你在雷神工业晋升为高级测试员。</span></div><div  class=\"entry fam\"><span  class=\"age\">27岁</span><span  class=\"txt\">你生下了一个女孩，取名克莱尔。</span></div><div  class=\"entry dec\"><span  class=\"age\">29岁</span><span  class=\"txt\">【警报】你选择了：去帮别人</span></div><div  class=\"entry death\"><span  class=\"age\">30岁</span><span  class=\"txt\">意外伤害带走了你。那年你 30 岁。</span></div>",
+        "text": "",
+        "class": ""
+      }
+    }
+  },
+  "infected": {
+    "seed": "life-4",
+    "expected": {
+      "age": 18,
+      "organization": null,
+      "infected": true
+    },
+    "markup": {
+      "rTitle": {
+        "html": "",
+        "text": "光元菖蒲的一生",
+        "class": ""
+      },
+      "rDead": {
+        "html": "卒于 18 岁 · 纠察队处决 · 年度风险判定 2.93% · 东国 锦织町\n      <br></br><span  style=\"color:var(--fg3);font-size:12px\">同为东国女性的模拟人生，平均活到 66.7 岁（四分位 49–84）——你少活了 48.7 年</span>\n      <br></br><span  style=\"color:var(--fg3);font-size:12px\">该国的统计预期寿命为 72.7 岁</span>",
+        "text": "",
+        "class": ""
+      },
+      "rGrid": {
+        "html": "<div  class=\"rcell amber\"><div  class=\"k\">享年</div><div  class=\"v\">18 岁</div></div><div  class=\"rcell red\"><div  class=\"k\">死因</div><div  class=\"v\">纠察队处决</div></div><div  class=\"rcell \"><div  class=\"k\">种族</div><div  class=\"v\">萨卡兹</div></div><div  class=\"rcell \"><div  class=\"k\">源石技艺</div><div  class=\"v\">中等 (46)</div></div><div  class=\"rcell teal\"><div  class=\"k\">最高职业</div><div  class=\"v\">账房金融</div></div><div  class=\"rcell \"><div  class=\"k\">学历</div><div  class=\"v\">高等</div></div><div  class=\"rcell \"><div  class=\"k\">终生平均·体质</div><div  class=\"v\">68</div></div><div  class=\"rcell \"><div  class=\"k\">终生平均·心境</div><div  class=\"v\">48</div></div><div  class=\"rcell \"><div  class=\"k\">终生平均·学识</div><div  class=\"v\">43</div></div><div  class=\"rcell \"><div  class=\"k\">终生平均·羁绊</div><div  class=\"v\">56</div></div><div  class=\"rcell amber\"><div  class=\"k\">峰值净资产</div><div  class=\"v\">1.7 万</div></div><div  class=\"rcell \"><div  class=\"k\">子女</div><div  class=\"v\">0 / 0 在世</div></div><div  class=\"rcell red\"><div  class=\"k\">感染年龄</div><div  class=\"v\">13 岁</div></div><div  class=\"rcell red\"><div  class=\"k\">离世时结晶率</div><div  class=\"v\">39%</div></div><div  class=\"rcell red\"><div  class=\"k\">是否接受治疗</div><div  class=\"v\">从未治疗</div></div>",
+        "text": "",
+        "class": ""
+      },
+      "rChartLbl": {
+        "html": "",
+        "text": "一生曲线 · 体质 / 心境 / 学识 / 羁绊 / 结晶率",
+        "class": ""
+      },
+      "rWealthLbl": {
+        "html": "",
+        "text": "净资产",
+        "class": ""
+      },
+      "rLogLbl": {
+        "html": "",
+        "text": "一生纪要",
+        "class": ""
+      },
+      "reportLog": {
+        "html": "<div  class=\"entry birth\"><span  class=\"age\">0岁</span><span  class=\"txt\">你出生在东国的北野。</span></div><div  class=\"entry birth\"><span  class=\"age\">0岁</span><span  class=\"txt\">你是萨卡兹，女孩。家里一贫如洗。</span></div><div  class=\"entry dec\"><span  class=\"age\">6岁</span><span  class=\"txt\">【该不该去学堂】你选择了：去上学</span></div><div  class=\"entry mil\"><span  class=\"age\">6岁</span><span  class=\"txt\">你进入初等学堂。</span></div><div  class=\"entry dec\"><span  class=\"age\">12岁</span><span  class=\"txt\">【中等学堂的方向】你选择了：继续读书</span></div><div  class=\"entry mil\"><span  class=\"age\">12岁</span><span  class=\"txt\">你结束了初等学业。</span></div><div  class=\"entry ori\"><span  class=\"age\">13岁</span><span  class=\"txt\">你的手指上出现了一小块黑色的结晶。它不疼，但你盯着它看了很久。</span></div><div  class=\"entry dec\"><span  class=\"age\">14岁</span><span  class=\"txt\">【要不要说出来】你选择了：只告诉最亲近的人</span></div><div  class=\"entry mil\"><span  class=\"age\">15岁</span><span  class=\"txt\">你进入高等学堂。</span></div><div  class=\"entry dec\"><span  class=\"age\">15岁</span><span  class=\"txt\">【十五岁】你选择了：读下去</span></div><div  class=\"entry dec\"><span  class=\"age\">15岁</span><span  class=\"txt\">【治不治】你选择了：找便宜的路子</span></div><div  class=\"entry dec\"><span  class=\"age\">16岁</span><span  class=\"txt\">【把角藏起来】你选择了：只对自己人露出角</span></div><div  class=\"entry ori\"><span  class=\"age\">16岁</span><span  class=\"txt\">结晶已经蔓延到手肘。医生在病历上写下「Ⅱ期」，然后很快合上了本子。</span></div><div  class=\"entry dec\"><span  class=\"age\">17岁</span><span  class=\"txt\">【源石技艺】你选择了：只当个爱好</span></div><div  class=\"entry dec\"><span  class=\"age\">17岁</span><span  class=\"txt\">【Ⅱ期之后】你选择了：把想做的事做完</span></div><div  class=\"entry mil\"><span  class=\"age\">17岁</span><span  class=\"txt\">你结束了高等学业。</span></div><div  class=\"entry dec\"><span  class=\"age\">18岁</span><span  class=\"txt\">【警报】你选择了：去帮别人</span></div><div  class=\"entry dec\"><span  class=\"age\">18岁</span><span  class=\"txt\">【毕业之后】你选择了：留在本地</span></div><div  class=\"entry death\"><span  class=\"age\">18岁</span><span  class=\"txt\">纠察队处决带走了你。那年你 18 岁。</span></div>",
+        "text": "",
+        "class": ""
+      }
+    }
+  }
+}

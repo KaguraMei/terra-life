@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terra-life.local/schemas/content-provenance.schema.json",
+  "title": "Setting and game-model provenance",
+  "description": "Setting evidence and project-specific simulation rules are separate fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["setting", "gameModel"],
+  "properties": {
+    "setting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "confidence", "sources"],
+      "properties": {
+        "kind": { "enum": ["canon-fact", "reference", "project-reconstruction", "project-authored", "project-model", "reference-needed"] },
+        "confidence": { "enum": ["documented", "inferred", "uncertain", "project-rule"] },
+        "sources": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "gameModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "sources"],
+      "properties": {
+        "kind": { "const": "project-rule" },
+        "sources": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    }
+  }
+}

@@ -17,6 +17,19 @@ node tools/verify-interviews.mjs
 
 游戏保持普通 `<script>` 加载，可直接双击 `index.html` 运行。发布题库包时，把经过验证的 JSON 数据作为对象传给 `TL.registerInterviewPack(pack)`，包装成单独 JS 文件并在核心 `js/engine/interview.js` 之后加载。不要在 `file://` 下依赖 `fetch()` 自动读取 JSON。本轮实现了题库注册接口，尚未实现玩家可操作的 DLC 安装器、开关或下载器。
 
+## 装载一份扩展包文档
+
+`TL.loadInterviewPacks(document)` 接受三种形态：单个包对象、`{packs: [...]}`、或直接是数组；也接受 JSON 字符串。
+它只做"解析 → 逐个交给注册器 → 收集失败"，**校验的唯一来源仍是 `TL.registerInterviewPack`**：
+
+- 一个包被拒不会影响同批次其他包，也不会留下半注册状态（注册器先全量校验再改动注册表）。
+- 失败按 `packs[i]` 定位并带 `pack.invalid` / `pack.not-object` / `pack.json-invalid` 三类码。
+- 池的归属属于**声明它的包**（`pack.pools`）；扩展包（`extensions`）只往既有池里加题，不改变归属，
+  因此会话的 `session.pack` 记的是声明包，而存档的内容锁会同时列出核心包与扩展包。
+
+内容锁与存档的关系见[存档版本协议](存档版本协议.md)：一旦某局用到了扩展包的题目，存档就会把该包记进
+`contentLock.packages`；在读不到该包（或版本/内容变了）的构建上，读档会被拒绝并给出具体是哪一个包。
+
 ## 玩家流程和判定
 
 招募邀请 → 3 道组织题（从 4 道中无重复抽取）→ 1 道岗位题 → 结果页 → 继续人生。题目与回答顺序使用项目种子随机数，结果页确认前时间保持暂停。所有题目都答完后统一评分，不在答对某一题时直接发放职业。

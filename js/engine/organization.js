@@ -7,21 +7,55 @@
     S.orgContacts = S.orgContacts || {};
     S.orgCooldowns = S.orgCooldowns || {};
   }
-  TL.organizationState = function (S, id) {
-    const o = TL.organizationDef(id), year = S.year;
-    const status = !o || !Number.isFinite(year) ? 'unknown'
-      : year < o.fromYear ? 'not_yet'
-      : o.untilYear != null && year > o.untilYear ? 'dissolved'
-      : o.recruitUntil != null && year > o.recruitUntil ? 'reorganized' : 'active';
-    return { id, status, available: status === 'active' || status === 'reorganized',
-      recruitment: status === 'active' };
-  };
-  TL.organizationAvailable = (S, id) => TL.organizationState(S, id).available &&
-    (!TL.organizationDef(id).locationAllowed || TL.organizationDef(id).locationAllowed(S));
+  /**
+   * 「能否被普通事件辞退」的唯一资格入口。只有真正在职且未进入退休身份的
+   * 个体才会丢掉工作；学生、待业、服刑、持家与已退休状态不会因为事件被
+   * 改写成待业，也不产生组织层面的辞退后果。
+   */
   TL.organizationEmploymentModel = function (id) {
     const o = TL.organizationDef(id);
     const models = TL.EMPLOYMENT_MODELS || {};
     return models[o && o.employmentModel] || models.contract || null;
+  };
+  TL.canBeDismissed = function (S) {
+    // 资格判定在 src/model/membership.ts：只有活着、在职、且没进入退休身份的人会被辞退。
+    if (!S) return false;
+    return TL.membershipDismissible(S);
+  };
+  /**
+   * 失去工作的唯一提交点；不满足资格时不做任何修改。
+   * 组织成员被辞退时必须同时结束组织身份：留着 affiliation 却没有对应岗位，
+   * 是状态不变量禁止的组合，也会让后续的组织事件对着一个不存在的岗位结算。
+   */
+  TL.dismissFromJob = function (S, reason) {
+    if (!TL.canBeDismissed(S)) return false;
+    if (S.affiliation) return TL.leaveOrganization(S, reason || '被辞退');
+    S.flags.lastJob = S.job;
+    S.job = 'seeking';
+    return true;
+  };
+  /**
+   * 强制劳役（苦役/服刑）的唯一提交点。
+   * 退休身份与强制劳役不能同时成立：被押走的人不再「已退休」，
+   * 但原有职业要留给释放后回去（退休前提下的 lastJob 已由 retire 记录）。
+   * 这不是普通事件的解雇，所以不复用 dismissFromJob。
+   */
+  TL.enterCoercedLabour = function (S, job) {
+    // 阶段、岗位合法性、是否已在该岗位：三条守卫在 src/model/membership.ts。
+    if (!S || !TL.coercedLabourGuard(S, job).ok) return false;
+    if (S.flags.retired) {
+      S.flags.retired = false;
+      // 退休身份被劳役取代后，已挣得的退休金仍然留档，但明确标注为「停发」：
+      // 记录不能凭空消失，也不能反过来假装此人仍在领取。
+      if (S.retirementPension && S.retirementPension.suspendedAt == null) {
+        S.retirementPension.suspendedAt = S.age;
+      }
+    } else if (TL.isWorking(S)) S.flags.lastJob = S.job;
+    // 组织成员被押走时同样要结束组织身份：劳役岗位与原岗位不能并存。
+    if (S.affiliation) TL.leaveOrganization(S, '被押走', {keepJob: true});
+    S.job = job;
+    S.flags.slaveAt = S.age;
+    return true;
   };
   TL.organizationBlocksEvent = function (S, eventId) {
     if (!S || S.phase !== 'life' || !S.affiliation || S.job !== S.orgJob || !TL.isWorking(S) ||
@@ -37,33 +71,12 @@
     !S.affiliation && !S.school && !S.flags.retired && !S.serveLeft &&
     !['slave', 'prison', 'retired'].includes(S.job) &&
     !!(S.ori && S.ori.stage > 0) && TL.reunionLean(S) > 0.5;
+  /**
+   * 准入判定：14 道检查在 src/model/admission.ts，这里只把选项翻译成 transfer 标志。
+   * 判定顺序与返回的 code 与迁移前逐条一致（差分探针 28800 条判定零分歧）。
+   */
   TL.organizationEligibility = function (S, id, routeId, options) {
-    options = options || {};
-    const o = TL.organizationDef(id), r = TL.organizationRouteDef(id, routeId);
-    const fail = (code, reason) => ({ ok: false, code, reason });
-    if (!o || !r) return fail('unknown', '组织或岗位不存在');
-    if (S.phase !== 'life') return fail('ended', '人生已经结束');
-    if (!TL.organizationState(S, id).recruitment) return fail('closed', '该组织当前不接受新成员');
-    if (o.locationAllowed && !o.locationAllowed(S)) return fail('location', '当地不允许该组织活动');
-    if (S.school || S.flags.retired || S.age >= 65 || S.serveLeft > 0 ||
-        ['slave', 'prison', 'retired'].includes(S.job)) return fail('unavailable', '当前不能参加招募');
-    if (S.affiliation && !options.transfer) return fail('affiliated', '需要先结束当前组织合同');
-    if ((S.orgCooldowns || {})[id] > S.year) return fail('cooldown', '尚未到再次申请的时间');
-    if (o.nations && !o.nations.includes(S.nation) &&
-        !(id === 'lungmen_guard' && S.nation === 'YAN' && /龙门/.test(S.city))) return fail('nation', '所在地不符合');
-    if (S.age < r.minAge || (r.maxAge != null && S.age > r.maxAge)) return fail('age', '年龄不符合');
-    if (r.fromYear != null && S.year < r.fromYear) return fail('route_year', '该部门尚未开放');
-    if (S.eduLevel < (r.edu || 0)) return fail('education', '学历不足');
-    // 允许待业者申请，但必须满足目标职业本身的学历与技艺门槛。
-    if (r.jobs && !r.jobs.includes(S.job)) {
-      const j = TL.JOBS[r.entryJob || r.jobs[0]];
-      if (S.job !== 'seeking' || !j || S.eduLevel < j.edu || S.arts < j.art * 100)
-        return fail('profession', '需要相关职业经验或专业资格');
-    }
-    if (r.require && !r.require(S)) return fail('requirements', '尚未达到岗位要求');
-    if (o.require && !o.require(S)) return fail('organization_requirements', '尚未达到组织要求');
-    return { ok: true, organization: id, route: routeId,
-      interview: TL.organizationInterviewSpec(id, routeId) };
+    return TL.organizationAdmission(S, id, routeId, Boolean(options && options.transfer));
   };
   TL.canJoinOrganization = (S, id, route) => TL.organizationEligibility(S, id, route).ok;
 
@@ -110,35 +123,41 @@
     if (!S.affiliation) return false;
     const id = S.affiliation, h = activeHistory(S);
     if (h) Object.assign(h, { leftAt: S.age, leftYear: S.year, reason: reason || '离职' });
-    if ((options.retirement || reason === '退休') && !S.retirementPension) {
-      const policy = TL.organizationEmploymentModel(id)?.retirement;
-      if (policy && S.orgService >= policy.minServiceYears) {
-        const finalMonthlyPay = Math.max(0, Number.isFinite(S.income) ? S.income : 0);
-        const nation = TL.NATION_BY_ID[S.nation];
-        S.retirementPension = {
-          organization: id,
-          serviceYears: S.orgService,
-          rank: S.orgRank || 0,
-          retiredAt: S.age,
-          finalMonthlyPay,
-          replacementRate: policy.replacementRate,
-          minimumMonthlyAmount: nation.ppp * policy.minimumMonthlyRate,
-          monthlyAmount: Math.max(finalMonthlyPay * policy.replacementRate,
-            nation.ppp * policy.minimumMonthlyRate)
-        };
-      }
-    }
+    // 退休金、冷却、岗位与职级重置的条件在 src/model/employment.ts，这里只按次写状态。
+    const terms = TL.leaveTerms(S, id, reason || '离职', options);
+    if (terms.pension) S.retirementPension = Object.assign({organization: id}, terms.pension);
     delete S.flags['org_' + id];
     if (id === 'reunion') { S.flags.reunion = false; S.flags.reunionLeft = S.age; }
-    if (id === 'rhodes' && !options.preserveOperatorRank) { S.opClass = null; S.opRank = 0; }
-    if (!options.keepJob && S.job === S.orgJob) {
+    if (terms.clearsOperatorRank) { S.opClass = null; S.opRank = 0; }
+    if (terms.resetsJob) {
       S.flags.lastJob = S.job; S.job = 'seeking';
     }
-    S.orgCooldowns[id] = S.year + 3;
+    S.orgCooldowns[id] = terms.cooldownYear;
     S.affiliation = null; S.orgRoute = null; S.orgRank = 0; S.orgService = 0;
     S.orgJoinedAt = null; S.orgJob = null; S.orgTransition = null;
     TL.log(S, '你离开了' + TL.organizationName(id) + '：' + (reason || '离职') + '。', 'org',
       { key: 'org_leave_' + id, organization: id });
+    TL.computeIncome(S);
+    return true;
+  };
+  TL.retire = function (S, options) {
+    options = options || {};
+    // 阶段 / 年龄 / 是否已退休：三条守卫在 src/model/membership.ts。
+    if (!TL.retirementGuard(S).ok) return false;
+    S.flags.retired = true;
+    if (TL.isWorking(S)) S.flags.lastJob = S.job;
+    S.job = 'retired';
+    // 重新获得退休身份时，因劳役停发的退休金随之恢复；金额沿用当年核定的数字。
+    if (S.retirementPension && S.retirementPension.suspendedAt != null) {
+      S.retirementPension.resumedAt = S.age;
+      delete S.retirementPension.suspendedAt;
+    }
+    // Annual simulation preserves its established timeline ordering. Organization
+    // departure is finalized by syncOrganization after the year's timeline entry.
+    if (options.deferOrganizationExit) return true;
+    if (S.affiliation) {
+      TL.leaveOrganization(S, '退休', { keepJob: true, retirement: true, preserveOperatorRank: true });
+    }
     TL.computeIncome(S);
     return true;
   };
@@ -158,47 +177,27 @@
       }
     }
     if (!S.affiliation || S.phase !== 'life') return;
-    const id = S.affiliation, o = TL.organizationDef(id), r = TL.organizationRouteDef(id, S.orgRoute);
-    if (!o || !r) { TL.leaveOrganization(S, '档案失效', { keepJob: true }); return; }
-    if (id === 'reunion' && !TL.organizationAvailable(S, id)) {
-      TL.leaveOrganization(S, '切城—龙门事件后旧编制瓦解，幸存者离散；九后来重组的整合运动另属一条路线');
+    // 离职原因与优先级在 src/model/membership.ts：档案失效 > 旧编制瓦解 > 地区禁令
+    // > 退休/应征服役/结束任职 > 转行 > 迁出辖区；否则只更新岗位记录。
+    const verdict = TL.syncVerdict(S);
+    if (verdict.kind === 'leave') {
+      TL.leaveOrganization(S, verdict.reason, verdict.options);
       return;
     }
-    if (o.locationAllowed && !o.locationAllowed(S)) {
-      TL.leaveOrganization(S, '新沃尔西尼禁止家族入驻及介入'); return;
+    if (verdict.kind === 'update') {
+      S.orgJob = verdict.orgJob;
+      if (verdict.orgRank != null) S.orgRank = verdict.orgRank;
     }
-    if (S.flags.retired || S.age >= 65 || !TL.isWorking(S) || S.school || S.serveLeft > 0) {
-      const retirement = !!(S.flags.retired || S.age >= 65);
-      const reason = retirement ? '退休' : S.serveLeft > 0 ? '应征服役' : '结束任职';
-      TL.leaveOrganization(S, reason, {
-        keepJob: true, retirement, preserveOperatorRank: retirement
-      }); return;
-    }
-    if (S.job !== S.orgJob && !(r.jobs || []).includes(S.job)) {
-      TL.leaveOrganization(S, '转行或应征服役', { keepJob: true }); return;
-    }
-    if (o.nations && !o.nations.includes(S.nation) &&
-        !(id === 'lungmen_guard' && S.nation === 'YAN' && /龙门/.test(S.city))) {
-      TL.leaveOrganization(S, '迁往组织辖区以外', { keepJob: false }); return;
-    }
-    S.orgJob = S.job;
-    if (id === 'rhodes') S.orgRank = S.opRank || 0;
-  };
-  TL.organizationPromotionReady = function (S) {
-    const r = TL.organizationRouteDef(S.affiliation, S.orgRoute);
-    if (!r || S.phase !== 'life' || S.school || S.age >= 65 || S.serveLeft > 0 ||
-        !TL.isWorking(S) || S.flags.retired || S.orgTransition ||
-        !TL.organizationState(S, S.affiliation).recruitment || !TL.organizationAvailable(S, S.affiliation)) return false;
-    const next = r.ranks[(S.orgRank || 0) + 1];
-    return !!next && S.orgService >= next.needYears && S.orgLastPromotionYear !== S.year;
   };
   TL.promoteOrganization = function (S, options) {
     options = options || {};
     // 年度结算显式传入 annualSettlement；普通脚本调用仍保留旧接口，
     // 但组织随机事件不再调用此函数，避免快照与现金账本出现半年度工资。
     if (!TL.organizationPromotionReady(S)) return false;
-    S.orgRank++; S.orgLastPromotionYear = S.year;
-    if (S.affiliation === 'rhodes') S.opRank = S.orgRank;
+    // 晋升只动一级；罗得岛同时把职级镜像给干员等级（src/model/employment.ts）。
+    const terms = TL.promotionTerms(S);
+    S.orgRank = terms.rank; S.orgLastPromotionYear = S.year;
+    if (terms.mirrorsOperatorRank) S.opRank = S.orgRank;
     const h = activeHistory(S);
     if (h) { h.ranks.push(S.orgRank); h.promotions.push({ year: S.year, rank: S.orgRank }); }
     TL.log(S, '你在' + TL.organizationName(S.affiliation) + '晋升为' +
@@ -216,44 +215,6 @@
     const h = activeHistory(S);
     if (h) h.serviceYears = S.orgService;
   };
-  TL.organizationPayMultiplier = function (S) {
-    if (TL.organizationUnpaid(S)) return 0;
-    if (!S.affiliation || !TL.isWorking(S) || S.flags.retired || S.job !== S.orgJob) return 1;
-    const payroll = (TL.organizationEmploymentModel(S.affiliation) || {}).payroll || {};
-    if (payroll.scale !== 'service-rank') return 1;
-    const steps = Math.min(payroll.maxRankSteps || 0, Math.max(0, S.orgRank || 0));
-    return 1 + steps * (payroll.rankStep || 0);
-  };
-  TL.organizationUnpaid = S => !!(S.affiliation && TL.organizationDef(S.affiliation)?.unpaid &&
-    TL.organizationAvailable(S, S.affiliation) && S.job === S.orgJob && TL.isWorking(S) &&
-    !S.school && !S.flags.retired && !S.serveLeft);
-  TL.organizationSubsistence = S => TL.organizationUnpaid(S) ?
-    TL.NATION_BY_ID[S.nation].ppp * (TL.organizationDef(S.affiliation).subsistence || 0) : 0;
-
-  TL.organizationContactEligible = function (S, id, c) {
-    if (S.phase !== 'life' || S.school || S.age >= 65 || S.flags.retired || S.serveLeft > 0 || S.orgTransition ||
-        S.affiliation !== id || !TL.isWorking(S) || !TL.organizationAvailable(S, id) ||
-        (S.orgRank || 0) < (c.minRank || 0)) return false;
-    if (S.year < c.fromYear || S.year > c.untilYear) return false;
-    const record = (S.orgContacts || {})[c.id];
-    return !record || (record.count < 3 && S.year - record.lastYear >= 4);
-  };
-  TL.organizationContact = function (S, id, contactId) {
-    init(S);
-    const c = ((TL.organizationDef(id) || {}).contacts || []).find(x => x.id === contactId);
-    if (!c || !TL.organizationContactEligible(S, id, c)) return null;
-    const prev = S.orgContacts[c.id];
-    S.orgContacts[c.id] = { name: c.name, organization: id,
-      firstYear: prev ? prev.firstYear : S.year, lastYear: S.year,
-      count: (prev ? prev.count : 0) + 1 };
-    TL.eff(S, { so: 3, h: 2 });
-    TL.log(S, (prev ? '再次与' : '你在工作中认识了') + c.name + '。' +
-      (c.interaction || '你们讨论了这次任务的安排。'), 'org',
-      { key: 'org_contact_' + id + '_' + c.id });
-    return c;
-  };
-
-  // 申请 token -> adapter -> complete。录用只兑现一次。
   TL.organizationInterviewAdapter = null;
   TL.setOrganizationInterviewAdapter = adapter => { TL.organizationInterviewAdapter = adapter || null; };
   TL.beginOrganizationInterview = function (S, id, route, context) {
@@ -267,6 +228,18 @@
     S.orgApplication = application;
     if (TL.organizationInterviewAdapter) return TL.organizationInterviewAdapter(S, application);
     return Object.assign({ mode: 'legacy' }, application);
+  };
+  TL.organizationContact = function (S, id, contactId) {
+    init(S);
+    const c = ((TL.organizationDef(id) || {}).contacts || []).find(x => x.id === contactId);
+    if (!c || !TL.organizationContactEligible(S, id, c)) return null;
+    const prev = S.orgContacts[c.id];
+    S.orgContacts[c.id] = TL.contactRecord(prev, c, id, S.year);
+    TL.eff(S, { so: 3, h: 2 });
+    TL.log(S, (prev ? '再次与' : '你在工作中认识了') + c.name + '。' +
+      (c.interaction || '你们讨论了这次任务的安排。'), 'org',
+      { key: 'org_contact_' + id + '_' + c.id });
+    return c;
   };
   TL.organizationApplicationEligibility = function(S,a) {
     if(a.year !== S.year) return {ok:false,reason:'申请已跨年，请重新申请。'};

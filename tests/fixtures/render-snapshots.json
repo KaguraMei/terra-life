@@ -1,0 +1,846 @@
+{
+  "birth": {
+    "seed": 424242,
+    "age": 0,
+    "markup": {
+      "brandSub": {
+        "html": "",
+        "text": "中国",
+        "class": ""
+      },
+      "ageBig": {
+        "html": "",
+        "text": 0,
+        "class": ""
+      },
+      "ageUnit": {
+        "html": "",
+        "text": "岁",
+        "class": ""
+      },
+      "metaL1": {
+        "html": "",
+        "text": "1040年 · 塔尔·断刃 · 幼儿",
+        "class": ""
+      },
+      "metaL2": {
+        "html": "",
+        "text": "卡兹戴尔 · 城市边缘与地下 · 1 年 ≈ 34.6 秒",
+        "class": ""
+      },
+      "idTitle": {
+        "html": "",
+        "text": "身份记录",
+        "class": ""
+      },
+      "idCode": {
+        "html": "",
+        "text": "KDZ · M00 · CNY",
+        "class": ""
+      },
+      "idName": {
+        "html": "",
+        "text": "塔尔·断刃",
+        "class": ""
+      },
+      "idSub": {
+        "html": "",
+        "text": "卡兹戴尔 · 王庭残垣",
+        "class": ""
+      },
+      "idTags": {
+        "html": "<span  class=\"tag amber\">萨卡兹</span><span  class=\"tag\">男</span><span  class=\"tag \">技艺 中等</span>",
+        "text": "",
+        "class": ""
+      },
+      "idTable": {
+        "html": "<tr><td  class=\"k\">性别</td><td  class=\"v\">男</td></tr><tr><td  class=\"k\">出生</td><td  class=\"v\">1040年</td></tr><tr><td  class=\"k\">居住地</td><td  class=\"v\">王庭残垣</td></tr><tr><td  class=\"k\">出身阶层</td><td  class=\"v\">城市边缘与地下</td></tr><tr><td  class=\"k\">家境分位</td><td  class=\"v\"><span  class=\"dots\"><i  class=\"on\"></i><i  class=\"\"></i><i  class=\"\"></i><i  class=\"\"></i><i  class=\"\"></i></span> <span  style=\"color:var(--fg3);font-size:10px\">1.0/5</span></td></tr><tr><td  class=\"k\">学历</td><td  class=\"v\">未就学</td></tr>",
+        "text": "",
+        "class": ""
+      },
+      "mrzText": {
+        "html": "",
+        "text": "T<KDZFRI<9A9B5E28<80-100",
+        "class": ""
+      },
+      "statTitle": {
+        "html": "",
+        "text": "状态",
+        "class": ""
+      },
+      "statBody": {
+        "html": "<div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">健康</span>\n          <span  class=\"v hl\">54</span><span  class=\"w\">硬朗</span></div>\n        <div  class=\"track\"><div  class=\"fill hl\" style=\"width:54%\"></div></div>\n      </div><div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">幸福</span>\n          <span  class=\"v h\">51</span><span  class=\"w\">平淡</span></div>\n        <div  class=\"track\"><div  class=\"fill h\" style=\"width:51%\"></div></div>\n      </div><div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">知识</span>\n          <span  class=\"v sm\">26</span><span  class=\"w\">粗通文墨</span></div>\n        <div  class=\"track\"><div  class=\"fill sm\" style=\"width:26%\"></div></div>\n      </div><div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">人际关系</span>\n          <span  class=\"v so\">53</span><span  class=\"w\">亲友在侧</span></div>\n        <div  class=\"track\"><div  class=\"fill so\" style=\"width:53%\"></div></div>\n      </div><div  class=\"statRow\" style=\"margin-top:8px;padding-top:7px;border-top:1px dotted var(--line)\">\n      <div  class=\"statTop\"><span  class=\"k\">技艺</span>\n        <span  class=\"v ar\">65</span><span  class=\"w\">中等</span></div>\n      <div  class=\"track\"><div  class=\"fill ar\" style=\"width:65%\"></div></div>\n    </div>",
+        "text": "",
+        "class": ""
+      },
+      "wealthTitle": {
+        "html": "",
+        "text": "财产",
+        "class": ""
+      },
+      "nwLabel": {
+        "html": "",
+        "text": "净资产",
+        "class": ""
+      },
+      "incLabel": {
+        "html": "",
+        "text": "年收入",
+        "class": ""
+      },
+      "nwVal": {
+        "html": "",
+        "text": "¥0",
+        "class": "mv "
+      },
+      "incVal": {
+        "html": "",
+        "text": "¥0",
+        "class": "mv"
+      },
+      "factList": {
+        "html": "<div  class=\"factLine\"><span  class=\"fk\">职业</span><span  class=\"fv \">幼儿</span></div><div  class=\"factLine\"><span  class=\"fk\">大陆收入分位</span><span  class=\"fv \">0%</span></div><div  class=\"factLine\"><span  class=\"fk\">还住在父母家</span><span  class=\"fv \"><span  style=\"color:var(--amber)\">是</span></span></div><div  class=\"factLine\"><span  class=\"fk\">年度死亡风险</span><span  class=\"fv \">0.00%</span></div><div  class=\"factLine\"><span  class=\"fk\">物价口径</span><span  class=\"fv \">以中国物价计</span></div>",
+        "text": "",
+        "class": ""
+      },
+      "survTitle": {
+        "html": "",
+        "text": "存活曲线",
+        "class": ""
+      },
+      "survHint": {
+        "html": "",
+        "text": "同一批出生的人还剩多少",
+        "class": ""
+      },
+      "survStat": {
+        "html": "<span>你 0 岁</span><span>同期群存活 100.0%</span><span>预期 52 岁</span>",
+        "text": "",
+        "class": ""
+      },
+      "famTitle": {
+        "html": "",
+        "text": "家人与生活",
+        "class": ""
+      },
+      "famList": {
+        "html": "<div  class=\"famRow \">\n        <span  class=\"fr\">母亲</span>\n        <span  class=\"fnm\">卡缇</span>\n        <span  class=\"fa\">30岁 · 猎人</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">父亲</span>\n        <span  class=\"fnm\">莫德</span>\n        <span  class=\"fa\">32岁 · 裁缝</span>\n      </div>",
+        "text": "",
+        "class": ""
+      },
+      "peerTitle": {
+        "html": "",
+        "text": "在同一秒出生的人们",
+        "class": ""
+      },
+      "peers": {
+        "html": "<div  class=\"peer \">\n        <span  class=\"pn\">卡缇·遗火</span>\n        <span  class=\"pd\">在世 0岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">奈尔·无碑</span>\n        <span  class=\"pd\">在世 0岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">洛恩·枯井</span>\n        <span  class=\"pd\">在世 0岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">梅芙·无碑</span>\n        <span  class=\"pd\">在世 0岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">维克·归途</span>\n        <span  class=\"pd\">在世 0岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">涅薇·血契</span>\n        <span  class=\"pd\">在世 0岁</span>\n      </div>",
+        "text": "",
+        "class": ""
+      },
+      "peerSum": {
+        "html": "还活着 <b>600</b> / 600 人 · <b>100.0%</b>",
+        "text": "",
+        "class": ""
+      },
+      "mapTitle": {
+        "html": "",
+        "text": "人生地图",
+        "class": ""
+      },
+      "lifeMap": {
+        "html": "<i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i>",
+        "text": "",
+        "class": ""
+      },
+      "mapLegendTxt": {
+        "html": "",
+        "text": "一格一年 · 越深越幸福 · 外框为预期寿命",
+        "class": ""
+      },
+      "mapHint": {
+        "html": "",
+        "text": "0/58 格",
+        "class": ""
+      },
+      "sceneCap": {
+        "html": "<b>王庭残垣</b> · 卡兹戴尔 · 边缘区 · 婴儿",
+        "text": "",
+        "class": ""
+      },
+      "stageHint": {
+        "html": "",
+        "text": "",
+        "class": ""
+      },
+      "focusDesc": {
+        "html": "",
+        "text": "这个年纪还做不了选择。",
+        "class": ""
+      },
+      "focusList": {
+        "html": "",
+        "text": "",
+        "class": ""
+      },
+      "feed": {
+        "html": "<#fragment><div class=\"entry birth\"><span  class=\"age\">0岁</span><span  class=\"txt\">你出生在卡兹戴尔的王庭残垣。</span></div><div class=\"entry tl\"><span  class=\"age\">0岁</span><span  class=\"txt\">长辈说，这座城市被烧过六次。他说这话的时候在数手指，数完还剩四根。</span><span class=\"tagline\">卡兹戴尔的六次毁灭</span></div></#fragment>",
+        "text": "",
+        "class": ""
+      },
+      "modalTitle": {
+        "html": "",
+        "text": "【快照】这是个决定的标题",
+        "class": ""
+      },
+      "modalSub": {
+        "html": "",
+        "text": "0 岁 · 卡兹戴尔 · 幼儿",
+        "class": ""
+      },
+      "modalText": {
+        "html": "",
+        "text": "一段用来固定弹层排版的正文。",
+        "class": ""
+      },
+      "modalOpts": {
+        "html": "<button  type=\"button\" class=\"opt\" data-i=\"0\"><span  class=\"ol\">第一个选项</span><span  class=\"oh\">带提示的副行</span></button><button  type=\"button\" class=\"opt\" data-i=\"1\"><span  class=\"ol\">第二个选项</span><span  class=\"oh\"></span></button>",
+        "text": "",
+        "class": ""
+      }
+    }
+  },
+  "worker": {
+    "seed": 700100,
+    "age": 26,
+    "markup": {
+      "brandSub": {
+        "html": "",
+        "text": "中国",
+        "class": ""
+      },
+      "ageBig": {
+        "html": "",
+        "text": 26,
+        "class": ""
+      },
+      "ageUnit": {
+        "html": "",
+        "text": "岁",
+        "class": ""
+      },
+      "metaL1": {
+        "html": "",
+        "text": "1066年 · 格雷·遗火 · 待业",
+        "class": ""
+      },
+      "metaL2": {
+        "html": "",
+        "text": "卡兹戴尔 · 工业与蓝领区 · 1 年 ≈ 30.5 秒",
+        "class": ""
+      },
+      "idTitle": {
+        "html": "",
+        "text": "身份记录",
+        "class": ""
+      },
+      "idCode": {
+        "html": "",
+        "text": "KDZ · M26 · CNY",
+        "class": ""
+      },
+      "idName": {
+        "html": "",
+        "text": "格雷·遗火",
+        "class": ""
+      },
+      "idSub": {
+        "html": "",
+        "text": "卡兹戴尔 · 灰烬平原",
+        "class": ""
+      },
+      "idTags": {
+        "html": "<span  class=\"tag amber\">萨卡兹</span><span  class=\"tag violet\">食腐者</span><span  class=\"tag\">男</span><span  class=\"tag \">技艺 中等</span>",
+        "text": "",
+        "class": ""
+      },
+      "idTable": {
+        "html": "<tr><td  class=\"k\">性别</td><td  class=\"v\">男</td></tr><tr><td  class=\"k\">出生</td><td  class=\"v\">1040年</td></tr><tr><td  class=\"k\">居住地</td><td  class=\"v\">灰烬平原</td></tr><tr><td  class=\"k\">出身阶层</td><td  class=\"v\">工业与蓝领区</td></tr><tr><td  class=\"k\">家境分位</td><td  class=\"v\"><span  class=\"dots\"><i  class=\"on\"></i><i  class=\"on\"></i><i  class=\"on\"></i><i  class=\"on\"></i><i  class=\"\"></i></span> <span  style=\"color:var(--fg3);font-size:10px\">4.0/5</span></td></tr><tr><td  class=\"k\">学历</td><td  class=\"v\">高等</td></tr>",
+        "text": "",
+        "class": ""
+      },
+      "mrzText": {
+        "html": "",
+        "text": "T<KDZIND<C3828CB0<150-350",
+        "class": ""
+      },
+      "statTitle": {
+        "html": "",
+        "text": "状态",
+        "class": ""
+      },
+      "statBody": {
+        "html": "<div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">健康</span>\n          <span  class=\"v hl\">81</span><span  class=\"w\">壮健</span></div>\n        <div  class=\"track\"><div  class=\"fill hl\" style=\"width:81%\"></div></div>\n      </div><div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">幸福</span>\n          <span  class=\"v h\">59</span><span  class=\"w\">安稳</span></div>\n        <div  class=\"track\"><div  class=\"fill h\" style=\"width:59%\"></div></div>\n      </div><div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">知识</span>\n          <span  class=\"v sm\">64</span><span  class=\"w\">学有所长</span></div>\n        <div  class=\"track\"><div  class=\"fill sm\" style=\"width:64%\"></div></div>\n      </div><div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">人际关系</span>\n          <span  class=\"v so\">74</span><span  class=\"w\">交游广阔</span></div>\n        <div  class=\"track\"><div  class=\"fill so\" style=\"width:74%\"></div></div>\n      </div><div  class=\"statRow\" style=\"margin-top:8px;padding-top:7px;border-top:1px dotted var(--line)\">\n      <div  class=\"statTop\"><span  class=\"k\">技艺</span>\n        <span  class=\"v ar\">56</span><span  class=\"w\">中等</span></div>\n      <div  class=\"track\"><div  class=\"fill ar\" style=\"width:56%\"></div></div>\n    </div>",
+        "text": "",
+        "class": ""
+      },
+      "wealthTitle": {
+        "html": "",
+        "text": "财产",
+        "class": ""
+      },
+      "nwLabel": {
+        "html": "",
+        "text": "净资产",
+        "class": ""
+      },
+      "incLabel": {
+        "html": "",
+        "text": "年收入",
+        "class": ""
+      },
+      "nwVal": {
+        "html": "",
+        "text": "¥36",
+        "class": "mv pos"
+      },
+      "incVal": {
+        "html": "",
+        "text": "¥0",
+        "class": "mv"
+      },
+      "factList": {
+        "html": "<div  class=\"factLine\"><span  class=\"fk\">职业</span><span  class=\"fv \">待业</span></div><div  class=\"factLine\"><span  class=\"fk\">大陆收入分位</span><span  class=\"fv \">0%</span></div><div  class=\"factLine\"><span  class=\"fk\">还住在父母家</span><span  class=\"fv \">否</span></div><div  class=\"factLine\"><span  class=\"fk\">年度死亡风险</span><span  class=\"fv \">2.01%</span></div><div  class=\"factLine\"><span  class=\"fk\">物价口径</span><span  class=\"fv \">以中国物价计</span></div>",
+        "text": "",
+        "class": ""
+      },
+      "survTitle": {
+        "html": "",
+        "text": "存活曲线",
+        "class": ""
+      },
+      "survHint": {
+        "html": "",
+        "text": "同一批出生的人还剩多少",
+        "class": ""
+      },
+      "survStat": {
+        "html": "<span>你 26 岁</span><span>同期群存活 66.3%</span><span>预期 59 岁</span>",
+        "text": "",
+        "class": ""
+      },
+      "famTitle": {
+        "html": "",
+        "text": "家人与生活",
+        "class": ""
+      },
+      "famList": {
+        "html": "<div  class=\"famRow \">\n        <span  class=\"fr\">母亲</span>\n        <span  class=\"fnm\">瑟兰</span>\n        <span  class=\"fa\">57岁 · 信使</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">父亲</span>\n        <span  class=\"fnm\">维克</span>\n        <span  class=\"fa\">60岁 · 理发师</span>\n      </div><div  class=\"famRow dead\">\n        <span  class=\"fr\">兄弟姐妹</span>\n        <span  class=\"fnm\">塔尔 †</span>\n        <span  class=\"fa\">已故</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">兄弟姐妹</span>\n        <span  class=\"fnm\">阿兹</span>\n        <span  class=\"fa\">25岁 · 机械师</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">兄弟姐妹</span>\n        <span  class=\"fnm\">奥莉</span>\n        <span  class=\"fa\">22岁 · 店主</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">兄弟姐妹</span>\n        <span  class=\"fnm\">格雷</span>\n        <span  class=\"fa\">20岁 · 律政</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">伴侣</span>\n        <span  class=\"fnm\">涅薇</span>\n        <span  class=\"fa\">23岁 · 医师</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">子女</span>\n        <span  class=\"fnm\">梅芙</span>\n        <span  class=\"fa\">0岁 · 幼儿</span>\n      </div>",
+        "text": "",
+        "class": ""
+      },
+      "peerTitle": {
+        "html": "",
+        "text": "在同一秒出生的人们",
+        "class": ""
+      },
+      "peers": {
+        "html": "<div  class=\"peer gone\">\n        <span  class=\"pn\">索恩·长夜</span>\n        <span  class=\"pd\">殁于 13岁</span>\n      </div><div  class=\"peer gone\">\n        <span  class=\"pn\">维克·无碑</span>\n        <span  class=\"pd\">殁于 13岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">奥莉·碎骨</span>\n        <span  class=\"pd\">在世 26岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">布伦·断刃</span>\n        <span  class=\"pd\">在世 26岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">涅薇·归途</span>\n        <span  class=\"pd\">在世 26岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">奥莉·血契</span>\n        <span  class=\"pd\">在世 26岁</span>\n      </div>",
+        "text": "",
+        "class": ""
+      },
+      "peerSum": {
+        "html": "还活着 <b>398</b> / 600 人 · <b>66.3%</b>",
+        "text": "",
+        "class": ""
+      },
+      "mapTitle": {
+        "html": "",
+        "text": "人生地图",
+        "class": ""
+      },
+      "lifeMap": {
+        "html": "<i  class=\"\" style=\"background:#7eaeaa\" title=\"0岁 · 42\"></i><i  class=\"\" style=\"background:#93bab6\" title=\"1岁 · 32\"></i><i  class=\"\" style=\"background:#95bbb7\" title=\"2岁 · 31\"></i><i  class=\"\" style=\"background:#97bcb9\" title=\"3岁 · 30\"></i><i  class=\"\" style=\"background:#9dc0bd\" title=\"4岁 · 27\"></i><i  class=\"\" style=\"background:#88b4b0\" title=\"5岁 · 37\"></i><i  class=\"\" style=\"background:#84b1ad\" title=\"6岁 · 39\"></i><i  class=\"\" style=\"background:#a6c5c2\" title=\"7岁 · 23\"></i><i  class=\"\" style=\"background:#95bbb7\" title=\"8岁 · 31\"></i><i  class=\"\" style=\"background:#8ab5b1\" title=\"9岁 · 36\"></i><i  class=\"\" style=\"background:#84b1ad\" title=\"10岁 · 39\"></i><i  class=\"\" style=\"background:#9bbfbb\" title=\"11岁 · 28\"></i><i  class=\"\" style=\"background:#a6c5c2\" title=\"12岁 · 23\"></i><i  class=\"\" style=\"background:#b4cdca\" title=\"13岁 · 17\"></i><i  class=\"\" style=\"background:#a6c5c2\" title=\"14岁 · 23\"></i><i  class=\"\" style=\"background:#a0c1be\" title=\"15岁 · 26\"></i><i  class=\"\" style=\"background:#a6c5c2\" title=\"16岁 · 23\"></i><i  class=\"\" style=\"background:#afcac7\" title=\"17岁 · 19\"></i><i  class=\"\" style=\"background:#a6c5c2\" title=\"18岁 · 23\"></i><i  class=\"\" style=\"background:#99bdba\" title=\"19岁 · 29\"></i><i  class=\"\" style=\"background:#a0c1be\" title=\"20岁 · 26\"></i><i  class=\"\" style=\"background:#adc9c6\" title=\"21岁 · 20\"></i><i  class=\"\" style=\"background:#a6c5c2\" title=\"22岁 · 23\"></i><i  class=\"\" style=\"background:#a0c1be\" title=\"23岁 · 26\"></i><i  class=\"\" style=\"background:#8ab5b1\" title=\"24岁 · 36\"></i><i  class=\"last\" style=\"background:#73a8a4\" title=\"25岁 · 47\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i>",
+        "text": "",
+        "class": ""
+      },
+      "mapLegendTxt": {
+        "html": "",
+        "text": "一格一年 · 越深越幸福 · 外框为预期寿命",
+        "class": ""
+      },
+      "mapHint": {
+        "html": "",
+        "text": "26/65 格",
+        "class": ""
+      },
+      "sceneCap": {
+        "html": "<b>灰烬平原</b> · 卡兹戴尔 · 工业区 · 青年",
+        "text": "",
+        "class": ""
+      },
+      "stageHint": {
+        "html": "",
+        "text": "成年",
+        "class": ""
+      },
+      "focusDesc": {
+        "html": "",
+        "text": "一年只能认真做一件事。年末按你花的时间结算。",
+        "class": ""
+      },
+      "focusList": {
+        "html": "<div  class=\"fopt \" data-f=\"family\">\n        <span  class=\"fn\">陪伴家人</span><span  class=\"fd\">羁绊↑ 心境↑</span>\n        </div><div  class=\"fopt \" data-f=\"health\">\n        <span  class=\"fn\">调养身体</span><span  class=\"fd\">体质↑</span>\n        </div><div  class=\"fopt sel\" data-f=\"learn\">\n        <span  class=\"fn\">进修</span><span  class=\"fd\">学识↑ 晋升机会↑</span>\n        </div><div  class=\"fopt \" data-f=\"hobby\">\n        <span  class=\"fn\">爱好</span><span  class=\"fd\">心境↑ 专精↑</span>\n        </div><div  class=\"fopt \" data-f=\"rest\">\n        <span  class=\"fn\">休息</span><span  class=\"fd\">体质↑ 心境↑</span>\n        </div><div  class=\"fopt \" data-f=\"parttime\">\n        <span  class=\"fn\">打零工</span><span  class=\"fd\">钱少许 学识↓</span>\n        </div><div  class=\"fopt \" data-f=\"career\">\n        <span  class=\"fn\">谋出路</span><span  class=\"fd\">就业机会↑ 心境↓</span>\n        </div><div  class=\"fopt \" data-f=\"arts_training\">\n        <span  class=\"fn\">修习源石技艺</span><span  class=\"fd\">技艺↑↑ 体质↓（有感染风险）</span>\n        </div><div  class=\"fopt \" data-f=\"disaster_drill\">\n        <span  class=\"fn\">天灾避难演练</span><span  class=\"fd\">天灾存活率↑ 心境↓</span>\n        </div>",
+        "text": "",
+        "class": ""
+      },
+      "feed": {
+        "html": "<#fragment><div class=\"entry fam\"><span  class=\"age\">25岁</span><span  class=\"txt\">涅薇生下了一个女孩，取名梅芙。</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">你在回去的路上被拦住了。钱没了，人没事。这已经算运气好。</span></div><div class=\"entry dec\"><span  class=\"age\">25岁</span><span  class=\"txt\">【买房子】你选择了：买</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">停战的消息是在夜里传到的。有人在营地外面唱歌，唱到一半就哭了。</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">你对着圣山的方向行了礼。没有人要求你这么做。</span></div><div class=\"entry ev\"><span  class=\"age\">24岁</span><span  class=\"txt\">城市换了个位置停下。你走出去，发现外面的土是新的，什么都没有。</span></div><div class=\"entry dec\"><span  class=\"age\">24岁</span><span  class=\"txt\">【要不要在一起】你选择了：结婚</span></div><div class=\"entry ev\"><span  class=\"age\">24岁</span><span  class=\"txt\">你开始觉得时间不够用，虽然也没什么非做不可的事。</span></div><div class=\"entry ev\"><span  class=\"age\">23岁</span><span  class=\"txt\">警报响了四遍。城市启动主引擎，整块地在夜里挪了个位置。</span></div><div class=\"entry ev\"><span  class=\"age\">23岁</span><span  class=\"txt\">你躺着，看着天花板。天从黑变亮，你一动没动。</span></div><div class=\"entry dec\"><span  class=\"age\">23岁</span><span  class=\"txt\">【警报】你选择了：去帮别人</span></div><div class=\"entry ev\"><span  class=\"age\">23岁</span><span  class=\"txt\">隔壁的人家送了一碗菜过来，说是做多了。其实你知道不是。</span></div><div class=\"entry ev\"><span  class=\"age\">22岁</span><span  class=\"txt\">连着上了半个月的夜班。你开始分不清今天是哪一天。</span></div><div class=\"entry ev\"><span  class=\"age\">22岁</span><span  class=\"txt\">你第一次完整地走完了一整套术式。手指在抖，但那是兴奋。</span></div><div class=\"entry dec\"><span  class=\"age\">22岁</span><span  class=\"txt\">【离开这里】你选择了：留下</span></div><div class=\"entry dec\"><span  class=\"age\">22岁</span><span  class=\"txt\">【二十二岁】你选择了：广交朋友</span></div><div class=\"entry ev\"><span  class=\"age\">22岁</span><span  class=\"txt\">你和一个同事关系不错。休息的时候他会分你一半的干粮。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">整座城市迁了三百公里。路上走了两个月，你换了三次住处。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">没什么大事，只是扭了脚。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">你捡到了一个钱包，还给了失主。对方硬塞给你一点谢礼。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">你说算了。说完之后一个人在街上走到很晚。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">日子过得很快，你说不上来都干了什么。</span></div><div class=\"entry ev\"><span  class=\"age\">20岁</span><span  class=\"txt\">这个月工钱少了一半。老板说行情不好，让大家一起扛。</span></div><div class=\"entry ev\"><span  class=\"age\">20岁</span><span  class=\"txt\">你第一次站到城墙上看城市移动。地面在往后退，像整片大地都在让路。</span></div><div class=\"entry dec\"><span  class=\"age\">20岁</span><span  class=\"txt\">【别的机会】你选择了：留下</span></div><div class=\"entry ev\"><span  class=\"age\">20岁</span><span  class=\"txt\">有人先动的手。你还手了，而且赢了。之后没人再找你麻烦。</span></div><div class=\"entry ev\"><span  class=\"age\">19岁</span><span  class=\"txt\">你病了两天，是隔壁的人替你买的水。</span></div><div class=\"entry ev\"><span  class=\"age\">19岁</span><span  class=\"txt\">伊瑟给你留了一张纸条。你把它叠好放在口袋里，一直没舍得扔。</span></div><div class=\"entry ev\"><span  class=\"age\">19岁</span><span  class=\"txt\">机器夹住了你的手。工友把你送到医馆，指头保住了，但不太听使唤。</span></div><div class=\"entry ev\"><span  class=\"age\">19岁</span><span  class=\"txt\">你开始记不清上一次觉得高兴是什么时候。</span></div><div class=\"entry ev\"><span  class=\"age\">18岁</span><span  class=\"txt\">你喝了两杯就停了。旁边的人笑你不像个大人。</span></div><div class=\"entry ev\"><span  class=\"age\">18岁</span><span  class=\"txt\">有个老工人教了你怎么省力气。他说这行干久了，省力气就是保命。</span></div><div class=\"entry ev\"><span  class=\"age\">18岁</span><span  class=\"txt\">这一年没什么大事。你照旧起床上工，照旧回来。</span></div><div class=\"entry dec\"><span  class=\"age\">18岁</span><span  class=\"txt\">【毕业之后】你选择了：留在本地</span></div><div class=\"entry ev\"><span  class=\"age\">18岁</span><span  class=\"txt\">你连着加了三个月的班，多拿了一笔钱，也落下了一点毛病。</span></div><div class=\"entry mil\"><span  class=\"age\">17岁</span><span  class=\"txt\">你结束了高等学业。</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">成绩下来那天，你的名字在上面。你把它抄了一遍带回家。</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">你在安置区待了三天。回来的时候，窗台上的灰有半指厚。</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">征兵令贴到了巷口。你家在名单上。第二天你就换上了那身衣服。</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">你认识了莉丝。你们什么都说，包括那些不该说的。</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">迁徙途中城市停了一次，据说是前面的地块脱钩了。</span></div><div class=\"entry dec\"><span  class=\"age\">17岁</span><span  class=\"txt\">【源石技艺】你选择了：只当个爱好</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">跟着认识的人一起走。你搬到了灰烬平原，行李只有一只箱子。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">他/她走了，没有留地址。你把能扔的都扔了，只留下一件。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">你捡到了一个钱包，还给了失主。对方硬塞给你一点谢礼。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">有人递烟给你，你摆手说不会。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">你在报纸上读到城墙外的事。读完你把报纸折好，放进了抽屉。</span></div><div class=\"entry ev\"><span  class=\"age\">15岁</span><span  class=\"txt\">你喜欢上了厄瑞。你没有说，但每次见到都会心跳得很快。</span></div><div class=\"entry ev\"><span  class=\"age\">15岁</span><span  class=\"txt\">有人跟你说话，你听见了，但隔着一层什么东西。</span></div><div class=\"entry dec\"><span  class=\"age\">15岁</span><span  class=\"txt\">【十五岁】你选择了：读下去</span></div><div class=\"entry mil\"><span  class=\"age\">15岁</span><span  class=\"txt\">你进入高等学堂。</span></div><div class=\"entry ev\"><span  class=\"age\">15岁</span><span  class=\"txt\">有人先动的手。你还手了，而且赢了。之后没人再找你麻烦。</span></div><div class=\"entry ev\"><span  class=\"age\">15岁</span><span  class=\"txt\">城市换了个位置停下。你走出去，发现外面的土是新的，什么都没有。</span></div><div class=\"entry ev\"><span  class=\"age\">14岁</span><span  class=\"txt\">隔壁的人家送了一碗菜过来，说是做多了。其实你知道不是。</span></div><div class=\"entry ev\"><span  class=\"age\">13岁</span><span  class=\"txt\">你跟着大人去赶集。第一次见到那么多不认识的人挤在一条街上。</span></div><div class=\"entry ev\"><span  class=\"age\">13岁</span><span  class=\"txt\">你在安置区待了三天。回来的时候，窗台上的灰有半指厚。</span></div><div class=\"entry ev\"><span  class=\"age\">13岁</span><span  class=\"txt\">母亲说钱不够，父亲说他知道。然后两个人都不说话了。</span></div><div class=\"entry ev\"><span  class=\"age\">13岁</span><span  class=\"txt\">你在矿口筛石子，一天挣了几个铜板。回家时母亲把钱数了两遍。</span></div><div class=\"entry mil\"><span  class=\"age\">12岁</span><span  class=\"txt\">你结束了初等学业。</span></div><div class=\"entry ev\"><span  class=\"age\">12岁</span><span  class=\"txt\">整座城市迁了三百公里。路上走了两个月，你换了三次住处。</span></div><div class=\"entry ev\"><span  class=\"age\">12岁</span><span  class=\"txt\">你没考过。教习说还有机会，但你知道那个机会不太属于你。</span></div><div class=\"entry ev\"><span  class=\"age\">12岁</span><span  class=\"txt\">有人跟你说，这个世界不会因为你是个好人就对你手下留情。你当时不信。</span></div><div class=\"entry ev\"><span  class=\"age\">12岁</span><span  class=\"txt\">父亲今天回来得很早，还带了一小块糖。他没说什么，放在你桌上就走了。</span></div><div class=\"entry dec\"><span  class=\"age\">12岁</span><span  class=\"txt\">【中等学堂的方向】你选择了：继续读书</span></div><div class=\"entry ev\"><span  class=\"age\">11岁</span><span  class=\"txt\">一辆车擦着你过去。你在地上坐了很久才站起来。</span></div><div class=\"entry ev\"><span  class=\"age\">11岁</span><span  class=\"txt\">警报响了三天。整座城市开始移动。你在安置区挤了一夜，天亮时从窗口看出去——原来那片地已经没了。</span></div><div class=\"entry ev\"><span  class=\"age\">10岁</span><span  class=\"txt\">下大雨那天，邻居帮你把晾在外面的东西收了。</span></div><div class=\"entry ev\"><span  class=\"age\">10岁</span><span  class=\"txt\">你和巷子里的孩子们玩到天黑。没有人问你是哪个种族的。</span></div><div class=\"entry ev\"><span  class=\"age\">10岁</span><span  class=\"txt\">你给铁匠拉风箱，一天挣了几个铜板。回家时母亲把钱数了两遍。</span></div><div class=\"entry tl\"><span  class=\"age\">10岁</span><span  class=\"txt\">卡西米尔骑士竞技职业化。</span><span class=\"tagline\">商业联合会建立与骑士阶层重构</span></div><div class=\"entry ev\"><span  class=\"age\">9岁</span><span  class=\"txt\">城市换了个位置停下。你走出去，发现外面的土是新的，上面什么都没有。</span></div><div class=\"entry ev\"><span  class=\"age\">9岁</span><span  class=\"txt\">你跟着大人去赶集。第一次见到那么多不认识的人挤在一条街上。</span></div><div class=\"entry ev\"><span  class=\"age\">9岁</span><span  class=\"txt\">父亲今天回来得很早，还带了一小块糖。他没说什么，放在你桌上就走了。</span></div><div class=\"entry ev\"><span  class=\"age\">8岁</span><span  class=\"txt\">迁徙途中城市停了一次，据说是前面的地块脱钩了。</span></div><div class=\"entry ev\"><span  class=\"age\">8岁</span><span  class=\"txt\">父亲只教过你一件事：答应别人的事，做不到就别答应。</span></div><div class=\"entry ev\"><span  class=\"age\">8岁</span><span  class=\"txt\">你伸手去接落下的碗，碗在半空停了一瞬。你自己吓了一跳。</span></div><div class=\"entry ev\"><span  class=\"age\">8岁</span><span  class=\"txt\">你和巷子里的孩子们玩到天黑。没有人问你是哪个种族的。</span></div><div class=\"entry ev\"><span  class=\"age\">7岁</span><span  class=\"txt\">母亲说钱不够，父亲说他知道。然后两个人都不说话了。</span></div><div class=\"entry ev\"><span  class=\"age\">7岁</span><span  class=\"txt\">你在矿口筛石子，一天挣了几个铜板。回家时母亲把钱数了两遍。</span></div><div class=\"entry ev\"><span  class=\"age\">7岁</span><span  class=\"txt\">你又一次没答上来。教习没有骂你，只是让你坐下。这比骂更让人想消失。</span></div><div class=\"entry mil\"><span  class=\"age\">6岁</span><span  class=\"txt\">你进入初等学堂。</span></div><div class=\"entry ev\"><span  class=\"age\">6岁</span><span  class=\"txt\">你捡回来一只瘦得只剩骨架的小兽。母亲说养不活，但它活下来了。</span></div><div class=\"entry ev\"><span  class=\"age\">6岁</span><span  class=\"txt\">家里多了个弟弟，叫格雷。从此你不再是屋里最小的那个。</span></div><div class=\"entry ev\"><span  class=\"age\">6岁</span><span  class=\"txt\">你被开水烫了半条胳膊。疼了一个月。</span></div><div class=\"entry dec\"><span  class=\"age\">6岁</span><span  class=\"txt\">【该不该去学堂】你选择了：去上学</span></div><div class=\"entry ev\"><span  class=\"age\">5岁</span><span  class=\"txt\">父亲今天回来得很早，还带了一小块糖。他没说什么，放在你桌上就走了。</span></div><div class=\"entry dec\"><span  class=\"age\">5岁</span><span  class=\"txt\">【警报】你选择了：去帮别人</span></div><div class=\"entry ev\"><span  class=\"age\">5岁</span><span  class=\"txt\">你在集市上走丢了两个小时，最后是自己找回来的。</span></div><div class=\"entry ev\"><span  class=\"age\">5岁</span><span  class=\"txt\">你在安置区待了三天。回来的时候，窗台上的灰有半指厚。</span></div><div class=\"entry ev\"><span  class=\"age\">4岁</span><span  class=\"txt\">你和巷子里的孩子们玩到天黑。没有人问你是哪个种族的。</span></div><div class=\"entry ev\"><span  class=\"age\">4岁</span><span  class=\"txt\">母亲说钱不够，父亲说他知道。然后两个人都不说话了。</span></div><div class=\"entry ev\"><span  class=\"age\">1岁</span><span  class=\"txt\">烧退下去之后，你的左耳再也听不清了。家里没有钱再请一次医生。</span></div><div class=\"entry birth\"><span  class=\"age\">0岁</span><span  class=\"txt\">你出生在卡兹戴尔的哀愁之地。</span></div><div class=\"entry tl\"><span  class=\"age\">0岁</span><span  class=\"txt\">长辈说，这座城市被烧过六次。他说这话的时候在数手指，数完还剩四根。</span><span class=\"tagline\">卡兹戴尔的六次毁灭</span></div></#fragment>",
+        "text": "",
+        "class": ""
+      },
+      "modalTitle": {
+        "html": "",
+        "text": "【快照】这是个决定的标题",
+        "class": ""
+      },
+      "modalSub": {
+        "html": "",
+        "text": "26 岁 · 卡兹戴尔 · 待业",
+        "class": ""
+      },
+      "modalText": {
+        "html": "",
+        "text": "一段用来固定弹层排版的正文。",
+        "class": ""
+      },
+      "modalOpts": {
+        "html": "<button  type=\"button\" class=\"opt\" data-i=\"0\"><span  class=\"ol\">第一个选项</span><span  class=\"oh\">带提示的副行</span></button><button  type=\"button\" class=\"opt\" data-i=\"1\"><span  class=\"ol\">第二个选项</span><span  class=\"oh\"></span></button>",
+        "text": "",
+        "class": ""
+      }
+    }
+  },
+  "infected-operator": {
+    "seed": 700126,
+    "age": 34,
+    "markup": {
+      "brandSub": {
+        "html": "",
+        "text": "中国",
+        "class": ""
+      },
+      "ageBig": {
+        "html": "",
+        "text": 34,
+        "class": ""
+      },
+      "ageUnit": {
+        "html": "",
+        "text": "岁",
+        "class": ""
+      },
+      "metaL1": {
+        "html": "",
+        "text": "1074年 · 茜尔·灰烬 · 士兵",
+        "class": ""
+      },
+      "metaL2": {
+        "html": "",
+        "text": "卡兹戴尔 · 移动城市核心区 · 1 年 ≈ 25.6 秒",
+        "class": ""
+      },
+      "idTitle": {
+        "html": "",
+        "text": "身份记录",
+        "class": ""
+      },
+      "idCode": {
+        "html": "",
+        "text": "KDZ · F34 · CNY",
+        "class": ""
+      },
+      "idName": {
+        "html": "",
+        "text": "茜尔·灰烬",
+        "class": ""
+      },
+      "idSub": {
+        "html": "",
+        "text": "卡兹戴尔 · 旧卡兹戴尔",
+        "class": ""
+      },
+      "idTags": {
+        "html": "<span  class=\"tag amber\">萨卡兹</span><span  class=\"tag violet\">石翼魔</span><span  class=\"tag\">女</span><span  class=\"tag amber\">技艺 优秀</span><span  class=\"tag red\">感染者 Ⅰ期</span><span  class=\"tag\">身份未公开</span><span  class=\"tag green\">萨卡兹佣兵团 · 资深战斗员 · 战斗员</span>",
+        "text": "",
+        "class": ""
+      },
+      "idTable": {
+        "html": "<tr><td  class=\"k\">性别</td><td  class=\"v\">女</td></tr><tr><td  class=\"k\">出生</td><td  class=\"v\">1040年</td></tr><tr><td  class=\"k\">居住地</td><td  class=\"v\">旧卡兹戴尔</td></tr><tr><td  class=\"k\">出身阶层</td><td  class=\"v\">移动城市核心区</td></tr><tr><td  class=\"k\">家境分位</td><td  class=\"v\"><span  class=\"dots\"><i  class=\"on\"></i><i  class=\"on\"></i><i  class=\"on\"></i><i  class=\"on\"></i><i  class=\"on\"></i></span> <span  style=\"color:var(--fg3);font-size:10px\">5.0/5</span></td></tr><tr><td  class=\"k\">学历</td><td  class=\"v\">高等</td></tr>",
+        "text": "",
+        "class": ""
+      },
+      "mrzText": {
+        "html": "",
+        "text": "T<KDZCOR<AB15BE28<180-400",
+        "class": ""
+      },
+      "statTitle": {
+        "html": "",
+        "text": "状态",
+        "class": ""
+      },
+      "statBody": {
+        "html": "<div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">健康</span>\n          <span  class=\"v hl\">53</span><span  class=\"w\">硬朗</span></div>\n        <div  class=\"track\"><div  class=\"fill hl\" style=\"width:53%\"></div></div>\n      </div><div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">幸福</span>\n          <span  class=\"v h\">49</span><span  class=\"w\">平淡</span></div>\n        <div  class=\"track\"><div  class=\"fill h\" style=\"width:49%\"></div></div>\n      </div><div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">知识</span>\n          <span  class=\"v sm\">69</span><span  class=\"w\">博学</span></div>\n        <div  class=\"track\"><div  class=\"fill sm\" style=\"width:69%\"></div></div>\n      </div><div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">人际关系</span>\n          <span  class=\"v so\">82</span><span  class=\"w\">交游广阔</span></div>\n        <div  class=\"track\"><div  class=\"fill so\" style=\"width:82%\"></div></div>\n      </div><div  class=\"statRow\" style=\"margin-top:8px;padding-top:7px;border-top:1px dotted var(--line)\">\n      <div  class=\"statTop\"><span  class=\"k\">技艺</span>\n        <span  class=\"v ar\">76</span><span  class=\"w\">优秀</span></div>\n      <div  class=\"track\"><div  class=\"fill ar\" style=\"width:76%\"></div></div>\n    </div><div  class=\"statRow oriRow\" style=\"margin-top:8px;padding-top:7px;border-top:1px solid var(--violet)\">\n        <div  class=\"statTop\"><span  class=\"k\" style=\"color:var(--violet)\">结晶率</span>\n          <span  class=\"v ori\">5%</span><span  class=\"w oriStage\">Ⅰ期</span></div>\n        <div  class=\"track ori\"><div  class=\"fill ori\" style=\"width:5%\"></div></div>\n      </div>",
+        "text": "",
+        "class": ""
+      },
+      "wealthTitle": {
+        "html": "",
+        "text": "财产",
+        "class": ""
+      },
+      "nwLabel": {
+        "html": "",
+        "text": "净资产",
+        "class": ""
+      },
+      "incLabel": {
+        "html": "",
+        "text": "年收入",
+        "class": ""
+      },
+      "nwVal": {
+        "html": "",
+        "text": "¥63",
+        "class": "mv pos"
+      },
+      "incVal": {
+        "html": "",
+        "text": "¥5",
+        "class": "mv"
+      },
+      "factList": {
+        "html": "<div  class=\"factLine\"><span  class=\"fk\">职业</span><span  class=\"fv \">士兵</span></div><div  class=\"factLine\"><span  class=\"fk\">组织</span><span  class=\"fv \">萨卡兹佣兵团</span></div><div  class=\"factLine\"><span  class=\"fk\">组织路线</span><span  class=\"fv \">资深战斗员</span></div><div  class=\"factLine\"><span  class=\"fk\">组织等级</span><span  class=\"fv \">战斗员</span></div><div  class=\"factLine\"><span  class=\"fk\">大陆收入分位</span><span  class=\"fv \">38%</span></div><div  class=\"factLine\"><span  class=\"fk\">还住在父母家</span><span  class=\"fv \">否</span></div><div  class=\"factLine\"><span  class=\"fk\">结晶率</span><span  class=\"fv neg\">5%</span></div><div  class=\"factLine\"><span  class=\"fk\">感染年龄</span><span  class=\"fv \">34岁</span></div><div  class=\"factLine\"><span  class=\"fk\">年度死亡风险</span><span  class=\"fv \">3.37%</span></div><div  class=\"factLine\"><span  class=\"fk\">物价口径</span><span  class=\"fv \">以中国物价计</span></div>",
+        "text": "",
+        "class": ""
+      },
+      "survTitle": {
+        "html": "",
+        "text": "存活曲线",
+        "class": ""
+      },
+      "survHint": {
+        "html": "",
+        "text": "同一批出生的人还剩多少",
+        "class": ""
+      },
+      "survStat": {
+        "html": "<span>你 34 岁</span><span>同期群存活 66.3%</span><span>预期 72 岁</span>",
+        "text": "",
+        "class": ""
+      },
+      "famTitle": {
+        "html": "",
+        "text": "家人与生活",
+        "class": ""
+      },
+      "famList": {
+        "html": "<div  class=\"famRow \">\n        <span  class=\"fr\">母亲</span>\n        <span  class=\"fnm\">穆尔</span>\n        <span  class=\"fa\">62岁 · 裁缝</span>\n      </div><div  class=\"famRow dead\">\n        <span  class=\"fr\">父亲</span>\n        <span  class=\"fnm\">布伦 †</span>\n        <span  class=\"fa\">已故</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">兄弟姐妹</span>\n        <span  class=\"fnm\">塞恩</span>\n        <span  class=\"fa\">41岁 · 源石采掘工</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">兄弟姐妹</span>\n        <span  class=\"fnm\">伊瑟</span>\n        <span  class=\"fa\">28岁 · 贵族</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">伴侣</span>\n        <span  class=\"fnm\">维克</span>\n        <span  class=\"fa\">35岁 · 摊贩</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">子女</span>\n        <span  class=\"fnm\">卡尔</span>\n        <span  class=\"fa\">8岁 · 在学</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">子女</span>\n        <span  class=\"fnm\">德雷</span>\n        <span  class=\"fa\">4岁 · 幼儿</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">子女</span>\n        <span  class=\"fnm\">薇薇</span>\n        <span  class=\"fa\">3岁 · 幼儿</span>\n      </div>",
+        "text": "",
+        "class": ""
+      },
+      "peerTitle": {
+        "html": "",
+        "text": "在同一秒出生的人们",
+        "class": ""
+      },
+      "peers": {
+        "html": "<div  class=\"peer gone\">\n        <span  class=\"pn\">厄瑞·血契</span>\n        <span  class=\"pd\">殁于 20岁</span>\n      </div><div  class=\"peer gone\">\n        <span  class=\"pn\">索恩·空庭</span>\n        <span  class=\"pd\">殁于 26岁</span>\n      </div><div  class=\"peer gone\">\n        <span  class=\"pn\">索拉·锈冠</span>\n        <span  class=\"pd\">殁于 28岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">茜尔·寂声</span>\n        <span  class=\"pd\">在世 34岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">格罗·残雪</span>\n        <span  class=\"pd\">在世 34岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">瓦伦·残雪</span>\n        <span  class=\"pd\">在世 34岁</span>\n      </div>",
+        "text": "",
+        "class": ""
+      },
+      "peerSum": {
+        "html": "还活着 <b>398</b> / 600 人 · <b>66.3%</b>",
+        "text": "",
+        "class": ""
+      },
+      "mapTitle": {
+        "html": "",
+        "text": "人生地图",
+        "class": ""
+      },
+      "lifeMap": {
+        "html": "<i  class=\"\" style=\"background:#6fa5a1\" title=\"0岁 · 49\"></i><i  class=\"\" style=\"background:#86b2af\" title=\"1岁 · 38\"></i><i  class=\"\" style=\"background:#8ab5b1\" title=\"2岁 · 36\"></i><i  class=\"\" style=\"background:#93bab6\" title=\"3岁 · 32\"></i><i  class=\"\" style=\"background:#80afab\" title=\"4岁 · 41\"></i><i  class=\"\" style=\"background:#97bcb9\" title=\"5岁 · 30\"></i><i  class=\"\" style=\"background:#73a8a4\" title=\"6岁 · 47\"></i><i  class=\"\" style=\"background:#75a9a5\" title=\"7岁 · 46\"></i><i  class=\"\" style=\"background:#86b2af\" title=\"8岁 · 38\"></i><i  class=\"\" style=\"background:#90b8b5\" title=\"9岁 · 33\"></i><i  class=\"\" style=\"background:#88b4b0\" title=\"10岁 · 37\"></i><i  class=\"\" style=\"background:#97bcb9\" title=\"11岁 · 30\"></i><i  class=\"\" style=\"background:#cadad7\" title=\"12岁 · 8\"></i><i  class=\"\" style=\"background:#abc8c5\" title=\"13岁 · 21\"></i><i  class=\"\" style=\"background:#a2c2bf\" title=\"14岁 · 25\"></i><i  class=\"\" style=\"background:#7caca9\" title=\"15岁 · 43\"></i><i  class=\"\" style=\"background:#80afab\" title=\"16岁 · 41\"></i><i  class=\"\" style=\"background:#b6cecb\" title=\"17岁 · 16\"></i><i  class=\"\" style=\"background:#a4c4c1\" title=\"18岁 · 24\"></i><i  class=\"\" style=\"background:#abc8c5\" title=\"19岁 · 21\"></i><i  class=\"\" style=\"background:#a2c2bf\" title=\"20岁 · 25\"></i><i  class=\"\" style=\"background:#9dc0bd\" title=\"21岁 · 27\"></i><i  class=\"\" style=\"background:#b9d0cd\" title=\"22岁 · 15\"></i><i  class=\"\" style=\"background:#bbd1ce\" title=\"23岁 · 14\"></i><i  class=\"\" style=\"background:#a2c2bf\" title=\"24岁 · 25\"></i><i  class=\"\" style=\"background:#a8c6c3\" title=\"25岁 · 22\"></i><i  class=\"\" style=\"background:#9bbfbb\" title=\"26岁 · 28\"></i><i  class=\"\" style=\"background:#a2c2bf\" title=\"27岁 · 25\"></i><i  class=\"\" style=\"background:#a6c5c2\" title=\"28岁 · 23\"></i><i  class=\"\" style=\"background:#bbd1ce\" title=\"29岁 · 14\"></i><i  class=\"\" style=\"background:#b4cdca\" title=\"30岁 · 17\"></i><i  class=\"\" style=\"background:#67a19d\" title=\"31岁 · 53\"></i><i  class=\"\" style=\"background:#4a908b\" title=\"32岁 · 68\"></i><i  class=\"last\" style=\"background:#4c918c\" title=\"33岁 · 67\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i>",
+        "text": "",
+        "class": ""
+      },
+      "mapLegendTxt": {
+        "html": "",
+        "text": "一格一年 · 越深越幸福 · 外框为预期寿命",
+        "class": ""
+      },
+      "mapHint": {
+        "html": "",
+        "text": "34/78 格",
+        "class": ""
+      },
+      "sceneCap": {
+        "html": "<b>旧卡兹戴尔</b> · 卡兹戴尔 · 核心区 · 壮年",
+        "text": "",
+        "class": ""
+      },
+      "stageHint": {
+        "html": "",
+        "text": "成年",
+        "class": ""
+      },
+      "focusDesc": {
+        "html": "",
+        "text": "一年只能认真做一件事。年末按你花的时间结算。",
+        "class": ""
+      },
+      "focusList": {
+        "html": "<div  class=\"fopt \" data-f=\"work\">\n        <span  class=\"fn\">埋头工作</span><span  class=\"fd\">收入↑ 体质·羁绊↓</span>\n        </div><div  class=\"fopt \" data-f=\"balance\">\n        <span  class=\"fn\">均衡度日</span><span  class=\"fd\">各项略升</span>\n        </div><div  class=\"fopt \" data-f=\"family\">\n        <span  class=\"fn\">陪伴家人</span><span  class=\"fd\">羁绊↑ 心境↑</span>\n        </div><div  class=\"fopt \" data-f=\"health\">\n        <span  class=\"fn\">调养身体</span><span  class=\"fd\">体质↑</span>\n        </div><div  class=\"fopt \" data-f=\"learn\">\n        <span  class=\"fn\">进修</span><span  class=\"fd\">学识↑ 晋升机会↑</span>\n        <span  class=\"fw\">100%</span></div><div  class=\"fopt \" data-f=\"hobby\">\n        <span  class=\"fn\">爱好</span><span  class=\"fd\">心境↑ 专精↑</span>\n        </div><div  class=\"fopt \" data-f=\"rest\">\n        <span  class=\"fn\">休息</span><span  class=\"fd\">体质↑ 心境↑</span>\n        </div><div  class=\"fopt sel\" data-f=\"arts_training\">\n        <span  class=\"fn\">修习源石技艺</span><span  class=\"fd\">技艺↑↑ 体质↓（有感染风险）</span>\n        </div><div  class=\"fopt \" data-f=\"ori_care\">\n        <span  class=\"fn\">矿石病治疗</span><span  class=\"fd\">延缓结晶 体质↓ 花钱</span>\n        </div><div  class=\"fopt \" data-f=\"fellowship\">\n        <span  class=\"fn\">感染者互助</span><span  class=\"fd\">羁绊↑ 心境↑ 暴露风险↑</span>\n        </div><div  class=\"fopt \" data-f=\"disaster_drill\">\n        <span  class=\"fn\">天灾避难演练</span><span  class=\"fd\">天灾存活率↑ 心境↓</span>\n        </div>",
+        "text": "",
+        "class": ""
+      },
+      "feed": {
+        "html": "<#fragment><div class=\"entry ev\"><span  class=\"age\">33岁</span><span  class=\"txt\">你把这几年攒下的钱全押了进去。半年后，账上多了一笔你从没见过的数目。</span></div><div class=\"entry ev\"><span  class=\"age\">33岁</span><span  class=\"txt\">活很脏，但给得痛快。你把钱缝进了衣服内衬里。</span></div><div class=\"entry ev\"><span  class=\"age\">33岁</span><span  class=\"txt\">你背着受伤的同伴回到集合点，队里的人替你分担了装备。</span></div><div class=\"entry ev\"><span  class=\"age\">33岁</span><span  class=\"txt\">你连着加了三个月的班，多拿了一笔钱，也落下了一点毛病。</span></div><div class=\"entry dec\"><span  class=\"age\">33岁</span><span  class=\"txt\">【警报】你选择了：去帮别人</span></div><div class=\"entry tl\"><span  class=\"age\">33岁</span><span  class=\"txt\">叙拉古确立家族分治秩序。</span><span class=\"tagline\">十二家族法典确立</span></div><div class=\"entry ev\"><span  class=\"age\">32岁</span><span  class=\"txt\">机器夹住了你的手。工友把你送到医馆，指头保住了，但不太听使唤。</span></div><div class=\"entry ev\"><span  class=\"age\">32岁</span><span  class=\"txt\">你的组织履历记录了这次表现，晋升将在年度评审时处理。</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【撑不住了】你选择了：请一段时间假</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【面试结果】你选择了：继续人生</span></div><div class=\"entry org\"><span  class=\"age\">32岁</span><span  class=\"txt\">萨卡兹佣兵团面试结果：录用。回答满足岗位要求，你已正式加入。</span></div><div class=\"entry org\"><span  class=\"age\">32岁</span><span  class=\"txt\">你加入了萨卡兹佣兵团，负责资深战斗员。</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【萨卡兹佣兵团 · 面试 4 / 4】你选择了：让他单独冲锋以检验胆量</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【萨卡兹佣兵团 · 面试 3 / 4】你选择了：重新谈报酬和撤离条件，征得队伍同意</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【萨卡兹佣兵团 · 面试 2 / 4】你选择了：安排接应，说明伤员撤离属于队伍底线</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【萨卡兹佣兵团 · 面试 1 / 4】你选择了：先领取确认无争议的部分，再追讨余款</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【萨卡兹佣兵团·面试】你选择了：接受招募考核</span></div><div class=\"entry ev\"><span  class=\"age\">32岁</span><span  class=\"txt\">有人向你递来一份萨卡兹佣兵团的招募信息，岗位是资深战斗员。</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【别的机会】你选择了：留下</span></div><div class=\"entry ev\"><span  class=\"age\">32岁</span><span  class=\"txt\">你和一个同事关系不错。休息的时候他会分你一半的干粮。</span></div><div class=\"entry tl\"><span  class=\"age\">32岁</span><span  class=\"txt\">卡西米尔骑士名门发生失踪事件。</span><span class=\"tagline\">临光家族「黜落」风波</span></div><div class=\"entry tl\"><span  class=\"age\">32岁</span><span  class=\"txt\">维多利亚在镇压一个叫塔拉的地方。新闻只有三行。</span><span class=\"tagline\">塔拉大起义</span></div><div class=\"entry dec\"><span  class=\"age\">31岁</span><span  class=\"txt\">【要不要孩子】你选择了：要</span></div><div class=\"entry fam\"><span  class=\"age\">31岁</span><span  class=\"txt\">你生下了一个女孩，取名薇薇。</span></div><div class=\"entry ev\"><span  class=\"age\">31岁</span><span  class=\"txt\">你捡到了一个钱包，还给了失主。对方硬塞给你一点谢礼。</span></div><div class=\"entry ev\"><span  class=\"age\">31岁</span><span  class=\"txt\">停战的消息是在夜里传到的。有人在营地外面唱歌，唱到一半就哭了。</span></div><div class=\"entry ev\"><span  class=\"age\">31岁</span><span  class=\"txt\">卡尔开始有自己的秘密了。你装作没发现。</span></div><div class=\"entry ev\"><span  class=\"age\">30岁</span><span  class=\"txt\">你从旧城区的名单上被划掉，又在新城区被登记了一次。</span></div><div class=\"entry ev\"><span  class=\"age\">30岁</span><span  class=\"txt\">有几次你想过要改变什么，后来都算了。</span></div><div class=\"entry ev\"><span  class=\"age\">30岁</span><span  class=\"txt\">你在安置区待了三天。回来的时候，窗台上的灰有半指厚。</span></div><div class=\"entry ev\"><span  class=\"age\">30岁</span><span  class=\"txt\">体检查出了高血压。医生开了药，你算了算价钱，说下次再来。</span></div><div class=\"entry fam\"><span  class=\"age\">29岁</span><span  class=\"txt\">你生下了一个男孩，取名德雷。</span></div><div class=\"entry ev\"><span  class=\"age\">29岁</span><span  class=\"txt\">你活下来了。你不知道为什么是你。</span></div><div class=\"entry ev\"><span  class=\"age\">29岁</span><span  class=\"txt\">原来那条街要拆。你搬到了旧卡兹戴尔，行李只有一只箱子。</span></div><div class=\"entry dec\"><span  class=\"age\">29岁</span><span  class=\"txt\">【离开这里】你选择了：留下</span></div><div class=\"entry ev\"><span  class=\"age\">29岁</span><span  class=\"txt\">邻居们把巷口堵了起来，轮流守夜。你也去了。</span></div><div class=\"entry ev\"><span  class=\"age\">28岁</span><span  class=\"txt\">没什么大事，只是扭了脚。</span></div><div class=\"entry ev\"><span  class=\"age\">28岁</span><span  class=\"txt\">市政厅贴出告示，说下个季度的过滤芯会按时更换。上一次这么说是在三年前。</span></div><div class=\"entry ev\"><span  class=\"age\">28岁</span><span  class=\"txt\">你开始记不清上一次觉得高兴是什么时候。</span></div><div class=\"entry tl\"><span  class=\"age\">28岁</span><span  class=\"txt\">第十次乌萨斯-卡西米尔战争结束，双方停战。</span><span class=\"tagline\">血峰战役</span></div><div class=\"entry ev\"><span  class=\"age\">27岁</span><span  class=\"txt\">没什么值得写下来的。你把大部分时间给了活计。</span></div><div class=\"entry ev\"><span  class=\"age\">27岁</span><span  class=\"txt\">你病了两天，是隔壁的人替你买的水。</span></div><div class=\"entry ev\"><span  class=\"age\">27岁</span><span  class=\"txt\">炮击停下之后，你听见有人在哭，但找不到是谁。</span></div><div class=\"entry dec\"><span  class=\"age\">26岁</span><span  class=\"txt\">【要不要孩子】你选择了：要</span></div><div class=\"entry ev\"><span  class=\"age\">26岁</span><span  class=\"txt\">你捡到了一个钱包，还给了失主。对方硬塞给你一点谢礼。</span></div><div class=\"entry ev\"><span  class=\"age\">26岁</span><span  class=\"txt\">裁员名单上有你。你问为什么，对方说「你心里清楚」。</span></div><div class=\"entry ev\"><span  class=\"age\">26岁</span><span  class=\"txt\">你在回去的路上被拦住了。钱没了，人没事。这已经算运气好。</span></div><div class=\"entry fam\"><span  class=\"age\">25岁</span><span  class=\"txt\">你生下了一个男孩，取名卡尔。</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">邻居们把巷口堵了起来，轮流守夜。你也去了。</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">你活下来了。你不知道为什么是你。</span></div><div class=\"entry dec\"><span  class=\"age\">25岁</span><span  class=\"txt\">【买房子】你选择了：买</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">整座城市迁了三百公里。路上走了两个月，你换了三次住处。</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">活很脏，但给得痛快。你把钱缝进了衣服内衬里。</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">你在安置区待了三天。回来的时候，窗台上的灰有半指厚。</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">雪祀替你念了一段。你听不懂，但心里安静了一些。</span></div><div class=\"entry ev\"><span  class=\"age\">24岁</span><span  class=\"txt\">电梯停了一次，卡在四十七层。你在里面站了二十分钟，没有人说话。</span></div><div class=\"entry ev\"><span  class=\"age\">24岁</span><span  class=\"txt\">迁徙的时候你趴在窗口看了很久：原来城市底下的履带比房子还高。</span></div><div class=\"entry ev\"><span  class=\"age\">24岁</span><span  class=\"txt\">机器夹住了你的手。工友把你送到医馆，指头保住了，但不太听使唤。</span></div><div class=\"entry dec\"><span  class=\"age\">24岁</span><span  class=\"txt\">【要不要在一起】你选择了：结婚</span></div><div class=\"entry ev\"><span  class=\"age\">24岁</span><span  class=\"txt\">例行体检。各项指标都在范围内，医生说下一年再来。</span></div><div class=\"entry ev\"><span  class=\"age\">23岁</span><span  class=\"txt\">认识的人里有人走了，也有人来了。你没太在意。</span></div><div class=\"entry ev\"><span  class=\"age\">23岁</span><span  class=\"txt\">有人跟你说话，你听见了，但隔着一层什么东西。</span></div><div class=\"entry ev\"><span  class=\"age\">22岁</span><span  class=\"txt\">警报响了三天。整座城市开始移动。你在安置区挤了一夜，天亮时从窗口看出去——原来那片地已经没了。</span></div><div class=\"entry ev\"><span  class=\"age\">22岁</span><span  class=\"txt\">你连着加了三个月的班，多拿了一笔钱，也落下了一点毛病。</span></div><div class=\"entry ev\"><span  class=\"age\">22岁</span><span  class=\"txt\">有个老工人教了你怎么省力气。他说这行干久了，省力气就是保命。</span></div><div class=\"entry ev\"><span  class=\"age\">22岁</span><span  class=\"txt\">你说算了。说完之后一个人在街上走到很晚。</span></div><div class=\"entry dec\"><span  class=\"age\">22岁</span><span  class=\"txt\">【二十二岁】你选择了：广交朋友</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">整座城市迁了三百公里。路上走了两个月，你换了三次住处。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">你随手买的号中了最小的那个奖。你把钱换成了酒，请了几个人。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">你打输了。躺在地上的时候，你听见有人在笑。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">城市换了个位置停下。你走出去，发现外面的土是新的，上面什么都没有。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">你和阿兹一起走了一段路。谁也没说话，但那段路走得很慢。</span></div><div class=\"entry ev\"><span  class=\"age\">20岁</span><span  class=\"txt\">这个月工钱少了一半。老板说行情不好，让大家一起扛。</span></div><div class=\"entry ev\"><span  class=\"age\">20岁</span><span  class=\"txt\">你第一次完整地走完了一整套术式。手指在抖，但那是兴奋。</span></div><div class=\"entry ev\"><span  class=\"age\">20岁</span><span  class=\"txt\">你第一次站到城墙上看城市移动。地面在往后退，像整片大地都在让路。</span></div><div class=\"entry dec\"><span  class=\"age\">20岁</span><span  class=\"txt\">【别的机会】你选择了：留下</span></div><div class=\"entry ev\"><span  class=\"age\">20岁</span><span  class=\"txt\">你病了两天，是隔壁的人替你买的水。</span></div><div class=\"entry ev\"><span  class=\"age\">19岁</span><span  class=\"txt\">你从台阶上摔了下来，断了一根肋骨。</span></div><div class=\"entry ev\"><span  class=\"age\">19岁</span><span  class=\"txt\">这一年没什么大事。你照旧起床上工，照旧回来。</span></div><div class=\"entry ev\"><span  class=\"age\">19岁</span><span  class=\"txt\">你躺着，看着天花板。天从黑变亮，你一动没动。</span></div><div class=\"entry ev\"><span  class=\"age\">18岁</span><span  class=\"txt\">机器夹住了你的手。工友把你送到医馆，指头保住了，但不太听使唤。</span></div><div class=\"entry ev\"><span  class=\"age\">18岁</span><span  class=\"txt\">有个老工人教了你怎么省力气。他说这行干久了，省力气就是保命。</span></div><div class=\"entry ev\"><span  class=\"age\">18岁</span><span  class=\"txt\">你盯着桌上的杯子，它动了。只有一点点，但你看见了。</span></div><div class=\"entry ev\"><span  class=\"age\">18岁</span><span  class=\"txt\">连着上了半个月的夜班。你开始分不清今天是哪一天。</span></div><div class=\"entry dec\"><span  class=\"age\">18岁</span><span  class=\"txt\">【毕业之后】你选择了：留在本地</span></div><div class=\"entry mil\"><span  class=\"age\">17岁</span><span  class=\"txt\">你结束了高等学业。</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">征兵令贴到了巷口。你家在名单上。第二天你就换上了那身衣服。</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">房东把房子卖了。你搬到了无碑城，行李只有一只箱子。</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">你们分开了。理由说了很多，其实只有一个。</span></div><div class=\"entry dec\"><span  class=\"age\">17岁</span><span  class=\"txt\">【源石技艺】你选择了：专门去学</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">整座城市迁了三百公里。路上走了两个月，你换了三次住处。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">你开始喝。一开始是为了暖身子，后来就不是了。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">城市换了个位置停下。你走出去，发现外面的土是新的，上面什么都没有。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">工友递过来一支。你接了过去。以后就戒不掉了。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">你开始觉得时间不够用，虽然也没什么非做不可的事。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">城市换了个位置停下。你走出去，发现外面的土是新的，什么都没有。</span></div><div class=\"entry ev\"><span  class=\"age\">15岁</span><span  class=\"txt\">布伦是第一个不问你出身的人。你们一起干了不少蠢事。</span></div><div class=\"entry ev\"><span  class=\"age\">15岁</span><span  class=\"txt\">布伦给你留了一张纸条。你把它叠好放在口袋里，一直没舍得扔。</span></div><div class=\"entry ev\"><span  class=\"age\">15岁</span><span  class=\"txt\">你随手买的号中了最小的那个奖。你把钱换成了酒，请了几个人。</span></div><div class=\"entry dec\"><span  class=\"age\">15岁</span><span  class=\"txt\">【十五岁】你选择了：读下去</span></div><div class=\"entry mil\"><span  class=\"age\">15岁</span><span  class=\"txt\">你进入高等学堂。</span></div><div class=\"entry ev\"><span  class=\"age\">15岁</span><span  class=\"txt\">有人先动的手。你还手了，而且赢了。之后没人再找你麻烦。</span></div><div class=\"entry ev\"><span  class=\"age\">14岁</span><span  class=\"txt\">你病了两天，是隔壁的人替你买的水。</span></div><div class=\"entry ev\"><span  class=\"age\">14岁</span><span  class=\"txt\">你替人看摊，一天挣了几个铜板。回家时母亲把钱数了两遍。</span></div><div class=\"entry ev\"><span  class=\"age\">13岁</span><span  class=\"txt\">父亲今天回来得很早，还带了一小块糖。他没说什么，放在你桌上就走了。</span></div><div class=\"entry ev\"><span  class=\"age\">13岁</span><span  class=\"txt\">集市上有人卖一种很甜的糕。你站在摊子前面看了很久，最后没买。</span></div><div class=\"entry ev\"><span  class=\"age\">13岁</span><span  class=\"txt\">没什么大事，只是扭了脚。</span></div><div class=\"entry mil\"><span  class=\"age\">12岁</span><span  class=\"txt\">你结束了初等学业。</span></div><div class=\"entry ev\"><span  class=\"age\">12岁</span><span  class=\"txt\">警报响了四遍。城市启动主引擎，整块地在夜里挪了个位置。</span></div><div class=\"entry ev\"><span  class=\"age\">12岁</span><span  class=\"txt\">你没考过。教习说还有机会，但你知道那个机会不太属于你。</span></div><div class=\"entry dec\"><span  class=\"age\">12岁</span><span  class=\"txt\">【中等学堂的方向】你选择了：继续读书</span></div><div class=\"entry ev\"><span  class=\"age\">12岁</span><span  class=\"txt\">体检报告上盖了个章。你把它夹进了证件袋。</span></div><div class=\"entry fam\"><span  class=\"age\">11岁</span><span  class=\"txt\">你的父亲去世了，享年 42 岁。</span></div><div class=\"entry ev\"><span  class=\"age\">11岁</span><span  class=\"txt\">你替人看摊，一天挣了几个铜板。回家时母亲把钱数了两遍。</span></div><div class=\"entry ev\"><span  class=\"age\">11岁</span><span  class=\"txt\">警报响了三天。整座城市开始移动。你在安置区挤了一夜，天亮时从窗口看出去——原来那片地已经没了。</span></div><div class=\"entry ev\"><span  class=\"age\">11岁</span><span  class=\"txt\">先生说过一句话你一直记着：「先看清楚，再动手。」</span></div><div class=\"entry ev\"><span  class=\"age\">10岁</span><span  class=\"txt\">你病了两天，是隔壁的人替你买的水。</span></div><div class=\"entry ev\"><span  class=\"age\">10岁</span><span  class=\"txt\">父亲今天回来得很早，还带了一小块糖。他没说什么，放在你桌上就走了。</span></div><div class=\"entry ev\"><span  class=\"age\">10岁</span><span  class=\"txt\">你从旧城区的名单上被划掉，又在新城区被登记了一次。</span></div><div class=\"entry tl\"><span  class=\"age\">10岁</span><span  class=\"txt\">卡西米尔骑士竞技职业化。</span><span class=\"tagline\">商业联合会建立与骑士阶层重构</span></div><div class=\"entry ev\"><span  class=\"age\">9岁</span><span  class=\"txt\">你和巷子里的孩子们玩到天黑。没有人问你是哪个种族的。</span></div><div class=\"entry ev\"><span  class=\"age\">9岁</span><span  class=\"txt\">争吵到一半突然停下——他们想起来你还在屋里。</span></div><div class=\"entry ev\"><span  class=\"age\">8岁</span><span  class=\"txt\">一辆车擦着你过去。你在地上坐了很久才站起来。</span></div><div class=\"entry ev\"><span  class=\"age\">8岁</span><span  class=\"txt\">集市上有人卖一种很甜的糕。你站在摊子前面看了很久，最后没买。</span></div><div class=\"entry ev\"><span  class=\"age\">8岁</span><span  class=\"txt\">警报响了四遍。城市启动主引擎，整块地在夜里挪了个位置。</span></div><div class=\"entry ev\"><span  class=\"age\">8岁</span><span  class=\"txt\">你跟着大人下地，一天挣了几个铜板。回家时母亲把钱数了两遍。</span></div><div class=\"entry ev\"><span  class=\"age\">7岁</span><span  class=\"txt\">父亲只教过你一件事：答应别人的事，做不到就别答应。</span></div><div class=\"entry ev\"><span  class=\"age\">7岁</span><span  class=\"txt\">你又一次没答上来。教习没有骂你，只是让你坐下。这比骂更让人想消失。</span></div><div class=\"entry ev\"><span  class=\"age\">7岁</span><span  class=\"txt\">父亲今天回来得很早，还带了一小块糖。他没说什么，放在你桌上就走了。</span></div><div class=\"entry mil\"><span  class=\"age\">6岁</span><span  class=\"txt\">你进入初等学堂。</span></div><div class=\"entry ev\"><span  class=\"age\">6岁</span><span  class=\"txt\">家里多了个妹妹，叫伊瑟。从此你不再是屋里最小的那个。</span></div><div class=\"entry ev\"><span  class=\"age\">6岁</span><span  class=\"txt\">你捡回来一只瘦得只剩骨架的小兽。母亲说养不活，但它活下来了。</span></div><div class=\"entry ev\"><span  class=\"age\">6岁</span><span  class=\"txt\">你和巷子里的孩子们玩到天黑。没有人问你是哪个种族的。</span></div><div class=\"entry dec\"><span  class=\"age\">6岁</span><span  class=\"txt\">【该不该去学堂】你选择了：自己找书看</span></div><div class=\"entry dec\"><span  class=\"age\">6岁</span><span  class=\"txt\">【警报】你选择了：去帮别人</span></div><div class=\"entry ev\"><span  class=\"age\">5岁</span><span  class=\"txt\">迁徙途中城市停了一次，据说是前面的地块脱钩了。</span></div><div class=\"entry ev\"><span  class=\"age\">5岁</span><span  class=\"txt\">他们在隔壁房间吵。你听得清每一个字，但假装睡着了。</span></div><div class=\"entry ev\"><span  class=\"age\">5岁</span><span  class=\"txt\">你跟着大人去赶集。第一次见到那么多不认识的人挤在一条街上。</span></div><div class=\"entry ev\"><span  class=\"age\">4岁</span><span  class=\"txt\">你和巷子里的孩子们玩到天黑。没有人问你是哪个种族的。</span></div><div class=\"entry ev\"><span  class=\"age\">4岁</span><span  class=\"txt\">父亲今天回来得很早，还带了一小块糖。他没说什么，放在你桌上就走了。</span></div><div class=\"entry ev\"><span  class=\"age\">3岁</span><span  class=\"txt\">你在安置区待了三天。回来的时候，窗台上的灰有半指厚。</span></div><div class=\"entry ev\"><span  class=\"age\">1岁</span><span  class=\"txt\">你烧了很久。没有人请医生——请不起。你自己挺了过来。</span></div><div class=\"entry birth\"><span  class=\"age\">0岁</span><span  class=\"txt\">你出生在卡兹戴尔的哀愁之地。</span></div><div class=\"entry tl\"><span  class=\"age\">0岁</span><span  class=\"txt\">长辈说，这座城市被烧过六次。他说这话的时候在数手指，数完还剩四根。</span><span class=\"tagline\">卡兹戴尔的六次毁灭</span></div></#fragment>",
+        "text": "",
+        "class": ""
+      },
+      "modalTitle": {
+        "html": "",
+        "text": "【快照】这是个决定的标题",
+        "class": ""
+      },
+      "modalSub": {
+        "html": "",
+        "text": "34 岁 · 卡兹戴尔 · 士兵",
+        "class": ""
+      },
+      "modalText": {
+        "html": "",
+        "text": "一段用来固定弹层排版的正文。",
+        "class": ""
+      },
+      "modalOpts": {
+        "html": "<button  type=\"button\" class=\"opt\" data-i=\"0\"><span  class=\"ol\">第一个选项</span><span  class=\"oh\">带提示的副行</span></button><button  type=\"button\" class=\"opt\" data-i=\"1\"><span  class=\"ol\">第二个选项</span><span  class=\"oh\"></span></button>",
+        "text": "",
+        "class": ""
+      }
+    }
+  },
+  "retiree": {
+    "seed": 700126,
+    "age": 70,
+    "markup": {
+      "brandSub": {
+        "html": "",
+        "text": "中国",
+        "class": ""
+      },
+      "ageBig": {
+        "html": "",
+        "text": 70,
+        "class": ""
+      },
+      "ageUnit": {
+        "html": "",
+        "text": "岁",
+        "class": ""
+      },
+      "metaL1": {
+        "html": "",
+        "text": "1110年 · 茜尔·灰烬 · 已退休",
+        "class": ""
+      },
+      "metaL2": {
+        "html": "",
+        "text": "卡兹戴尔 · 移动城市核心区 · 1 年 ≈ 20.5 秒",
+        "class": ""
+      },
+      "idTitle": {
+        "html": "",
+        "text": "身份记录",
+        "class": ""
+      },
+      "idCode": {
+        "html": "",
+        "text": "KDZ · F70 · CNY",
+        "class": ""
+      },
+      "idName": {
+        "html": "",
+        "text": "茜尔·灰烬",
+        "class": ""
+      },
+      "idSub": {
+        "html": "",
+        "text": "卡兹戴尔 · 无碑城",
+        "class": ""
+      },
+      "idTags": {
+        "html": "<span  class=\"tag amber\">萨卡兹</span><span  class=\"tag violet\">石翼魔</span><span  class=\"tag\">女</span><span  class=\"tag \">技艺 中等</span>",
+        "text": "",
+        "class": ""
+      },
+      "idTable": {
+        "html": "<tr><td  class=\"k\">性别</td><td  class=\"v\">女</td></tr><tr><td  class=\"k\">出生</td><td  class=\"v\">1040年</td></tr><tr><td  class=\"k\">居住地</td><td  class=\"v\">无碑城</td></tr><tr><td  class=\"k\">出身阶层</td><td  class=\"v\">移动城市核心区</td></tr><tr><td  class=\"k\">家境分位</td><td  class=\"v\"><span  class=\"dots\"><i  class=\"on\"></i><i  class=\"on\"></i><i  class=\"on\"></i><i  class=\"on\"></i><i  class=\"on\"></i></span> <span  style=\"color:var(--fg3);font-size:10px\">5.0/5</span></td></tr><tr><td  class=\"k\">学历</td><td  class=\"v\">高等</td></tr>",
+        "text": "",
+        "class": ""
+      },
+      "mrzText": {
+        "html": "",
+        "text": "T<KDZCOR<AB15BE28<180-400",
+        "class": ""
+      },
+      "statTitle": {
+        "html": "",
+        "text": "状态",
+        "class": ""
+      },
+      "statBody": {
+        "html": "<div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">健康</span>\n          <span  class=\"v hl\">52</span><span  class=\"w\">硬朗</span></div>\n        <div  class=\"track\"><div  class=\"fill hl\" style=\"width:52%\"></div></div>\n      </div><div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">幸福</span>\n          <span  class=\"v h\">34</span><span  class=\"w\">消沉</span></div>\n        <div  class=\"track\"><div  class=\"fill h\" style=\"width:34%\"></div></div>\n      </div><div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">知识</span>\n          <span  class=\"v sm\">63</span><span  class=\"w\">学有所长</span></div>\n        <div  class=\"track\"><div  class=\"fill sm\" style=\"width:63%\"></div></div>\n      </div><div  class=\"statRow\">\n        <div  class=\"statTop\"><span  class=\"k\">人际关系</span>\n          <span  class=\"v so\">62</span><span  class=\"w\">亲友在侧</span></div>\n        <div  class=\"track\"><div  class=\"fill so\" style=\"width:62%\"></div></div>\n      </div><div  class=\"statRow\" style=\"margin-top:8px;padding-top:7px;border-top:1px dotted var(--line)\">\n      <div  class=\"statTop\"><span  class=\"k\">技艺</span>\n        <span  class=\"v ar\">67</span><span  class=\"w\">中等</span></div>\n      <div  class=\"track\"><div  class=\"fill ar\" style=\"width:67%\"></div></div>\n    </div>",
+        "text": "",
+        "class": ""
+      },
+      "wealthTitle": {
+        "html": "",
+        "text": "财产",
+        "class": ""
+      },
+      "nwLabel": {
+        "html": "",
+        "text": "净资产",
+        "class": ""
+      },
+      "incLabel": {
+        "html": "",
+        "text": "年收入",
+        "class": ""
+      },
+      "nwVal": {
+        "html": "",
+        "text": "¥98",
+        "class": "mv pos"
+      },
+      "incVal": {
+        "html": "",
+        "text": "¥2",
+        "class": "mv"
+      },
+      "factList": {
+        "html": "<div  class=\"factLine\"><span  class=\"fk\">职业</span><span  class=\"fv \">已退休</span></div><div  class=\"factLine\"><span  class=\"fk\">大陆收入分位</span><span  class=\"fv \">20%</span></div><div  class=\"factLine\"><span  class=\"fk\">还住在父母家</span><span  class=\"fv \">否</span></div><div  class=\"factLine\"><span  class=\"fk\">服役</span><span  class=\"fv \">还剩 4 年</span></div><div  class=\"factLine\"><span  class=\"fk\">年度死亡风险</span><span  class=\"fv neg\">7.15%</span></div><div  class=\"factLine\"><span  class=\"fk\">物价口径</span><span  class=\"fv \">以中国物价计</span></div>",
+        "text": "",
+        "class": ""
+      },
+      "survTitle": {
+        "html": "",
+        "text": "存活曲线",
+        "class": ""
+      },
+      "survHint": {
+        "html": "",
+        "text": "同一批出生的人还剩多少",
+        "class": ""
+      },
+      "survStat": {
+        "html": "<span>你 70 岁</span><span>同期群存活 46.3%</span><span>预期 72 岁</span>",
+        "text": "",
+        "class": ""
+      },
+      "famTitle": {
+        "html": "",
+        "text": "家人与生活",
+        "class": ""
+      },
+      "famList": {
+        "html": "<div  class=\"famRow dead\">\n        <span  class=\"fr\">母亲</span>\n        <span  class=\"fnm\">穆尔 †</span>\n        <span  class=\"fa\">已故</span>\n      </div><div  class=\"famRow dead\">\n        <span  class=\"fr\">父亲</span>\n        <span  class=\"fnm\">布伦 †</span>\n        <span  class=\"fa\">已故</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">兄弟姐妹</span>\n        <span  class=\"fnm\">塞恩</span>\n        <span  class=\"fa\">77岁 · 工匠</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">兄弟姐妹</span>\n        <span  class=\"fnm\">伊瑟</span>\n        <span  class=\"fa\">64岁 · 贵族</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">伴侣</span>\n        <span  class=\"fnm\">维克</span>\n        <span  class=\"fa\">71岁 · 已退休</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">子女</span>\n        <span  class=\"fnm\">卡尔</span>\n        <span  class=\"fa\">44岁 · 信使</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">子女</span>\n        <span  class=\"fnm\">德雷</span>\n        <span  class=\"fa\">40岁 · 工程师</span>\n      </div><div  class=\"famRow \">\n        <span  class=\"fr\">子女</span>\n        <span  class=\"fnm\">薇薇</span>\n        <span  class=\"fa\">39岁 · 猎人</span>\n      </div>",
+        "text": "",
+        "class": ""
+      },
+      "peerTitle": {
+        "html": "",
+        "text": "在同一秒出生的人们",
+        "class": ""
+      },
+      "peers": {
+        "html": "<div  class=\"peer gone\">\n        <span  class=\"pn\">厄瑞·血契</span>\n        <span  class=\"pd\">殁于 20岁</span>\n      </div><div  class=\"peer gone\">\n        <span  class=\"pn\">索恩·空庭</span>\n        <span  class=\"pd\">殁于 26岁</span>\n      </div><div  class=\"peer gone\">\n        <span  class=\"pn\">索拉·锈冠</span>\n        <span  class=\"pd\">殁于 28岁</span>\n      </div><div  class=\"peer gone\">\n        <span  class=\"pn\">茜尔·寂声</span>\n        <span  class=\"pd\">殁于 68岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">格罗·残雪</span>\n        <span  class=\"pd\">在世 70岁</span>\n      </div><div  class=\"peer \">\n        <span  class=\"pn\">瓦伦·残雪</span>\n        <span  class=\"pd\">在世 70岁</span>\n      </div>",
+        "text": "",
+        "class": ""
+      },
+      "peerSum": {
+        "html": "还活着 <b>278</b> / 600 人 · <b>46.3%</b>",
+        "text": "",
+        "class": ""
+      },
+      "mapTitle": {
+        "html": "",
+        "text": "人生地图",
+        "class": ""
+      },
+      "lifeMap": {
+        "html": "<i  class=\"\" style=\"background:#6fa5a1\" title=\"0岁 · 49\"></i><i  class=\"\" style=\"background:#86b2af\" title=\"1岁 · 38\"></i><i  class=\"\" style=\"background:#8ab5b1\" title=\"2岁 · 36\"></i><i  class=\"\" style=\"background:#93bab6\" title=\"3岁 · 32\"></i><i  class=\"\" style=\"background:#80afab\" title=\"4岁 · 41\"></i><i  class=\"\" style=\"background:#97bcb9\" title=\"5岁 · 30\"></i><i  class=\"\" style=\"background:#73a8a4\" title=\"6岁 · 47\"></i><i  class=\"\" style=\"background:#75a9a5\" title=\"7岁 · 46\"></i><i  class=\"\" style=\"background:#86b2af\" title=\"8岁 · 38\"></i><i  class=\"\" style=\"background:#90b8b5\" title=\"9岁 · 33\"></i><i  class=\"\" style=\"background:#88b4b0\" title=\"10岁 · 37\"></i><i  class=\"\" style=\"background:#97bcb9\" title=\"11岁 · 30\"></i><i  class=\"\" style=\"background:#cadad7\" title=\"12岁 · 8\"></i><i  class=\"\" style=\"background:#abc8c5\" title=\"13岁 · 21\"></i><i  class=\"\" style=\"background:#a2c2bf\" title=\"14岁 · 25\"></i><i  class=\"\" style=\"background:#7caca9\" title=\"15岁 · 43\"></i><i  class=\"\" style=\"background:#80afab\" title=\"16岁 · 41\"></i><i  class=\"\" style=\"background:#b6cecb\" title=\"17岁 · 16\"></i><i  class=\"\" style=\"background:#a4c4c1\" title=\"18岁 · 24\"></i><i  class=\"\" style=\"background:#abc8c5\" title=\"19岁 · 21\"></i><i  class=\"\" style=\"background:#a2c2bf\" title=\"20岁 · 25\"></i><i  class=\"\" style=\"background:#9dc0bd\" title=\"21岁 · 27\"></i><i  class=\"\" style=\"background:#b9d0cd\" title=\"22岁 · 15\"></i><i  class=\"\" style=\"background:#bbd1ce\" title=\"23岁 · 14\"></i><i  class=\"\" style=\"background:#a2c2bf\" title=\"24岁 · 25\"></i><i  class=\"\" style=\"background:#a8c6c3\" title=\"25岁 · 22\"></i><i  class=\"\" style=\"background:#9bbfbb\" title=\"26岁 · 28\"></i><i  class=\"\" style=\"background:#a2c2bf\" title=\"27岁 · 25\"></i><i  class=\"\" style=\"background:#a6c5c2\" title=\"28岁 · 23\"></i><i  class=\"\" style=\"background:#bbd1ce\" title=\"29岁 · 14\"></i><i  class=\"\" style=\"background:#b4cdca\" title=\"30岁 · 17\"></i><i  class=\"\" style=\"background:#67a19d\" title=\"31岁 · 53\"></i><i  class=\"\" style=\"background:#4a908b\" title=\"32岁 · 68\"></i><i  class=\"\" style=\"background:#4c918c\" title=\"33岁 · 67\"></i><i  class=\"\" style=\"background:#5c9a96\" title=\"34岁 · 59\"></i><i  class=\"\" style=\"background:#7eaeaa\" title=\"35岁 · 42\"></i><i  class=\"\" style=\"background:#7caca9\" title=\"36岁 · 43\"></i><i  class=\"\" style=\"background:#95bbb7\" title=\"37岁 · 31\"></i><i  class=\"\" style=\"background:#b6cecb\" title=\"38岁 · 16\"></i><i  class=\"\" style=\"background:#adc9c6\" title=\"39岁 · 20\"></i><i  class=\"\" style=\"background:#97bcb9\" title=\"40岁 · 30\"></i><i  class=\"\" style=\"background:#afcac7\" title=\"41岁 · 19\"></i><i  class=\"\" style=\"background:#b4cdca\" title=\"42岁 · 17\"></i><i  class=\"\" style=\"background:#bbd1ce\" title=\"43岁 · 14\"></i><i  class=\"\" style=\"background:#c5d7d4\" title=\"44岁 · 10\"></i><i  class=\"\" style=\"background:#b6cecb\" title=\"45岁 · 16\"></i><i  class=\"\" style=\"background:#a6c5c2\" title=\"46岁 · 23\"></i><i  class=\"\" style=\"background:#a2c2bf\" title=\"47岁 · 25\"></i><i  class=\"\" style=\"background:#adc9c6\" title=\"48岁 · 20\"></i><i  class=\"\" style=\"background:#abc8c5\" title=\"49岁 · 21\"></i><i  class=\"\" style=\"background:#a6c5c2\" title=\"50岁 · 23\"></i><i  class=\"\" style=\"background:#a2c2bf\" title=\"51岁 · 25\"></i><i  class=\"\" style=\"background:#9dc0bd\" title=\"52岁 · 27\"></i><i  class=\"\" style=\"background:#a0c1be\" title=\"53岁 · 26\"></i><i  class=\"\" style=\"background:#c0d4d1\" title=\"54岁 · 12\"></i><i  class=\"\" style=\"background:#bed2d0\" title=\"55岁 · 13\"></i><i  class=\"\" style=\"background:#b9d0cd\" title=\"56岁 · 15\"></i><i  class=\"\" style=\"background:#d0ddda\" title=\"57岁 · 6\"></i><i  class=\"\" style=\"background:#b6cecb\" title=\"58岁 · 16\"></i><i  class=\"\" style=\"background:#9bbfbb\" title=\"59岁 · 28\"></i><i  class=\"\" style=\"background:#99bdba\" title=\"60岁 · 29\"></i><i  class=\"\" style=\"background:#97bcb9\" title=\"61岁 · 30\"></i><i  class=\"\" style=\"background:#86b2af\" title=\"62岁 · 38\"></i><i  class=\"\" style=\"background:#9dc0bd\" title=\"63岁 · 27\"></i><i  class=\"\" style=\"background:#93bab6\" title=\"64岁 · 32\"></i><i  class=\"\" style=\"background:#93bab6\" title=\"65岁 · 32\"></i><i  class=\"\" style=\"background:#93bab6\" title=\"66岁 · 32\"></i><i  class=\"\" style=\"background:#8eb7b4\" title=\"67岁 · 34\"></i><i  class=\"\" style=\"background:#8eb7b4\" title=\"68岁 · 34\"></i><i  class=\"last\" style=\"background:#8eb7b4\" title=\"69岁 · 34\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i><i  class=\"future\"></i>",
+        "text": "",
+        "class": ""
+      },
+      "mapLegendTxt": {
+        "html": "",
+        "text": "一格一年 · 越深越幸福 · 外框为预期寿命",
+        "class": ""
+      },
+      "mapHint": {
+        "html": "",
+        "text": "70/78 格",
+        "class": ""
+      },
+      "sceneCap": {
+        "html": "<b>无碑城</b> · 卡兹戴尔 · 核心区 · 老年",
+        "text": "",
+        "class": ""
+      },
+      "stageHint": {
+        "html": "",
+        "text": "服役",
+        "class": ""
+      },
+      "focusDesc": {
+        "html": "",
+        "text": "一年只能认真做一件事。年末按你花的时间结算。",
+        "class": ""
+      },
+      "focusList": {
+        "html": "<div  class=\"fopt sel\" data-f=\"balance\">\n        <span  class=\"fn\">均衡度日</span><span  class=\"fd\">各项略升</span>\n        <span  class=\"fw\">100%</span></div><div  class=\"fopt \" data-f=\"sport\">\n        <span  class=\"fn\">锻炼</span><span  class=\"fd\">体质↑ 心境↑</span>\n        </div><div  class=\"fopt \" data-f=\"family\">\n        <span  class=\"fn\">陪伴家人</span><span  class=\"fd\">羁绊↑ 心境↑</span>\n        </div><div  class=\"fopt \" data-f=\"train\">\n        <span  class=\"fn\">习武</span><span  class=\"fd\">体质↑ 心境↑</span>\n        </div><div  class=\"fopt \" data-f=\"arts_training\">\n        <span  class=\"fn\">修习源石技艺</span><span  class=\"fd\">技艺↑↑ 体质↓（有感染风险）</span>\n        </div><div  class=\"fopt \" data-f=\"disaster_drill\">\n        <span  class=\"fn\">天灾避难演练</span><span  class=\"fd\">天灾存活率↑ 心境↓</span>\n        </div>",
+        "text": "",
+        "class": ""
+      },
+      "feed": {
+        "html": "<#fragment><div class=\"entry ev\"><span  class=\"age\">67岁</span><span  class=\"txt\">电梯停了一次，卡在四十七层。你在里面站了二十分钟，没有人说话。</span></div><div class=\"entry dec\"><span  class=\"age\">64岁</span><span  class=\"txt\">【警报】你选择了：去帮别人</span></div><div class=\"entry ev\"><span  class=\"age\">63岁</span><span  class=\"txt\">这次偏航慢了半拍。你所在的那块地块被擦到了。</span></div><div class=\"entry ev\"><span  class=\"age\">62岁</span><span  class=\"txt\">你在报纸上读到城墙外的事。读完你把报纸折好，放进了抽屉。</span></div><div class=\"entry dec\"><span  class=\"age\">62岁</span><span  class=\"txt\">【留下什么】你选择了：写下来</span></div><div class=\"entry tl\"><span  class=\"age\">59岁</span><span  class=\"txt\">千年的禁忌第一次松开了一条缝。你从那条缝里看过去，对面也是人。</span><span class=\"tagline\">万国峰会与「原初律法」启示</span></div><div class=\"entry tl\"><span  class=\"age\">59岁</span><span  class=\"txt\">拉特兰召开万国万教代表大会。</span><span class=\"tagline\">万国峰会与「原初律法」启示</span></div><div class=\"entry tl\"><span  class=\"age\">59岁</span><span  class=\"txt\">叙拉古的新沃尔西尼确立了禁止家族介入的新秩序。</span><span class=\"tagline\">新沃尔西尼建立与家族冲突</span></div><div class=\"entry tl\"><span  class=\"age\">59岁</span><span  class=\"txt\">那声音过去之后，你发现自己能做的事多了一点。这件事你谁也没告诉。</span><span class=\"tagline\">崔林特尔梅之夜</span></div><div class=\"entry tl\"><span  class=\"age\">59岁</span><span  class=\"txt\">莱塔尼亚移动城邦崔林特尔梅发生异动，黑女皇牺牲。</span><span class=\"tagline\">崔林特尔梅之夜</span></div><div class=\"entry tl\"><span  class=\"age\">59岁</span><span  class=\"txt\">有人把天捅开了一个口子。那天晚上，所有人都在抬头。</span><span class=\"tagline\">「孤星」计划与破天事件</span></div><div class=\"entry tl\"><span  class=\"age\">59岁</span><span  class=\"txt\">炎国大荒城农牧减产。</span><span class=\"tagline\">大荒城司农寺农牧危机</span></div><div class=\"entry tl\"><span  class=\"age\">58岁</span><span  class=\"txt\">炎国边陲移动城邦遇袭。</span><span class=\"tagline\">玉门关塞防卫战</span></div><div class=\"entry tl\"><span  class=\"age\">58岁</span><span  class=\"txt\">维多利亚内战，首都工业区大面积损毁。</span><span class=\"tagline\">碎片大厦启动与伦蒂尼姆战役</span></div><div class=\"entry tl\"><span  class=\"age\">58岁</span><span  class=\"txt\">街上忽然多了很多和你一样的人。你分不清这是安心还是更不安心。</span><span class=\"tagline\">伦蒂尼姆事变与萨卡兹进驻</span></div><div class=\"entry tl\"><span  class=\"age\">58岁</span><span  class=\"txt\">维多利亚的首都现在由萨卡兹驻防。</span><span class=\"tagline\">伦蒂尼姆事变与萨卡兹进驻</span></div><div class=\"entry ev\"><span  class=\"age\">57岁</span><span  class=\"txt\">这次偏航慢了半拍。你所在的那块地块被擦到了。</span></div><div class=\"entry ev\"><span  class=\"age\">57岁</span><span  class=\"txt\">你把剩下的半包扔了。头一个月很难熬，之后就好了。</span></div><div class=\"entry tl\"><span  class=\"age\">57岁</span><span  class=\"txt\">谢拉格解除闭关，全面开放商路。</span><span class=\"tagline\">雪山三族会议与喀兰贸易破局</span></div><div class=\"entry tl\"><span  class=\"age\">57岁</span><span  class=\"txt\">伊比利亚失蹤旗舰「愚人号」被重新发现。</span><span class=\"tagline\">「愚人号」返航与盐风城危机</span></div><div class=\"entry tl\"><span  class=\"age\">57岁</span><span  class=\"txt\">卡西米尔爆发感染者起义，商业联合会妥协。</span><span class=\"tagline\">第二十四届特锦赛与感染者大起义</span></div><div class=\"entry tl\"><span  class=\"age\">57岁</span><span  class=\"txt\">炎国尚蜀行政区一度封锁，现已解除。</span><span class=\"tagline\">尚蜀器物活化事件</span></div><div class=\"entry ev\"><span  class=\"age\">56岁</span><span  class=\"txt\">地铁新开了一站。车厢里的人都在看自己的终端。</span></div><div class=\"entry ev\"><span  class=\"age\">56岁</span><span  class=\"txt\">体检查出了肾脏问题。医生开了药，你算了算价钱，说下次再来。</span></div><div class=\"entry tl\"><span  class=\"age\">56岁</span><span  class=\"txt\">乌萨斯一座移动城市被攻占，险些引发与炎国的战争。</span><span class=\"tagline\">切尔诺伯格停泊事变</span></div><div class=\"entry ev\"><span  class=\"age\">55岁</span><span  class=\"txt\">体检查出了代谢病。医生开了药，你算了算价钱，说下次再来。</span></div><div class=\"entry dec\"><span  class=\"age\">54岁</span><span  class=\"txt\">【警报】你选择了：去帮别人</span></div><div class=\"entry tl\"><span  class=\"age\">54岁</span><span  class=\"txt\">你认识的人里有三个去了那面旗下面。回来了一个。</span><span class=\"tagline\">卡兹戴尔斩首行动</span></div><div class=\"entry tl\"><span  class=\"age\">54岁</span><span  class=\"txt\">旗舰遇袭，她死了。第二天军事委员会接管了一切，没有人反对。</span><span class=\"tagline\">卡兹戴尔斩首行动</span></div><div class=\"entry tl\"><span  class=\"age\">54岁</span><span  class=\"txt\">卡西米尔耀骑士因感染矿石病被流放。</span><span class=\"tagline\">耀骑士流放</span></div><div class=\"entry ev\"><span  class=\"age\">53岁</span><span  class=\"txt\">城市换了个位置停下。你走出去，发现外面的土是新的，上面什么都没有。</span></div><div class=\"entry ev\"><span  class=\"age\">49岁</span><span  class=\"txt\">城市换了个位置停下。你走出去，发现外面的土是新的，上面什么都没有。</span></div><div class=\"entry tl\"><span  class=\"age\">49岁</span><span  class=\"txt\">乌萨斯北原矿区发生暴动。</span><span class=\"tagline\">柯瓦尔矿场暴动</span></div><div class=\"entry ev\"><span  class=\"age\">48岁</span><span  class=\"txt\">警报响了三天。整座城市开始移动。你在安置区挤了一夜，天亮时从窗口看出去——原来那片地已经没了。</span></div><div class=\"entry tl\"><span  class=\"age\">46岁</span><span  class=\"txt\">有人在荒原上挖出一条船，然后竖了一面旗。旗上写着「巴别塔」。</span><span class=\"tagline\">巴别塔组织成立</span></div><div class=\"entry ev\"><span  class=\"age\">45岁</span><span  class=\"txt\">市政厅贴出告示，说下个季度的过滤芯会按时更换。上一次这么说是在三年前。</span></div><div class=\"entry ev\"><span  class=\"age\">44岁</span><span  class=\"txt\">警报响了三天。整座城市开始移动。你在安置区挤了一夜，天亮时从窗口看出去——原来那片地已经没了。</span></div><div class=\"entry ev\"><span  class=\"age\">44岁</span><span  class=\"txt\">体检的人问你最近睡得好不好。你说了谎。</span></div><div class=\"entry ev\"><span  class=\"age\">44岁</span><span  class=\"txt\">城市换了个位置停下。你走出去，发现外面的土是新的，上面什么都没有。</span></div><div class=\"entry ev\"><span  class=\"age\">43岁</span><span  class=\"txt\">卡尔问你为什么有的人住在城外。你想了很久才回答。</span></div><div class=\"entry fam\"><span  class=\"age\">42岁</span><span  class=\"txt\">你的母亲去世了，享年 71 岁。</span></div><div class=\"entry ev\"><span  class=\"age\">42岁</span><span  class=\"txt\">有几次你想过要改变什么，后来都算了。</span></div><div class=\"entry ev\"><span  class=\"age\">42岁</span><span  class=\"txt\">你躺着，看着天花板。天从黑变亮，你一动没动。</span></div><div class=\"entry ev\"><span  class=\"age\">41岁</span><span  class=\"txt\">整座城市迁了三百公里。路上走了两个月，你换了三次住处。</span></div><div class=\"entry dec\"><span  class=\"age\">41岁</span><span  class=\"txt\">【要不要孩子】你选择了：要</span></div><div class=\"entry ev\"><span  class=\"age\">41岁</span><span  class=\"txt\">只是不想再待在那个地方。你搬到了无碑城，行李只有一只箱子。</span></div><div class=\"entry ev\"><span  class=\"age\">41岁</span><span  class=\"txt\">你在战壕里蹲了两天。出来的时候，认识的人少了三个。</span></div><div class=\"entry ev\"><span  class=\"age\">40岁</span><span  class=\"txt\">电梯停了一次，卡在四十七层。你在里面站了二十分钟，没有人说话。</span></div><div class=\"entry ev\"><span  class=\"age\">40岁</span><span  class=\"txt\">卡尔第一次自己去上学，回来的时候手里攥着一朵不知从哪摘的花。</span></div><div class=\"entry ev\"><span  class=\"age\">39岁</span><span  class=\"txt\">没什么值得写下来的。你把大部分时间给了活计。</span></div><div class=\"entry ev\"><span  class=\"age\">38岁</span><span  class=\"txt\">有人跟你说话，你听见了，但隔着一层什么东西。</span></div><div class=\"entry ev\"><span  class=\"age\">38岁</span><span  class=\"txt\">你在战壕里蹲了两天。出来的时候，认识的人少了三个。</span></div><div class=\"entry ev\"><span  class=\"age\">38岁</span><span  class=\"txt\">你在安置区待了三天。回来的时候，窗台上的灰有半指厚。</span></div><div class=\"entry ev\"><span  class=\"age\">37岁</span><span  class=\"txt\">裁员名单上有你。你问为什么，对方说「你心里清楚」。</span></div><div class=\"entry ev\"><span  class=\"age\">37岁</span><span  class=\"txt\">卡尔问你为什么有的人住在城外。你想了很久才回答。</span></div><div class=\"entry ev\"><span  class=\"age\">37岁</span><span  class=\"txt\">你从旧城区的名单上被划掉，又在新城区被登记了一次。</span></div><div class=\"entry tl\"><span  class=\"age\">37岁</span><span  class=\"txt\">莱塔尼亚政权更迭，巫王身死。</span><span class=\"tagline\">九月起义与夕照区之变</span></div><div class=\"entry tl\"><span  class=\"age\">37岁</span><span  class=\"txt\">乌萨斯在大叛乱后发生石棺数据泄露事件，军方被指灭口研究团队。</span><span class=\"tagline\">石棺数据泄露与军方灭口</span></div><div class=\"entry tl\"><span  class=\"age\">37岁</span><span  class=\"txt\">维多利亚没有国王了。</span><span class=\"tagline\">二十一人公爵会议与弑君</span></div><div class=\"entry ev\"><span  class=\"age\">36岁</span><span  class=\"txt\">没什么值得写下来的。你把大部分时间给了活计。</span></div><div class=\"entry dec\"><span  class=\"age\">36岁</span><span  class=\"txt\">【要不要孩子】你选择了：要</span></div><div class=\"entry ev\"><span  class=\"age\">36岁</span><span  class=\"txt\">这一单护送的是货，不是人。你问了不该问的，对方加了三成钱让你别问。</span></div><div class=\"entry ev\"><span  class=\"age\">35岁</span><span  class=\"txt\">你在战壕里蹲了两天。出来的时候，认识的人少了三个。</span></div><div class=\"entry ev\"><span  class=\"age\">35岁</span><span  class=\"txt\">你在回去的路上被拦住了。钱没了，人没事。这已经算运气好。</span></div><div class=\"entry tl\"><span  class=\"age\">35岁</span><span  class=\"txt\">哥伦比亚工业与科研大突破。</span><span class=\"tagline\">工业淘金热与山地开拓潮</span></div><div class=\"entry org\"><span  class=\"age\">34岁</span><span  class=\"txt\">你离开了萨卡兹佣兵团：应征服役。</span></div><div class=\"entry ev\"><span  class=\"age\">34岁</span><span  class=\"txt\">征兵令贴到了巷口。你家在名单上。第二天你就换上了那身衣服。</span></div><div class=\"entry ev\"><span  class=\"age\">34岁</span><span  class=\"txt\">邻居们把巷口堵了起来，轮流守夜。你也去了。</span></div><div class=\"entry ev\"><span  class=\"age\">34岁</span><span  class=\"txt\">雇主要求临时加单，你们重新谈妥撤离条件才动身。</span></div><div class=\"entry ev\"><span  class=\"age\">34岁</span><span  class=\"txt\">卡尔问你为什么有的人住在城外。你想了很久才回答。</span></div><div class=\"entry ev\"><span  class=\"age\">34岁</span><span  class=\"txt\">你在安置区待了三天。回来的时候，窗台上的灰有半指厚。</span></div><div class=\"entry ev\"><span  class=\"age\">33岁</span><span  class=\"txt\">你把这几年攒下的钱全押了进去。半年后，账上多了一笔你从没见过的数目。</span></div><div class=\"entry ev\"><span  class=\"age\">33岁</span><span  class=\"txt\">活很脏，但给得痛快。你把钱缝进了衣服内衬里。</span></div><div class=\"entry ev\"><span  class=\"age\">33岁</span><span  class=\"txt\">你背着受伤的同伴回到集合点，队里的人替你分担了装备。</span></div><div class=\"entry ev\"><span  class=\"age\">33岁</span><span  class=\"txt\">你连着加了三个月的班，多拿了一笔钱，也落下了一点毛病。</span></div><div class=\"entry dec\"><span  class=\"age\">33岁</span><span  class=\"txt\">【警报】你选择了：去帮别人</span></div><div class=\"entry tl\"><span  class=\"age\">33岁</span><span  class=\"txt\">叙拉古确立家族分治秩序。</span><span class=\"tagline\">十二家族法典确立</span></div><div class=\"entry ev\"><span  class=\"age\">32岁</span><span  class=\"txt\">机器夹住了你的手。工友把你送到医馆，指头保住了，但不太听使唤。</span></div><div class=\"entry ev\"><span  class=\"age\">32岁</span><span  class=\"txt\">你的组织履历记录了这次表现，晋升将在年度评审时处理。</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【撑不住了】你选择了：请一段时间假</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【面试结果】你选择了：继续人生</span></div><div class=\"entry org\"><span  class=\"age\">32岁</span><span  class=\"txt\">萨卡兹佣兵团面试结果：录用。回答满足岗位要求，你已正式加入。</span></div><div class=\"entry org\"><span  class=\"age\">32岁</span><span  class=\"txt\">你加入了萨卡兹佣兵团，负责资深战斗员。</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【萨卡兹佣兵团 · 面试 4 / 4】你选择了：让他单独冲锋以检验胆量</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【萨卡兹佣兵团 · 面试 3 / 4】你选择了：重新谈报酬和撤离条件，征得队伍同意</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【萨卡兹佣兵团 · 面试 2 / 4】你选择了：安排接应，说明伤员撤离属于队伍底线</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【萨卡兹佣兵团 · 面试 1 / 4】你选择了：先领取确认无争议的部分，再追讨余款</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【萨卡兹佣兵团·面试】你选择了：接受招募考核</span></div><div class=\"entry ev\"><span  class=\"age\">32岁</span><span  class=\"txt\">有人向你递来一份萨卡兹佣兵团的招募信息，岗位是资深战斗员。</span></div><div class=\"entry dec\"><span  class=\"age\">32岁</span><span  class=\"txt\">【别的机会】你选择了：留下</span></div><div class=\"entry ev\"><span  class=\"age\">32岁</span><span  class=\"txt\">你和一个同事关系不错。休息的时候他会分你一半的干粮。</span></div><div class=\"entry tl\"><span  class=\"age\">32岁</span><span  class=\"txt\">卡西米尔骑士名门发生失踪事件。</span><span class=\"tagline\">临光家族「黜落」风波</span></div><div class=\"entry tl\"><span  class=\"age\">32岁</span><span  class=\"txt\">维多利亚在镇压一个叫塔拉的地方。新闻只有三行。</span><span class=\"tagline\">塔拉大起义</span></div><div class=\"entry dec\"><span  class=\"age\">31岁</span><span  class=\"txt\">【要不要孩子】你选择了：要</span></div><div class=\"entry fam\"><span  class=\"age\">31岁</span><span  class=\"txt\">你生下了一个女孩，取名薇薇。</span></div><div class=\"entry ev\"><span  class=\"age\">31岁</span><span  class=\"txt\">你捡到了一个钱包，还给了失主。对方硬塞给你一点谢礼。</span></div><div class=\"entry ev\"><span  class=\"age\">31岁</span><span  class=\"txt\">停战的消息是在夜里传到的。有人在营地外面唱歌，唱到一半就哭了。</span></div><div class=\"entry ev\"><span  class=\"age\">31岁</span><span  class=\"txt\">卡尔开始有自己的秘密了。你装作没发现。</span></div><div class=\"entry ev\"><span  class=\"age\">30岁</span><span  class=\"txt\">你从旧城区的名单上被划掉，又在新城区被登记了一次。</span></div><div class=\"entry ev\"><span  class=\"age\">30岁</span><span  class=\"txt\">有几次你想过要改变什么，后来都算了。</span></div><div class=\"entry ev\"><span  class=\"age\">30岁</span><span  class=\"txt\">你在安置区待了三天。回来的时候，窗台上的灰有半指厚。</span></div><div class=\"entry ev\"><span  class=\"age\">30岁</span><span  class=\"txt\">体检查出了高血压。医生开了药，你算了算价钱，说下次再来。</span></div><div class=\"entry fam\"><span  class=\"age\">29岁</span><span  class=\"txt\">你生下了一个男孩，取名德雷。</span></div><div class=\"entry ev\"><span  class=\"age\">29岁</span><span  class=\"txt\">你活下来了。你不知道为什么是你。</span></div><div class=\"entry ev\"><span  class=\"age\">29岁</span><span  class=\"txt\">原来那条街要拆。你搬到了旧卡兹戴尔，行李只有一只箱子。</span></div><div class=\"entry dec\"><span  class=\"age\">29岁</span><span  class=\"txt\">【离开这里】你选择了：留下</span></div><div class=\"entry ev\"><span  class=\"age\">29岁</span><span  class=\"txt\">邻居们把巷口堵了起来，轮流守夜。你也去了。</span></div><div class=\"entry ev\"><span  class=\"age\">28岁</span><span  class=\"txt\">没什么大事，只是扭了脚。</span></div><div class=\"entry ev\"><span  class=\"age\">28岁</span><span  class=\"txt\">市政厅贴出告示，说下个季度的过滤芯会按时更换。上一次这么说是在三年前。</span></div><div class=\"entry ev\"><span  class=\"age\">28岁</span><span  class=\"txt\">你开始记不清上一次觉得高兴是什么时候。</span></div><div class=\"entry tl\"><span  class=\"age\">28岁</span><span  class=\"txt\">第十次乌萨斯-卡西米尔战争结束，双方停战。</span><span class=\"tagline\">血峰战役</span></div><div class=\"entry ev\"><span  class=\"age\">27岁</span><span  class=\"txt\">没什么值得写下来的。你把大部分时间给了活计。</span></div><div class=\"entry ev\"><span  class=\"age\">27岁</span><span  class=\"txt\">你病了两天，是隔壁的人替你买的水。</span></div><div class=\"entry ev\"><span  class=\"age\">27岁</span><span  class=\"txt\">炮击停下之后，你听见有人在哭，但找不到是谁。</span></div><div class=\"entry dec\"><span  class=\"age\">26岁</span><span  class=\"txt\">【要不要孩子】你选择了：要</span></div><div class=\"entry ev\"><span  class=\"age\">26岁</span><span  class=\"txt\">你捡到了一个钱包，还给了失主。对方硬塞给你一点谢礼。</span></div><div class=\"entry ev\"><span  class=\"age\">26岁</span><span  class=\"txt\">裁员名单上有你。你问为什么，对方说「你心里清楚」。</span></div><div class=\"entry ev\"><span  class=\"age\">26岁</span><span  class=\"txt\">你在回去的路上被拦住了。钱没了，人没事。这已经算运气好。</span></div><div class=\"entry fam\"><span  class=\"age\">25岁</span><span  class=\"txt\">你生下了一个男孩，取名卡尔。</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">邻居们把巷口堵了起来，轮流守夜。你也去了。</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">你活下来了。你不知道为什么是你。</span></div><div class=\"entry dec\"><span  class=\"age\">25岁</span><span  class=\"txt\">【买房子】你选择了：买</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">整座城市迁了三百公里。路上走了两个月，你换了三次住处。</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">活很脏，但给得痛快。你把钱缝进了衣服内衬里。</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">你在安置区待了三天。回来的时候，窗台上的灰有半指厚。</span></div><div class=\"entry ev\"><span  class=\"age\">25岁</span><span  class=\"txt\">雪祀替你念了一段。你听不懂，但心里安静了一些。</span></div><div class=\"entry ev\"><span  class=\"age\">24岁</span><span  class=\"txt\">电梯停了一次，卡在四十七层。你在里面站了二十分钟，没有人说话。</span></div><div class=\"entry ev\"><span  class=\"age\">24岁</span><span  class=\"txt\">迁徙的时候你趴在窗口看了很久：原来城市底下的履带比房子还高。</span></div><div class=\"entry ev\"><span  class=\"age\">24岁</span><span  class=\"txt\">机器夹住了你的手。工友把你送到医馆，指头保住了，但不太听使唤。</span></div><div class=\"entry dec\"><span  class=\"age\">24岁</span><span  class=\"txt\">【要不要在一起】你选择了：结婚</span></div><div class=\"entry ev\"><span  class=\"age\">24岁</span><span  class=\"txt\">例行体检。各项指标都在范围内，医生说下一年再来。</span></div><div class=\"entry ev\"><span  class=\"age\">23岁</span><span  class=\"txt\">认识的人里有人走了，也有人来了。你没太在意。</span></div><div class=\"entry ev\"><span  class=\"age\">23岁</span><span  class=\"txt\">有人跟你说话，你听见了，但隔着一层什么东西。</span></div><div class=\"entry ev\"><span  class=\"age\">22岁</span><span  class=\"txt\">警报响了三天。整座城市开始移动。你在安置区挤了一夜，天亮时从窗口看出去——原来那片地已经没了。</span></div><div class=\"entry ev\"><span  class=\"age\">22岁</span><span  class=\"txt\">你连着加了三个月的班，多拿了一笔钱，也落下了一点毛病。</span></div><div class=\"entry ev\"><span  class=\"age\">22岁</span><span  class=\"txt\">有个老工人教了你怎么省力气。他说这行干久了，省力气就是保命。</span></div><div class=\"entry ev\"><span  class=\"age\">22岁</span><span  class=\"txt\">你说算了。说完之后一个人在街上走到很晚。</span></div><div class=\"entry dec\"><span  class=\"age\">22岁</span><span  class=\"txt\">【二十二岁】你选择了：广交朋友</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">整座城市迁了三百公里。路上走了两个月，你换了三次住处。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">你随手买的号中了最小的那个奖。你把钱换成了酒，请了几个人。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">你打输了。躺在地上的时候，你听见有人在笑。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">城市换了个位置停下。你走出去，发现外面的土是新的，上面什么都没有。</span></div><div class=\"entry ev\"><span  class=\"age\">21岁</span><span  class=\"txt\">你和阿兹一起走了一段路。谁也没说话，但那段路走得很慢。</span></div><div class=\"entry ev\"><span  class=\"age\">20岁</span><span  class=\"txt\">这个月工钱少了一半。老板说行情不好，让大家一起扛。</span></div><div class=\"entry ev\"><span  class=\"age\">20岁</span><span  class=\"txt\">你第一次完整地走完了一整套术式。手指在抖，但那是兴奋。</span></div><div class=\"entry ev\"><span  class=\"age\">20岁</span><span  class=\"txt\">你第一次站到城墙上看城市移动。地面在往后退，像整片大地都在让路。</span></div><div class=\"entry dec\"><span  class=\"age\">20岁</span><span  class=\"txt\">【别的机会】你选择了：留下</span></div><div class=\"entry ev\"><span  class=\"age\">20岁</span><span  class=\"txt\">你病了两天，是隔壁的人替你买的水。</span></div><div class=\"entry ev\"><span  class=\"age\">19岁</span><span  class=\"txt\">你从台阶上摔了下来，断了一根肋骨。</span></div><div class=\"entry ev\"><span  class=\"age\">19岁</span><span  class=\"txt\">这一年没什么大事。你照旧起床上工，照旧回来。</span></div><div class=\"entry ev\"><span  class=\"age\">19岁</span><span  class=\"txt\">你躺着，看着天花板。天从黑变亮，你一动没动。</span></div><div class=\"entry ev\"><span  class=\"age\">18岁</span><span  class=\"txt\">机器夹住了你的手。工友把你送到医馆，指头保住了，但不太听使唤。</span></div><div class=\"entry ev\"><span  class=\"age\">18岁</span><span  class=\"txt\">有个老工人教了你怎么省力气。他说这行干久了，省力气就是保命。</span></div><div class=\"entry ev\"><span  class=\"age\">18岁</span><span  class=\"txt\">你盯着桌上的杯子，它动了。只有一点点，但你看见了。</span></div><div class=\"entry ev\"><span  class=\"age\">18岁</span><span  class=\"txt\">连着上了半个月的夜班。你开始分不清今天是哪一天。</span></div><div class=\"entry dec\"><span  class=\"age\">18岁</span><span  class=\"txt\">【毕业之后】你选择了：留在本地</span></div><div class=\"entry mil\"><span  class=\"age\">17岁</span><span  class=\"txt\">你结束了高等学业。</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">征兵令贴到了巷口。你家在名单上。第二天你就换上了那身衣服。</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">房东把房子卖了。你搬到了无碑城，行李只有一只箱子。</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">你们分开了。理由说了很多，其实只有一个。</span></div><div class=\"entry dec\"><span  class=\"age\">17岁</span><span  class=\"txt\">【源石技艺】你选择了：专门去学</span></div><div class=\"entry ev\"><span  class=\"age\">17岁</span><span  class=\"txt\">整座城市迁了三百公里。路上走了两个月，你换了三次住处。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">你开始喝。一开始是为了暖身子，后来就不是了。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">城市换了个位置停下。你走出去，发现外面的土是新的，上面什么都没有。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">工友递过来一支。你接了过去。以后就戒不掉了。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">你开始觉得时间不够用，虽然也没什么非做不可的事。</span></div><div class=\"entry ev\"><span  class=\"age\">16岁</span><span  class=\"txt\">城市换了个位置停下。你走出去，发现外面的土是新的，什么都没有。</span></div><div class=\"entry ev\"><span  class=\"age\">15岁</span><span  class=\"txt\">布伦是第一个不问你出身的人。你们一起干了不少蠢事。</span></div><div class=\"entry ev\"><span  class=\"age\">15岁</span><span  class=\"txt\">布伦给你留了一张纸条。你把它叠好放在口袋里，一直没舍得扔。</span></div><div class=\"entry ev\"><span  class=\"age\">15岁</span><span  class=\"txt\">你随手买的号中了最小的那个奖。你把钱换成了酒，请了几个人。</span></div><div class=\"entry dec\"><span  class=\"age\">15岁</span><span  class=\"txt\">【十五岁】你选择了：读下去</span></div><div class=\"entry mil\"><span  class=\"age\">15岁</span><span  class=\"txt\">你进入高等学堂。</span></div><div class=\"entry ev\"><span  class=\"age\">15岁</span><span  class=\"txt\">有人先动的手。你还手了，而且赢了。之后没人再找你麻烦。</span></div><div class=\"entry ev\"><span  class=\"age\">14岁</span><span  class=\"txt\">你病了两天，是隔壁的人替你买的水。</span></div><div class=\"entry ev\"><span  class=\"age\">14岁</span><span  class=\"txt\">你替人看摊，一天挣了几个铜板。回家时母亲把钱数了两遍。</span></div><div class=\"entry ev\"><span  class=\"age\">13岁</span><span  class=\"txt\">父亲今天回来得很早，还带了一小块糖。他没说什么，放在你桌上就走了。</span></div><div class=\"entry ev\"><span  class=\"age\">13岁</span><span  class=\"txt\">集市上有人卖一种很甜的糕。你站在摊子前面看了很久，最后没买。</span></div><div class=\"entry ev\"><span  class=\"age\">13岁</span><span  class=\"txt\">没什么大事，只是扭了脚。</span></div><div class=\"entry mil\"><span  class=\"age\">12岁</span><span  class=\"txt\">你结束了初等学业。</span></div><div class=\"entry ev\"><span  class=\"age\">12岁</span><span  class=\"txt\">警报响了四遍。城市启动主引擎，整块地在夜里挪了个位置。</span></div><div class=\"entry ev\"><span  class=\"age\">12岁</span><span  class=\"txt\">你没考过。教习说还有机会，但你知道那个机会不太属于你。</span></div><div class=\"entry dec\"><span  class=\"age\">12岁</span><span  class=\"txt\">【中等学堂的方向】你选择了：继续读书</span></div><div class=\"entry ev\"><span  class=\"age\">12岁</span><span  class=\"txt\">体检报告上盖了个章。你把它夹进了证件袋。</span></div><div class=\"entry fam\"><span  class=\"age\">11岁</span><span  class=\"txt\">你的父亲去世了，享年 42 岁。</span></div><div class=\"entry ev\"><span  class=\"age\">11岁</span><span  class=\"txt\">你替人看摊，一天挣了几个铜板。回家时母亲把钱数了两遍。</span></div><div class=\"entry ev\"><span  class=\"age\">11岁</span><span  class=\"txt\">警报响了三天。整座城市开始移动。你在安置区挤了一夜，天亮时从窗口看出去——原来那片地已经没了。</span></div><div class=\"entry ev\"><span  class=\"age\">11岁</span><span  class=\"txt\">先生说过一句话你一直记着：「先看清楚，再动手。」</span></div><div class=\"entry ev\"><span  class=\"age\">10岁</span><span  class=\"txt\">你病了两天，是隔壁的人替你买的水。</span></div><div class=\"entry ev\"><span  class=\"age\">10岁</span><span  class=\"txt\">父亲今天回来得很早，还带了一小块糖。他没说什么，放在你桌上就走了。</span></div><div class=\"entry ev\"><span  class=\"age\">10岁</span><span  class=\"txt\">你从旧城区的名单上被划掉，又在新城区被登记了一次。</span></div><div class=\"entry tl\"><span  class=\"age\">10岁</span><span  class=\"txt\">卡西米尔骑士竞技职业化。</span><span class=\"tagline\">商业联合会建立与骑士阶层重构</span></div><div class=\"entry ev\"><span  class=\"age\">9岁</span><span  class=\"txt\">你和巷子里的孩子们玩到天黑。没有人问你是哪个种族的。</span></div><div class=\"entry ev\"><span  class=\"age\">9岁</span><span  class=\"txt\">争吵到一半突然停下——他们想起来你还在屋里。</span></div><div class=\"entry ev\"><span  class=\"age\">8岁</span><span  class=\"txt\">一辆车擦着你过去。你在地上坐了很久才站起来。</span></div><div class=\"entry ev\"><span  class=\"age\">8岁</span><span  class=\"txt\">集市上有人卖一种很甜的糕。你站在摊子前面看了很久，最后没买。</span></div><div class=\"entry ev\"><span  class=\"age\">8岁</span><span  class=\"txt\">警报响了四遍。城市启动主引擎，整块地在夜里挪了个位置。</span></div><div class=\"entry ev\"><span  class=\"age\">8岁</span><span  class=\"txt\">你跟着大人下地，一天挣了几个铜板。回家时母亲把钱数了两遍。</span></div><div class=\"entry ev\"><span  class=\"age\">7岁</span><span  class=\"txt\">父亲只教过你一件事：答应别人的事，做不到就别答应。</span></div><div class=\"entry ev\"><span  class=\"age\">7岁</span><span  class=\"txt\">你又一次没答上来。教习没有骂你，只是让你坐下。这比骂更让人想消失。</span></div><div class=\"entry ev\"><span  class=\"age\">7岁</span><span  class=\"txt\">父亲今天回来得很早，还带了一小块糖。他没说什么，放在你桌上就走了。</span></div><div class=\"entry mil\"><span  class=\"age\">6岁</span><span  class=\"txt\">你进入初等学堂。</span></div><div class=\"entry ev\"><span  class=\"age\">6岁</span><span  class=\"txt\">家里多了个妹妹，叫伊瑟。从此你不再是屋里最小的那个。</span></div><div class=\"entry ev\"><span  class=\"age\">6岁</span><span  class=\"txt\">你捡回来一只瘦得只剩骨架的小兽。母亲说养不活，但它活下来了。</span></div><div class=\"entry ev\"><span  class=\"age\">6岁</span><span  class=\"txt\">你和巷子里的孩子们玩到天黑。没有人问你是哪个种族的。</span></div><div class=\"entry dec\"><span  class=\"age\">6岁</span><span  class=\"txt\">【该不该去学堂】你选择了：自己找书看</span></div><div class=\"entry dec\"><span  class=\"age\">6岁</span><span  class=\"txt\">【警报】你选择了：去帮别人</span></div><div class=\"entry ev\"><span  class=\"age\">5岁</span><span  class=\"txt\">迁徙途中城市停了一次，据说是前面的地块脱钩了。</span></div><div class=\"entry ev\"><span  class=\"age\">5岁</span><span  class=\"txt\">他们在隔壁房间吵。你听得清每一个字，但假装睡着了。</span></div><div class=\"entry ev\"><span  class=\"age\">5岁</span><span  class=\"txt\">你跟着大人去赶集。第一次见到那么多不认识的人挤在一条街上。</span></div><div class=\"entry ev\"><span  class=\"age\">4岁</span><span  class=\"txt\">你和巷子里的孩子们玩到天黑。没有人问你是哪个种族的。</span></div><div class=\"entry ev\"><span  class=\"age\">4岁</span><span  class=\"txt\">父亲今天回来得很早，还带了一小块糖。他没说什么，放在你桌上就走了。</span></div><div class=\"entry ev\"><span  class=\"age\">3岁</span><span  class=\"txt\">你在安置区待了三天。回来的时候，窗台上的灰有半指厚。</span></div><div class=\"entry ev\"><span  class=\"age\">1岁</span><span  class=\"txt\">你烧了很久。没有人请医生——请不起。你自己挺了过来。</span></div><div class=\"entry birth\"><span  class=\"age\">0岁</span><span  class=\"txt\">你出生在卡兹戴尔的哀愁之地。</span></div><div class=\"entry tl\"><span  class=\"age\">0岁</span><span  class=\"txt\">长辈说，这座城市被烧过六次。他说这话的时候在数手指，数完还剩四根。</span><span class=\"tagline\">卡兹戴尔的六次毁灭</span></div></#fragment>",
+        "text": "",
+        "class": ""
+      },
+      "modalTitle": {
+        "html": "",
+        "text": "【快照】这是个决定的标题",
+        "class": ""
+      },
+      "modalSub": {
+        "html": "",
+        "text": "70 岁 · 卡兹戴尔 · 已退休",
+        "class": ""
+      },
+      "modalText": {
+        "html": "",
+        "text": "一段用来固定弹层排版的正文。",
+        "class": ""
+      },
+      "modalOpts": {
+        "html": "<button  type=\"button\" class=\"opt\" data-i=\"0\"><span  class=\"ol\">第一个选项</span><span  class=\"oh\">带提示的副行</span></button><button  type=\"button\" class=\"opt\" data-i=\"1\"><span  class=\"ol\">第二个选项</span><span  class=\"oh\"></span></button>",
+        "text": "",
+        "class": ""
+      }
+    }
+  }
+}

@@ -1,0 +1,361 @@
+{
+  "reproducibility": {
+    "seed": 292000,
+    "samples": 1000,
+    "seedStep": 1,
+    "rules": "current core rules",
+    "completeLives": 1000
+  },
+  "population": {
+    "nations": {
+      "AEG": 66,
+      "BLV": 26,
+      "CLB": 33,
+      "DUR": 8,
+      "HIG": 19,
+      "IBE": 14,
+      "KAZ": 29,
+      "KDZ": 7,
+      "KJR": 7,
+      "LAT": 8,
+      "LEI": 39,
+      "LMN": 13,
+      "MIN": 11,
+      "RMB": 54,
+      "SAMI": 5,
+      "SIR": 4,
+      "SRG": 167,
+      "SST": 6,
+      "URS": 110,
+      "VIC": 76,
+      "YAN": 298
+    },
+    "races": {
+      "aegir": 37,
+      "anura": 21,
+      "aslan": 75,
+      "caprinae": 54,
+      "cautus": 24,
+      "draco": 22,
+      "durin": 3,
+      "elafia": 12,
+      "feline": 137,
+      "forte": 41,
+      "kuranta": 34,
+      "liberi": 71,
+      "lung": 89,
+      "lupo": 25,
+      "oni": 8,
+      "perro": 40,
+      "petram": 45,
+      "phidia": 40,
+      "rebbah": 22,
+      "sankta": 3,
+      "sarkaz": 59,
+      "savra": 27,
+      "tiacauh": 15,
+      "ursus": 43,
+      "vouivre": 34,
+      "vulpo": 19
+    },
+    "sexes": {
+      "F": 497,
+      "M": 503
+    }
+  },
+  "longevity": {
+    "count": 1000,
+    "mean": 52.904,
+    "p10": 12,
+    "p50": 46,
+    "p90": 92,
+    "min": 0,
+    "max": 184
+  },
+  "causes": {
+    "alc": {
+      "count": 7,
+      "share": 0.007
+    },
+    "art": {
+      "count": 19,
+      "share": 0.019
+    },
+    "beast": {
+      "count": 13,
+      "share": 0.013
+    },
+    "can": {
+      "count": 134,
+      "share": 0.134
+    },
+    "cat": {
+      "count": 66,
+      "share": 0.066
+    },
+    "cir": {
+      "count": 8,
+      "share": 0.008
+    },
+    "cold": {
+      "count": 3,
+      "share": 0.003
+    },
+    "con": {
+      "count": 9,
+      "share": 0.009
+    },
+    "copd": {
+      "count": 40,
+      "share": 0.04
+    },
+    "dem": {
+      "count": 52,
+      "share": 0.052
+    },
+    "dia": {
+      "count": 2,
+      "share": 0.002
+    },
+    "drown": {
+      "count": 12,
+      "share": 0.012
+    },
+    "exec": {
+      "count": 4,
+      "share": 0.004
+    },
+    "fall": {
+      "count": 13,
+      "share": 0.013
+    },
+    "heat": {
+      "count": 17,
+      "share": 0.017
+    },
+    "hom": {
+      "count": 14,
+      "share": 0.014
+    },
+    "ihd": {
+      "count": 165,
+      "share": 0.165
+    },
+    "inf": {
+      "count": 67,
+      "share": 0.067
+    },
+    "inj": {
+      "count": 153,
+      "share": 0.153
+    },
+    "kid": {
+      "count": 7,
+      "share": 0.007
+    },
+    "lri": {
+      "count": 6,
+      "share": 0.006
+    },
+    "neo": {
+      "count": 8,
+      "share": 0.008
+    },
+    "nut": {
+      "count": 2,
+      "share": 0.002
+    },
+    "ori": {
+      "count": 55,
+      "share": 0.055
+    },
+    "sea": {
+      "count": 1,
+      "share": 0.001
+    },
+    "slave": {
+      "count": 7,
+      "share": 0.007
+    },
+    "starv": {
+      "count": 2,
+      "share": 0.002
+    },
+    "str": {
+      "count": 74,
+      "share": 0.074
+    },
+    "war": {
+      "count": 40,
+      "share": 0.04
+    }
+  },
+  "oripathy": {
+    "infected": 165,
+    "incidence": 0.165,
+    "treated": 94,
+    "known": 92,
+    "stageByFinalState": {
+      "0": 835,
+      "1": 48,
+      "2": 63,
+      "3": 54
+    },
+    "finalCrystalRate": {
+      "count": 165,
+      "mean": 48.75430937047328,
+      "p10": 16.978095559393658,
+      "p50": 40.17840814239735,
+      "p90": 100,
+      "min": 7.727850254830592,
+      "max": 100
+    },
+    "annualCrystalRate": {
+      "count": 2179,
+      "mean": 38.301041827858604,
+      "p10": 15.765885296949563,
+      "p50": 32.066080537123405,
+      "p90": 71.60689033435212,
+      "min": 7.408864461757046,
+      "max": 100
+    }
+  },
+  "salary": {
+    "unit": "monthly amount in job-coded person-years",
+    "count": 18542,
+    "mean": 2.7891813180886635,
+    "p10": 1,
+    "p50": 2,
+    "p90": 6,
+    "min": 0,
+    "max": 13
+  },
+  "pension": {
+    "unit": "monthly amount in retired person-years",
+    "count": 10580,
+    "mean": 2.1566162570888467,
+    "p10": 0,
+    "p50": 1,
+    "p90": 6,
+    "min": 0,
+    "max": 8
+  },
+  "careers": {
+    "finalJob": {
+      "agbiz": 16,
+      "alchemist": 1,
+      "artsmith": 4,
+      "banker": 31,
+      "barber": 17,
+      "bounty": 12,
+      "caster": 3,
+      "child": 40,
+      "clerk": 13,
+      "construct": 10,
+      "cook": 18,
+      "courier": 10,
+      "domestic": 2,
+      "driver": 8,
+      "engineer": 2,
+      "factory": 8,
+      "farm": 13,
+      "farmhand": 8,
+      "fisher": 3,
+      "guard": 26,
+      "herder": 8,
+      "hunter": 5,
+      "inn": 16,
+      "journalist": 21,
+      "knight": 2,
+      "lawyer": 5,
+      "mechanic": 20,
+      "mercenary": 22,
+      "merchant": 16,
+      "miner": 6,
+      "noble": 19,
+      "nurse": 4,
+      "official": 15,
+      "op_caster": 5,
+      "op_defender": 90,
+      "op_guard": 24,
+      "op_medic": 5,
+      "op_sniper": 17,
+      "op_specialist": 11,
+      "op_supporter": 7,
+      "op_vanguard": 24,
+      "oridoc": 1,
+      "oriminer": 9,
+      "performer": 6,
+      "police": 22,
+      "refiner": 7,
+      "retired": 3,
+      "scholar": 17,
+      "seeking": 29,
+      "shop": 15,
+      "shopowner": 31,
+      "slave": 1,
+      "smith": 15,
+      "soldier": 50,
+      "stormcaller": 1,
+      "student": 164,
+      "tailor": 12,
+      "teacher": 21,
+      "vendor": 8,
+      "witch": 1
+    },
+    "organizationMemberships": 286,
+    "peopleWithOrganizations": 267,
+    "membershipsByOrganization": {
+      "karlan_trade": 2,
+      "kaz_knights": 2,
+      "laterano_guard": 5,
+      "lungmen_guard": 14,
+      "melander": 2,
+      "penguin_logistics": 9,
+      "raythean": 3,
+      "rhine_life": 6,
+      "rhodes": 190,
+      "sarkaz_mercs": 27,
+      "yan_sishuitai": 26
+    },
+    "completedMemberships": 215,
+    "promotions": 569,
+    "serviceYearsPerMembership": {
+      "count": 286,
+      "mean": 25.157342657342657,
+      "p10": 1,
+      "p50": 29,
+      "p90": 44,
+      "min": 0,
+      "max": 46
+    }
+  },
+  "runtimeErrors": [],
+  "sampleLives": [
+    {
+      "seed": 292000,
+      "age": 68,
+      "cause": "ihd"
+    },
+    {
+      "seed": 292001,
+      "age": 13,
+      "cause": "cat"
+    },
+    {
+      "seed": 292002,
+      "age": 19,
+      "cause": "can"
+    },
+    {
+      "seed": 292003,
+      "age": 9,
+      "cause": "inf"
+    },
+    {
+      "seed": 292004,
+      "age": 28,
+      "cause": "inj"
+    }
+  ]
+}

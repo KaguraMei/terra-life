@@ -34,12 +34,17 @@ export interface EventDefinition<S> {
   run(state: S, payload: unknown): EventText;
 }
 
+/** How completely a failed dispatch was undone. */
+export type Rollback = 'full' | 'state-only' | 'none';
+
 export interface EventFailure {
   readonly eventId: string;
   readonly eventType: EventKind;
   readonly age: number;
   readonly at: number;
   readonly cause: unknown;
+  /** `full` = state and random stream restored, `none` = nothing could be restored. */
+  readonly rollback: Rollback;
 }
 
 export interface EventPorts<S extends EventState> {
@@ -56,18 +61,62 @@ export interface EventPorts<S extends EventState> {
   sync(state: S): void;
   endYear(state: S): void;
   error(failure: EventFailure): void;
+  /**
+   * Optional random checkpoint. When both hooks are supplied, a failed
+   * dispatch also rewinds the random stream, so content that threw cannot
+   * shift every later draw.
+   */
+  randomCheckpoint?(): unknown;
+  randomRestore?(checkpoint: unknown): void;
 }
 
 export type DispatchResult = 'executed' | 'skipped' | 'failed';
 export type AdvanceResult = 'ended' | 'decision' | 'searching';
 
 /**
- * Legacy-compatible dispatch semantics. The ports are explicit, but legacy run(S)
- * still mutates state. Transactional content handlers are a separate migration.
+ * Legacy-compatible dispatch semantics. The ports are explicit and every
+ * dispatch runs as a draft: if content throws, the state is restored from a
+ * JSON snapshot and the random stream is rewound, so a broken event cannot
+ * leave half a change behind or shift every later draw.
+ *
+ * The snapshot is a whole-state JSON round trip, which is cheap enough at this
+ * state size and easy to reason about. It is *not* a general transaction: state
+ * that cannot be serialized (a pending decision's closures) disables rollback
+ * and is reported as such instead of being silently invented.
  */
 export function createEventEngine<S extends EventState>(ports: EventPorts<S>) {
+  function captureState(state: S): string | null {
+    // A pending interaction holds closures; snapshotting it would silently drop
+    // the definition, so such a dispatch is not rolled back.
+    if (state.pending) return null;
+    try {
+      return JSON.stringify(state);
+    } catch {
+      return null;
+    }
+  }
+
+  function restoreState(state: S, snapshot: string): boolean {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(snapshot);
+    } catch {
+      return false;
+    }
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return false;
+    const target = state as unknown as Record<string, unknown>;
+    for (const key of Object.keys(target)) delete target[key];
+    Object.assign(target, parsed as Record<string, unknown>);
+    return true;
+  }
+
   function fire(state: S, event: ScheduledEvent): DispatchResult {
+    // Capture before touching anything, so a rollback restores exactly the
+    // pre-dispatch object (including absent marker fields).
+    const snapshot = captureState(state);
+    const checkpoint = snapshot === null ? undefined : ports.randomCheckpoint?.();
     state.actEvent = null;
+    let failed = false;
     try {
       if (event.type === 'ev') {
         const definition = ports.definition(event.id);
@@ -96,10 +145,21 @@ export function createEventEngine<S extends EventState>(ports: EventPorts<S>) {
       else if (event.type === 'cat') ports.catastrophe(state, event.p);
       return 'executed';
     } catch (cause) {
-      ports.error({ eventId: event.id, eventType: event.type, age: state.age, at: state.t, cause });
+      failed = true;
+      let rollback: Rollback = 'none';
+      if (snapshot !== null && restoreState(state, snapshot)) {
+        rollback = 'state-only';
+        if (checkpoint != null && ports.randomRestore) {
+          ports.randomRestore(checkpoint);
+          rollback = 'full';
+        }
+      }
+      ports.error({ eventId: event.id, eventType: event.type, age: state.age, at: state.t, cause, rollback });
       return 'failed';
     } finally {
-      if (state.phase === 'life') ports.sync(state);
+      // A rolled-back dispatch already equals its pre-event state; running the
+      // organization sync again would apply it twice.
+      if (!failed && state.phase === 'life') ports.sync(state);
     }
   }
 

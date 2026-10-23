@@ -1,0 +1,17 @@
+{
+  "note": "Deliberate behaviour changes relative to the 89055db baseline. Each entry names one life whose archived end-state hash no longer matches, with the reason and the fields that changed. Everything else in the baseline is still asserted byte-for-byte.",
+  "changes": [
+    {
+      "seed": 810012,
+      "changedAt": "2026-10-21",
+      "reason": "Dismissal from an organization post now ends the membership (reason 被辞退) instead of only rewriting the job and leaving the affiliation dangling, which the state invariants reject.",
+      "fields": [
+        "report.orgHistory[0].reason: 结束任职 -> 被辞退",
+        "report.organization.history[0].reason: same",
+        "report.log: 离开组织 line now precedes the 裁员 line, and its text carries the new reason"
+      ],
+      "unchanged": ["death age 43", "death cause", "event log except the departure line", "random tail"],
+      "endHash": "adb1d8731c245a45e17db39107040d5b63f0d4236d12f981e706616acb4c1046"
+    }
+  ]
+}

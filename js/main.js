@@ -11,7 +11,7 @@
   const UI = TL.UI;
 
   let raf = null, lastTs = 0;
-  const STORE_KEY = 'terra-life-saves-v1';
+  // 存储键由应用端口（src/platform/storage.ts）持有，UI 不再重复声明。
 
   /* ---------------------------------------------------------------------- */
   /* 开局设置                                                                */
@@ -96,27 +96,9 @@
       seed: SETUP.seed
     });
     const begin = () => {
-      S.paused = false;
-      UI.focus = null;
-      UI.lastLogLen = 0;
-      UI.lastAge = -1;
-      UI.auto = false;
-      UI.seekingDecision = false;
-      $('feed').innerHTML = '';
-      $('start').hidden = true;
-      $('report').hidden = true;
-      $('game').hidden = false;
-      $('autoBtn').classList.remove('on');
-
+      enterGame(S);
       // 开局先给一次身份旁白
       announceOrigin(S);
-      TL.renderAll(S, true);
-      TL.renderFocus(S);
-
-      lastTs = 0;
-      if (raf) cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(loop);
-      toast('按「下一个决定」或等待时间推进');
     };
     if (withBirth === true) {
       if (raf) { cancelAnimationFrame(raf); raf = null; }
@@ -124,15 +106,61 @@
     } else begin();
   }
 
+  /** 进入游戏界面（新局与续玩共用；不写旁白，不碰状态）。 */
+  function enterGame(S) {
+    S.paused = false;
+    UI.focus = null;
+    UI.lastLogLen = 0;
+    UI.lastAge = -1;
+    UI.auto = false;
+    UI.seekingDecision = false;
+    $('feed').innerHTML = '';
+    $('start').hidden = true;
+    $('report').hidden = true;
+    $('game').hidden = false;
+    $('autoBtn').classList.remove('on');
+
+    TL.renderAll(S, true);
+    TL.renderFocus(S);
+
+    lastTs = 0;
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(loop);
+  }
+
+  /** 从自动存档恢复：状态由模拟层校验，UI 只负责切屏。 */
+  function resumeGame() {
+    const S = TL.loadProgress();
+    if (!S) {
+      toast('没有可以继续的人生');
+      refreshResumeButton();
+      return;
+    }
+    enterGame(S);
+    toast('已从上次年度结算继续（第 ' + TL.deriveSessionView(S).age + ' 岁）');
+  }
+
+  /** 只在确实存在可恢复的存档时显示「继续上次人生」。 */
+  function refreshResumeButton() {
+    const button = $('resumeBtn');
+    if (!button) return;
+    let has = false;
+    try { has = !!(TL.hasProgress && TL.hasProgress()); } catch (e) { has = false; }
+    button.hidden = !has;
+    if (has) button.textContent = TL.t('resumeLife');
+  }
+
   /** 开局旁白：把抽签结果讲成一个故事（出生那一句已由 newLife 写入，此处不重复） */
   function announceOrigin(S) {
-    const n = TL.NATION_BY_ID[S.nation];
-    const r = TL.RACE_BY_ID[S.race];
-    const qw = ['一贫如洗', '勉强度日', '尚能温饱', '过得去', '殷实'][S.q - 1];
-    TL.log(S, TL.L`你是${r.name}${S.courtName && S.court !== 'none' ? '（' + S.courtName + '）' : ''}，${S.sex === 'M' ? '男' : '女'}孩。家里${qw}。`, 'birth');
-    if (S.urban) TL.log(S, TL.L`你家住在城里。`, 'ev');
+    const v = TL.deriveLifeView(S);
+    const id = v.identity;
+    const n = TL.NATION_BY_ID[id.nation];
+    const r = TL.RACE_BY_ID[id.race];
+    const qw = ['一贫如洗', '勉强度日', '尚能温饱', '过得去', '殷实'][id.familyTier - 1];
+    TL.log(S, TL.L`你是${r.name}${id.courtName && id.court ? '（' + id.courtName + '）' : ''}，${id.sex === 'M' ? '男' : '女'}孩。家里${qw}。`, 'birth');
+    if (id.urban) TL.log(S, TL.L`你家住在城里。`, 'ev');
     else TL.log(S, TL.L`你家在城外，最近的邻居要走一刻钟。`, 'ev');
-    if (TL.artRank(S) >= 2) TL.log(S, TL.L`还很小的时候，家里人就发现你对源石有反应——杯子会随着你的情绪轻轻晃动。`, 'ev');
+    if (id.artsRank >= 2) TL.log(S, TL.L`还很小的时候，家里人就发现你对源石有反应——杯子会随着你的情绪轻轻晃动。`, 'ev');
     if (r.disc > 0.2) TL.log(S, TL.L`在${n.name}，${r.name}这个身份意味着一些东西。你还没懂，但你的父母懂。`, 'ev');
     TL.log(S, TL.L`${n.tag}`, 'ev');
   }
@@ -149,11 +177,13 @@
     lastTs = ts;
     if (dt > 0.4) dt = 0.4;              // 切标签页回来不要一次性跳很多年
 
-    if (S.phase === 'life') {
+    // 循环只问"这一局现在处于什么状态"，不再逐个字段去猜。
+    const session = TL.deriveSessionView(S);
+    if (session.phase === 'life') {
       if (UI.seekingDecision) {
         const result = TL.advanceToDecision(S);
         if (result !== 'searching') UI.seekingDecision = false;
-      } else if (UI.auto && S.pending) {
+      } else if (UI.auto && session.decision.open) {
         TL.autoChoose(S);
         $('modal').hidden = true;
         $('modal')._pendingDecision = null;
@@ -161,24 +191,25 @@
       // 自动模式下，无抉择时自动选重心
       if (UI.auto && !S.focus) { S.focus = TL.autoFocus(S); UI.focus = S.focus; }
       if (!UI.seekingDecision) TL.tick(S, dt);
-      if (UI.auto && S.pending) TL.autoChoose(S);
+      if (UI.auto && TL.deriveSessionView(S).decision.open) TL.autoChoose(S);
 
-      if (S.pending) {
+      const now = TL.deriveSessionView(S);
+      if (now.decision.open) {
         TL.renderAll(S, true);
         TL.showDecision(S, S.pending);
         return;
       }
-      if (S.phase === 'report') { finishLife(S); return; }
+      if (now.phase === 'report') { finishLife(S); return; }
 
       // 年龄变化时才做完整重绘，其余只更新进度条
-      if (S.age !== UI.lastAge) {
-        UI.lastAge = S.age;
+      if (now.age !== UI.lastAge) {
+        UI.lastAge = now.age;
         TL.renderAll(S, false);
       } else {
-        $('progBar').style.width = (S.t * 100).toFixed(1) + '%';
+        $('progBar').style.width = (now.pacing.progress * 100).toFixed(1) + '%';
         TL.renderFeed(S, false);
       }
-    } else if (S.phase === 'report') {
+    } else if (session.phase === 'report') {
       finishLife(S);
     }
   }
@@ -197,18 +228,22 @@
 
   function renderReport(S, rep) {
     const lt = S.lt;
+    // 报告头部与关键格子改读派生视图：年龄/死因只有一处定义，避免渲染器各算一遍。
+    const view = TL.deriveLifeView ? TL.deriveLifeView(S) : null;
+    const deathAge = view ? view.mortality.deathAge : rep.age;
+    const causeName = view ? TL.causeName(view.mortality.deathCause, deathAge) : rep.causeName;
     $('rTitle').textContent = TL.L`${rep.name}的一生`;
     const rel = rep.delta >= 0 ? '多活了' : '少活了';
     const deathMode = rep.deathTrigger === 'annual'
       ? TL.L`年度风险判定 ${TL.fmt.pct(rep.deathRisk || 0, 2)}`
       : TL.L`事件直接致死`;
-    $('rDead').innerHTML = TL.L`卒于 ${rep.age} 岁 · ${rep.causeName} · ${deathMode} · ${rep.nation} ${rep.city}
+    $('rDead').innerHTML = TL.L`卒于 ${deathAge} 岁 · ${causeName} · ${deathMode} · ${rep.nation} ${rep.city}
       <br><span style="color:var(--fg3);font-size:12px">同为${rep.nation}${rep.sex === 'M' ? '男' : '女'}性的模拟人生，平均活到 ${rep.lifeExp} 岁（四分位 ${rep.baseP25}–${rep.baseP75}）——你${rel} ${Math.abs(rep.delta).toFixed(1)} 年</span>
       <br><span style="color:var(--fg3);font-size:12px">该国的统计预期寿命为 ${rep.statLE} 岁</span>`;
 
     const cells = [
-      ['享年', rep.age + ' 岁', 'amber'],
-      ['死因', rep.causeName, 'red'],
+      ['享年', deathAge + ' 岁', 'amber'],
+      ['死因', causeName, 'red'],
       ['种族', rep.race + (rep.court && rep.court !== '无王庭' ? '·' + rep.court : ''), ''],
       ['源石技艺', rep.artsRankName + ' (' + Math.round(rep.arts) + ')', ''],
       ['最高职业', rep.apex.opClass ? (TL.opRankName(rep.apex.opRank) + '·' + TL.opClassName(rep.apex.opClass)) : TL.jobLabel(rep.apex.job), 'teal'],
@@ -273,29 +308,28 @@
 
   /* ---------------------------------------------------------------------- */
   /* 本地存档（对应原作的「过去的人生」）                                      */
+  /* 持久化由应用端口负责：这里只提交摘要、读取只读列表，               */
+  /* 不再直接访问 localStorage（隐私模式、配额与损坏数据由端口处理）。          */
   /* ---------------------------------------------------------------------- */
   function loadSaves() {
-    try {
-      const records = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-      return Array.isArray(records) ? records.filter(s => s && Number.isFinite(s.age) && typeof s.cause === 'string') : [];
-    } catch (e) { return []; }
+    if (!TL.lifeStore) return [];
+    return TL.lifeStore.readCompletedLives();
   }
   function saveLife(S) {
-    if (!S || S.phase !== 'report' || !Number.isFinite(S.deathAge) || !S.deathCause) return;
-    try {
-      const all = loadSaves();
-      all.unshift({
-        t: Date.now(),
-        name: S.fullName,
-        nation: TL.NATION_BY_ID[S.nation].name,
-        race: TL.RACE_BY_ID[S.race].name,
-        age: S.deathAge,
-        cause: TL.causeName(S.deathCause, S.deathAge),
-        seed: TL.seed(),
-        setup: Object.assign({}, SETUP)
-      });
-      localStorage.setItem(STORE_KEY, JSON.stringify(all.slice(0, 60)));
-    } catch (e) { /* 隐私模式下写不了，忽略 */ }
+    if (!TL.lifeStore || !S) return;
+    const session = TL.deriveSessionView(S);
+    const v = TL.deriveLifeView(S);
+    if (session.phase !== 'report' || !v.mortality.ended) return;
+    if (!Number.isFinite(v.mortality.deathAge) || !v.mortality.deathCause) return;
+    TL.lifeStore.recordCompletedLife({
+      name: v.identity.name,
+      nation: TL.NATION_BY_ID[v.identity.nation].name,
+      race: TL.RACE_BY_ID[v.identity.race].name,
+      age: v.mortality.deathAge,
+      cause: TL.causeName(v.mortality.deathCause, v.mortality.deathAge),
+      seed: TL.seed(),
+      setup: Object.assign({}, SETUP)
+    });
   }
   function renderSaves() {
     const all = loadSaves();
@@ -329,6 +363,7 @@
     bindChips('paceChips', 'pace', false);
 
     $('startBtn').addEventListener('click', () => startGame(true));
+    $('resumeBtn').addEventListener('click', resumeGame);
     TL.initLanding(() => startGame(true));
 
     $('seedBtn').addEventListener('click', () => {
@@ -350,7 +385,8 @@
         else { S.paused = false; S.speed = v; }
         lastTs = 0;
         TL.renderTop(S);
-        toast(S.paused ? '已暂停' : TL.L`${S.speed} 倍速`);
+        const now = TL.deriveSessionView(S);
+        toast(now.pacing.paused ? '已暂停' : TL.L`${now.pacing.speed} 倍速`);
       });
     });
 
@@ -379,6 +415,7 @@
       $('start').hidden = false;
       renderSaves();
       renderOdds();
+      refreshResumeButton();
     });
 
     $('againBtn').addEventListener('click', () => {
@@ -387,12 +424,13 @@
       $('report').hidden = true;
       $('start').hidden = false;
       renderSaves(); renderOdds();
+      refreshResumeButton();
     });
 
     $('sameSeedBtn').addEventListener('click', () => {
       const S = TL.S;
       if (!S) return;
-      SETUP.seed = S.lt && TL.seed() != null ? TL.seed() : null;
+      SETUP.seed = TL.deriveSessionView(S).seed;
       if (SETUP.seed == null) { toast('这一局没有固定种子'); return; }
       $('report').hidden = true;
       startGame(true);
@@ -476,12 +514,14 @@
     }).join('');
 
     const S = TL.S;
-    const info = S ? `
-      <div class="row"><span class="rk">出生地</span><span class="rv">${esc(TL.NATION_BY_ID[S.nation].name)} · ${esc(S.stratumName)}</span></div>
-      <div class="row"><span class="rk">社会预期寿命</span><span class="rv">${S.lt.e0.toFixed(1)} 岁</span></div>
-      <div class="row"><span class="rk">生理极限</span><span class="rv">${S.lifeMax[0]}–${S.lifeMax[1]} 岁</span></div>
-      <div class="row"><span class="rk">种子</span><span class="rv">${TL.seed() == null ? '真随机' : TL.seed()}</span></div>
-      <div class="row"><span class="rk">倍速 / 节奏</span><span class="rv">${S.speed}× · 1 年 ≈ ${S.yearSec.toFixed(1)} 秒</span></div>
+    const view = S ? TL.deriveLifeView(S) : null;
+    const session = S ? TL.deriveSessionView(S) : null;
+    const info = view ? `
+      <div class="row"><span class="rk">出生地</span><span class="rv">${esc(TL.NATION_BY_ID[view.identity.nation].name)} · ${esc(view.identity.stratumName)}</span></div>
+      <div class="row"><span class="rk">社会预期寿命</span><span class="rv">${view.survival.expectedAge.toFixed(1)} 岁</span></div>
+      <div class="row"><span class="rk">生理极限</span><span class="rv">${view.identity.lifeRange.min}–${view.identity.lifeRange.max} 岁</span></div>
+      <div class="row"><span class="rk">种子</span><span class="rv">${session.seed == null ? '未记录（不可复现）' : session.seed}</span></div>
+      <div class="row"><span class="rk">倍速 / 节奏</span><span class="rv">${session.pacing.speed}× · 1 年 ≈ ${session.pacing.yearSeconds.toFixed(1)} 秒</span></div>
     ` : `<div style="color:var(--fg3)">还没有开始一局。</div>`;
 
     const body = openSheet('设置',
@@ -497,7 +537,7 @@
 
     Array.prototype.forEach.call(body.querySelectorAll('[data-region]'), el => {
       el.addEventListener('click', () => {
-        TL.setLocale(el.dataset.region, true);
+        applyRegion(el.dataset.region, true);
         applyStaticText();
         if (TL.S) TL.renderAll(TL.S, true);
         toast('地区已切换为 ' + TL.locale.name);
@@ -529,7 +569,7 @@
     $('noteSave').addEventListener('click', () => {
       const v = $('noteTa').value.trim();
       if (!v) { closeSheet(); return; }
-      notes.push({ seed: String(TL.seed()), age: S ? Math.floor(S.age) : 0, text: v, at: Date.now() });
+      notes.push({ seed: String(TL.seed()), age: S ? Math.floor(TL.deriveSessionView(S).age) : 0, text: v, at: Date.now() });
       try { localStorage.setItem(key, JSON.stringify(notes.slice(-500))); } catch (e) { /* 忽略 */ }
       if (S) TL.log(S, TL.L`【想法】${v}`, 'dec');
       toast('已记下');
@@ -608,19 +648,23 @@
    */
   function fastForward(S, targetAge) {
     let guard = 0;
-    while (S.phase === 'life' && S.age < targetAge && guard++ < 20000) {
+    let session = TL.deriveSessionView(S);
+    while (session.phase === 'life' && session.age < targetAge && guard++ < 20000) {
       if (!S.focus) S.focus = TL.autoFocus(S);
       // 每次推进 1/4 年，保证年内排程的抉择都能被触发
-      TL.tick(S, S.yearSec / 4);
-      if (S.pending) {
+      TL.tick(S, session.pacing.yearSeconds / 4);
+      session = TL.deriveSessionView(S);
+      if (session.decision.open) {
         // ?hold=1：停在第一个未决抉择上，用来截图 / 验证弹层
         if (SETUP.hold) break;
         TL.autoChoose(S);
+        session = TL.deriveSessionView(S);
       }
-      if (S.phase !== 'life') break;
+      if (session.phase !== 'life') break;
     }
     S.paused = false;
-    if (S.pending && SETUP.hold) {
+    session = TL.deriveSessionView(S);
+    if (session.decision.open && SETUP.hold) {
       UI.focus = null;
       TL.showDecision(S, S.pending);
       return S;
@@ -666,6 +710,22 @@
    * 把界面上的固定文案按当前地区语言写一遍。
    * 动态文案（事件、抉择、记录）在数据层，不在这里处理。
    */
+  /* 地区选择的"应用层一半"：切换语言、写 <html lang/data-region>、记住选择。
+     模型层（src/model/locale.ts）只负责查表与格式化，不碰 DOM 与存储。 */
+  const REGION_KEY = 'terra.region';
+  function applyRegion(id, persist) {
+    const region = TL.setLocale(id);
+    try {
+      document.documentElement.lang = TL.lang === 'zh' ? 'zh-CN' : TL.lang;
+      document.documentElement.setAttribute('data-region', region.id);
+    } catch (e) { /* 无 document 时忽略 */ }
+    if (persist) { try { localStorage.setItem(REGION_KEY, region.id); } catch (e) { /* 忽略 */ } }
+    return region;
+  }
+  function savedRegion() {
+    try { return localStorage.getItem(REGION_KEY); } catch (e) { return null; }
+  }
+
   function applyStaticText() {
     const S = TL.S;
     document.title = TL.lang === 'zh'
@@ -708,7 +768,7 @@
     }).join('');
     Array.prototype.forEach.call(box.querySelectorAll('.chip'), el => {
       el.addEventListener('click', () => {
-        TL.setLocale(el.dataset.v, true);
+        applyRegion(el.dataset.v, true);
         applyStaticText();
         renderOdds();
         if (TL.S) TL.renderAll(TL.S, true);
@@ -769,12 +829,13 @@
 
   function initInner() {
     const q = applyQuery();
-    TL.initLocale(q.get('region'));       // URL ?region=CN|US|JP|KR|EU 优先
+    applyRegion(TL.initLocale(q.get('region'), savedRegion()).id, false); // URL ?region=CN|US|JP|KR|EU 优先
     applyStaticText();
     renderNationChips();
     renderRaceChips();
     renderOdds();
     renderSaves();
+    refreshResumeButton();
     bind();
 
     // 同步 chip 的选中态
@@ -798,7 +859,7 @@
       const ff = parseInt(q.get('ff') || '0', 10);
       if (ff > 0) {
         fastForward(TL.S, ff);
-        if (TL.S.phase === 'report') { finishLife(TL.S); return; }
+        if (TL.deriveSessionView(TL.S).phase === 'report') { finishLife(TL.S); return; }
         TL.renderAll(TL.S, true);
       }
       if (q.get('auto') === '1') {

@@ -614,11 +614,12 @@
   D('ori_job_loss', {
     title: '他们知道了',
     text: () => TL.L`你的感染状态被公开了。`,
-    when: S => !TL.organizationBlocksEvent?.(S, 'ori_job_loss'),
+    // 只有真正在职的感染者才会被「撤下岗位」；退休与未就业者不会被这个抉择辞退。
+    when: S => TL.canBeDismissed(S) && !TL.organizationBlocksEvent?.(S, 'ori_job_loss'),
     options: [
       {
         label: '接受处理', eff: { h: -12, so: -6 },
-        run(S) { S.flags.lastJob = S.job; S.job = 'seeking'; return TL.L`你被从岗位上撤了下来。`;
+        run(S) { TL.dismissFromJob(S); return TL.L`你被从岗位上撤了下来。`;
         }
       },
       {
@@ -626,13 +627,13 @@
         eff: { h: -4 },
         run(S) {
           if (TL.chance(TL.clamp(S.st.sm / 180, 0.1, 0.6))) { TL.eff(S, { money: 2 }); return TL.L`你写了申诉。三个月后，他们同意让你回去——但换了个岗位。`; }
-          S.flags.lastJob = S.job; S.job = 'seeking';
+          TL.dismissFromJob(S);
           return TL.L`申诉被驳回了。理由只有一行字。`;
         }
       },
       {
         label: '自己走', eff: { h: -6, so: 2, sm: 2 },
-        run(S) { S.flags.lastJob = S.job; S.job = 'seeking'; return TL.L`你没等他们动手，自己递了辞呈。`;
+        run(S) { TL.dismissFromJob(S); return TL.L`你没等他们动手，自己递了辞呈。`;
         }
       }
     ]

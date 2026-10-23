@@ -137,7 +137,10 @@ function element(id) {
     click(){handlers.click?.({target:e});}
   }; elements.set(id,e); return e;
 }
-const app=simulation({log(){},warn(){},error(...args){errors.push(args);}});
+// Wire the application storage port the way the browser bootstrap does, so the
+// archive assertions exercise the real port instead of a raw localStorage read.
+const app=simulation({log(){},warn(){},error(...args){errors.push(args);}},
+  {storage:()=>({getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)})});
 const U=app.TL;
 U.UI={auto:false}; U.$=element;
 for(const name of ['renderAll','renderFocus','renderTop','renderLandingOdds','initLanding',
@@ -159,9 +162,9 @@ element('birth').hidden=true;
 element('startBtn').click();
 assert.equal(U.S.phase,'life');
 element('closeBtn').click();
-assert.equal(storage.has('terra-life-saves-v1'),false,'unfinished life is not saved');
+assert.equal(storage.has('terra-life:v1:completed-lives'),false,'unfinished life is not saved');
 // Old malformed summaries are hidden without deleting valid browser records.
-storage.set('terra-life-saves-v1',JSON.stringify([{name:'unfinished'},{name:'complete',age:50,cause:'test'}]));
+storage.set('terra-life:v1:completed-lives',JSON.stringify([{name:'unfinished'},{name:'complete',age:50,cause:'test'}]));
 element('closeBtn').click();
 assert.ok(!element('saves').innerHTML.includes('unfinished'));
 assert.ok(element('saves').innerHTML.includes('complete'));
@@ -179,7 +182,28 @@ assert.equal(U.S.pending,null,'auto resolves a newly opened decision');
 assert.ok(U.S.log.some(e=>e.key==='middle_path'));
 U.die(U.S,'old');
 frames.at(-1)(1200);
-assert.equal(JSON.parse(storage.get('terra-life-saves-v1')).length,2,'completed life saves once');
+assert.equal(JSON.parse(storage.get('terra-life:v1:completed-lives')).length,2,'completed life saves once');
+// 报告头部与「死因」格子改读派生视图，仍必须与快照一致。
+assert.match(element('rDead').innerHTML,/卒于 \d+ 岁/,'报告头部含年龄');
+assert.ok(element('rDead').innerHTML.includes(U.S.report.causeName),'报告头部死因与快照一致');
+assert.ok(element('rGrid').innerHTML.includes(U.S.report.causeName),'死因格子与快照一致');
+
+// 续玩：年度结算自动存档，开局页出现「继续上次人生」，点击后回到同一个结算点。
+// 固定种子：这里验的是接线，不是随机分布；不播种会让断言随局外随机结果飘。
+element('restartBtn').click();
+const seededLife = U.newLife({seed: 700021, pace: 'short'});
+U.endYear(seededLife);
+assert.equal(seededLife.phase,'life','第一年结算后仍在世（固定种子）');
+assert.ok(storage.has('terra-life:v1:resumable-life'),'年度结算后写入可续存档');
+const boundaryAge = seededLife.age;
+element('restartBtn').click();
+assert.equal(element('resumeBtn').hidden,false,'有存档时显示继续入口');
+element('resumeBtn').click();
+assert.equal(element('game').hidden,false,'续玩直接进入游戏界面');
+assert.notEqual(U.S,seededLife,'续玩重建状态而不是复用对象');
+assert.equal(U.S.age,boundaryAge,'恢复到同一个年度结算点');
+U.die(U.S,'old');
+assert.equal(storage.has('terra-life:v1:resumable-life'),false,'死亡后不再提供续玩');
 
 for (const [name,event] of [['error',{error:new Error('test error')}],
   ['unhandledrejection',{reason:new Error('test rejection')}]]) {

@@ -1,0 +1,242 @@
+{
+  "specified-nation": {
+    "config": {
+      "name": "specified-nation",
+      "seed": 1234567,
+      "nation": "KDZ",
+      "race": "sarkaz",
+      "specified": true,
+      "mode": "birth"
+    },
+    "age": 0,
+    "nation": "KDZ",
+    "race": "sarkaz",
+    "markup": {
+      "startTitle": {
+        "html": "<span>泰拉</span><span>人<em>生</em></span>",
+        "text": "泰拉人生模拟",
+        "class": ""
+      },
+      "startBtn": {
+        "html": "",
+        "text": "出生",
+        "class": ""
+      },
+      "oddsTable": {
+        "html": "<div  class=\"odds-row\"><span>炎国</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:100.00%\"></div></div><span  class=\"odds-pct\">30.2%</span></div><div  class=\"odds-row\"><span>萨尔贡</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:66.42%\"></div></div><span  class=\"odds-pct\">20.1%</span></div><div  class=\"odds-row\"><span>乌萨斯</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:38.06%\"></div></div><span  class=\"odds-pct\">11.5%</span></div><div  class=\"odds-row\"><span>阿戈尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:22.39%\"></div></div><span  class=\"odds-pct\">6.8%</span></div><div  class=\"odds-row\"><span>雷姆必拓</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:17.16%\"></div></div><span  class=\"odds-pct\">5.2%</span></div><div  class=\"odds-row\"><span>维多利亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:16.42%\"></div></div><span  class=\"odds-pct\">5.0%</span></div><div  class=\"odds-row\"><span>莱塔尼亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:12.69%\"></div></div><span  class=\"odds-pct\">3.8%</span></div><div  class=\"odds-row\"><span>玻利瓦尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:11.94%\"></div></div><span  class=\"odds-pct\">3.6%</span></div><div  class=\"odds-row\"><span>哥伦比亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:8.96%\"></div></div><span  class=\"odds-pct\">2.7%</span></div><div  class=\"odds-row other\"><span>其余 12 个地区</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:36.57%\"></div></div><span  class=\"odds-pct\">11.1%</span></div>",
+        "text": "",
+        "class": ""
+      },
+      "oddsAll": {
+        "html": "<div  class=\"odds-row\"><span>炎国</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:100.00%\"></div></div><span  class=\"odds-pct\">30.2%</span></div><div  class=\"odds-row\"><span>萨尔贡</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:66.42%\"></div></div><span  class=\"odds-pct\">20.1%</span></div><div  class=\"odds-row\"><span>乌萨斯</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:38.06%\"></div></div><span  class=\"odds-pct\">11.5%</span></div><div  class=\"odds-row\"><span>阿戈尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:22.39%\"></div></div><span  class=\"odds-pct\">6.8%</span></div><div  class=\"odds-row\"><span>雷姆必拓</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:17.16%\"></div></div><span  class=\"odds-pct\">5.2%</span></div><div  class=\"odds-row\"><span>维多利亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:16.42%\"></div></div><span  class=\"odds-pct\">5.0%</span></div><div  class=\"odds-row\"><span>莱塔尼亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:12.69%\"></div></div><span  class=\"odds-pct\">3.8%</span></div><div  class=\"odds-row\"><span>玻利瓦尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:11.94%\"></div></div><span  class=\"odds-pct\">3.6%</span></div><div  class=\"odds-row\"><span>哥伦比亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:8.96%\"></div></div><span  class=\"odds-pct\">2.7%</span></div><div  class=\"odds-row\"><span>卡西米尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:7.84%\"></div></div><span  class=\"odds-pct\">2.4%</span></div><div  class=\"odds-row\"><span>东国</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:5.60%\"></div></div><span  class=\"odds-pct\">1.7%</span></div><div  class=\"odds-row\"><span>伊比利亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:4.85%\"></div></div><span  class=\"odds-pct\">1.5%</span></div><div  class=\"odds-row\"><span>杜林</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:3.73%\"></div></div><span  class=\"odds-pct\">1.1%</span></div><div  class=\"odds-row\"><span>米诺斯</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:2.99%\"></div></div><span  class=\"odds-pct\">0.90%</span></div><div  class=\"odds-row\"><span>拉特兰</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:2.24%\"></div></div><span  class=\"odds-pct\">0.68%</span></div><div  class=\"odds-row\"><span>卡兹戴尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:2.24%\"></div></div><span  class=\"odds-pct\">0.68%</span></div><div  class=\"odds-row\"><span>萨米</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:1.87%\"></div></div><span  class=\"odds-pct\">0.56%</span></div><div  class=\"odds-row\"><span>龙门</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:1.87%\"></div></div><span  class=\"odds-pct\">0.56%</span></div><div  class=\"odds-row\"><span>叙拉古</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:1.49%\"></div></div><span  class=\"odds-pct\">0.45%</span></div><div  class=\"odds-row\"><span>谢拉格</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:1.49%\"></div></div><span  class=\"odds-pct\">0.45%</span></div><div  class=\"odds-row\"><span>汐斯塔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:0.37%\"></div></div><span  class=\"odds-pct\">0.11%</span></div>",
+        "text": "",
+        "class": ""
+      },
+      "rollName": {
+        "html": "",
+        "text": "卡兹戴尔",
+        "class": ""
+      },
+      "rollMeta": {
+        "html": "",
+        "text": "概率：0.68%",
+        "class": ""
+      },
+      "certNumber": {
+        "html": "",
+        "text": "No. KDZ-1040-CC7EC587",
+        "class": ""
+      },
+      "certName": {
+        "html": "",
+        "text": "瑟兰·铁誓",
+        "class": ""
+      },
+      "certStory": {
+        "html": "",
+        "text": "泰拉历 1040 年，你出生在卡兹戴尔的十王庭废墟，一个一贫如洗的家庭。你是萨卡兹女孩，家住工业与蓝领区。",
+        "class": ""
+      },
+      "certPace": {
+        "html": "",
+        "text": "走到预期寿命约需 60 分钟（1 年 ≈ 58 秒）。准备好之后，开始这一生。",
+        "class": ""
+      },
+      "certFields": {
+        "html": "<div><dt>性别</dt><dd>女性</dd></div><div><dt>出生国家 / 地区</dt><dd>卡兹戴尔</dd></div><div><dt>出生地</dt><dd>十王庭废墟</dd></div><div><dt>种族</dt><dd>萨卡兹</dd></div><div><dt>出身阶层</dt><dd>工业与蓝领区</dd></div><div><dt>家境</dt><dd>●○○○○ 第1分位</dd></div><div><dt>父母年龄</dt><dd>母亲 27 岁 · 父亲 28 岁</dd></div><div><dt>父母的工作</dt><dd>母亲：文书；父亲：源石采掘工</dd></div><div><dt>源石技艺适应性</dt><dd>中等</dd></div><div><dt>社会预期寿命</dt><dd>62.0 岁</dd></div><div><dt>种族生理寿命区间</dt><dd>80–100 岁</dd></div><div><dt>矿石病</dt><dd>未感染</dd></div>",
+        "text": "",
+        "class": ""
+      },
+      "certOdds": {
+        "html": "这是你指定的出生地。在按年出生人数抽签的模型中，有 <b>0.68%</b> 的人会在卡兹戴尔开始人生。<br></br><span  class=\"landing-small\">抽签权重、预期寿命与生理寿命为本项目的设定模型。</span>",
+        "text": "",
+        "class": ""
+      },
+      "certPeers": {
+        "html": "<li>茜尔·归途 · 萨卡兹 · 女</li><li>德莉·碎骨 · 萨卡兹 · 女</li><li>莉丝·枯井 · 萨卡兹 · 女</li><li>厄瑞·锈冠 · 萨卡兹 · 女</li>",
+        "text": "",
+        "class": ""
+      }
+    }
+  },
+  "random-draw": {
+    "config": {
+      "name": "random-draw",
+      "seed": 7654321,
+      "nation": null,
+      "race": null,
+      "specified": false,
+      "mode": "birth"
+    },
+    "age": 0,
+    "nation": "AEG",
+    "race": "phidia",
+    "markup": {
+      "startTitle": {
+        "html": "<span>泰拉</span><span>人<em>生</em></span>",
+        "text": "泰拉人生模拟",
+        "class": ""
+      },
+      "startBtn": {
+        "html": "",
+        "text": "出生",
+        "class": ""
+      },
+      "oddsTable": {
+        "html": "<div  class=\"odds-row\"><span>炎国</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:100.00%\"></div></div><span  class=\"odds-pct\">30.2%</span></div><div  class=\"odds-row\"><span>萨尔贡</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:66.42%\"></div></div><span  class=\"odds-pct\">20.1%</span></div><div  class=\"odds-row\"><span>乌萨斯</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:38.06%\"></div></div><span  class=\"odds-pct\">11.5%</span></div><div  class=\"odds-row\"><span>阿戈尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:22.39%\"></div></div><span  class=\"odds-pct\">6.8%</span></div><div  class=\"odds-row\"><span>雷姆必拓</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:17.16%\"></div></div><span  class=\"odds-pct\">5.2%</span></div><div  class=\"odds-row\"><span>维多利亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:16.42%\"></div></div><span  class=\"odds-pct\">5.0%</span></div><div  class=\"odds-row\"><span>莱塔尼亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:12.69%\"></div></div><span  class=\"odds-pct\">3.8%</span></div><div  class=\"odds-row\"><span>玻利瓦尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:11.94%\"></div></div><span  class=\"odds-pct\">3.6%</span></div><div  class=\"odds-row\"><span>哥伦比亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:8.96%\"></div></div><span  class=\"odds-pct\">2.7%</span></div><div  class=\"odds-row other\"><span>其余 12 个地区</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:36.57%\"></div></div><span  class=\"odds-pct\">11.1%</span></div>",
+        "text": "",
+        "class": ""
+      },
+      "oddsAll": {
+        "html": "<div  class=\"odds-row\"><span>炎国</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:100.00%\"></div></div><span  class=\"odds-pct\">30.2%</span></div><div  class=\"odds-row\"><span>萨尔贡</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:66.42%\"></div></div><span  class=\"odds-pct\">20.1%</span></div><div  class=\"odds-row\"><span>乌萨斯</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:38.06%\"></div></div><span  class=\"odds-pct\">11.5%</span></div><div  class=\"odds-row\"><span>阿戈尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:22.39%\"></div></div><span  class=\"odds-pct\">6.8%</span></div><div  class=\"odds-row\"><span>雷姆必拓</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:17.16%\"></div></div><span  class=\"odds-pct\">5.2%</span></div><div  class=\"odds-row\"><span>维多利亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:16.42%\"></div></div><span  class=\"odds-pct\">5.0%</span></div><div  class=\"odds-row\"><span>莱塔尼亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:12.69%\"></div></div><span  class=\"odds-pct\">3.8%</span></div><div  class=\"odds-row\"><span>玻利瓦尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:11.94%\"></div></div><span  class=\"odds-pct\">3.6%</span></div><div  class=\"odds-row\"><span>哥伦比亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:8.96%\"></div></div><span  class=\"odds-pct\">2.7%</span></div><div  class=\"odds-row\"><span>卡西米尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:7.84%\"></div></div><span  class=\"odds-pct\">2.4%</span></div><div  class=\"odds-row\"><span>东国</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:5.60%\"></div></div><span  class=\"odds-pct\">1.7%</span></div><div  class=\"odds-row\"><span>伊比利亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:4.85%\"></div></div><span  class=\"odds-pct\">1.5%</span></div><div  class=\"odds-row\"><span>杜林</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:3.73%\"></div></div><span  class=\"odds-pct\">1.1%</span></div><div  class=\"odds-row\"><span>米诺斯</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:2.99%\"></div></div><span  class=\"odds-pct\">0.90%</span></div><div  class=\"odds-row\"><span>拉特兰</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:2.24%\"></div></div><span  class=\"odds-pct\">0.68%</span></div><div  class=\"odds-row\"><span>卡兹戴尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:2.24%\"></div></div><span  class=\"odds-pct\">0.68%</span></div><div  class=\"odds-row\"><span>萨米</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:1.87%\"></div></div><span  class=\"odds-pct\">0.56%</span></div><div  class=\"odds-row\"><span>龙门</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:1.87%\"></div></div><span  class=\"odds-pct\">0.56%</span></div><div  class=\"odds-row\"><span>叙拉古</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:1.49%\"></div></div><span  class=\"odds-pct\">0.45%</span></div><div  class=\"odds-row\"><span>谢拉格</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:1.49%\"></div></div><span  class=\"odds-pct\">0.45%</span></div><div  class=\"odds-row\"><span>汐斯塔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:0.37%\"></div></div><span  class=\"odds-pct\">0.11%</span></div>",
+        "text": "",
+        "class": ""
+      },
+      "rollName": {
+        "html": "",
+        "text": "阿戈尔",
+        "class": ""
+      },
+      "rollMeta": {
+        "html": "",
+        "text": "概率：6.8%",
+        "class": ""
+      },
+      "certNumber": {
+        "html": "",
+        "text": "No. AEG-1040-AE7CB3AF",
+        "class": ""
+      },
+      "certName": {
+        "html": "",
+        "text": "涅柔斯·潮汐",
+        "class": ""
+      },
+      "certStory": {
+        "html": "",
+        "text": "泰拉历 1040 年，你出生在阿戈尔的珊瑚穹顶，一个勉强度日的家庭。你是菲迪亚男孩，家住城市边缘与地下。",
+        "class": ""
+      },
+      "certPace": {
+        "html": "",
+        "text": "走到预期寿命约需 60 分钟（1 年 ≈ 49 秒）。准备好之后，开始这一生。",
+        "class": ""
+      },
+      "certFields": {
+        "html": "<div><dt>性别</dt><dd>男性</dd></div><div><dt>出生国家 / 地区</dt><dd>阿戈尔</dd></div><div><dt>出生地</dt><dd>珊瑚穹顶</dd></div><div><dt>种族</dt><dd>菲迪亚</dd></div><div><dt>出身阶层</dt><dd>城市边缘与地下</dd></div><div><dt>家境</dt><dd>●●○○○ 第2分位</dd></div><div><dt>父母年龄</dt><dd>母亲 22 岁 · 父亲 26 岁</dd></div><div><dt>父母的工作</dt><dd>母亲：记者；父亲：教师</dd></div><div><dt>源石技艺适应性</dt><dd>无适应性</dd></div><div><dt>社会预期寿命</dt><dd>76.9 岁</dd></div><div><dt>种族生理寿命区间</dt><dd>82–104 岁</dd></div><div><dt>矿石病</dt><dd>未感染</dd></div>",
+        "text": "",
+        "class": ""
+      },
+      "certOdds": {
+        "html": "在按年出生人数抽签的模型中，有 <b>6.8%</b> 的人会在阿戈尔开始人生。<br></br><span  class=\"landing-small\">抽签权重、预期寿命与生理寿命为本项目的设定模型。</span>",
+        "text": "",
+        "class": ""
+      },
+      "certPeers": {
+        "html": "<li>卡吕普索·暗流 · 阿戈尔 · 女</li><li>琉科忒亚·盐与铁 · 菲迪亚 · 女</li><li>涅柔斯·深海 · 匹特拉姆 · 男</li><li>波塞冬·盐与铁 · 菲迪亚 · 男</li>",
+        "text": "",
+        "class": ""
+      }
+    }
+  },
+  "population-mode": {
+    "config": {
+      "name": "population-mode",
+      "seed": 1234567,
+      "nation": "YAN",
+      "race": "lung",
+      "specified": true,
+      "mode": "pop"
+    },
+    "age": 0,
+    "nation": "YAN",
+    "race": "lung",
+    "markup": {
+      "startTitle": {
+        "html": "<span>泰拉</span><span>人<em>生</em></span>",
+        "text": "泰拉人生模拟",
+        "class": ""
+      },
+      "startBtn": {
+        "html": "",
+        "text": "出生",
+        "class": ""
+      },
+      "oddsTable": {
+        "html": "<div  class=\"odds-row\"><span>炎国</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:100.00%\"></div></div><span  class=\"odds-pct\">30.2%</span></div><div  class=\"odds-row\"><span>萨尔贡</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:66.42%\"></div></div><span  class=\"odds-pct\">20.1%</span></div><div  class=\"odds-row\"><span>乌萨斯</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:38.06%\"></div></div><span  class=\"odds-pct\">11.5%</span></div><div  class=\"odds-row\"><span>阿戈尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:22.39%\"></div></div><span  class=\"odds-pct\">6.8%</span></div><div  class=\"odds-row\"><span>雷姆必拓</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:17.16%\"></div></div><span  class=\"odds-pct\">5.2%</span></div><div  class=\"odds-row\"><span>维多利亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:16.42%\"></div></div><span  class=\"odds-pct\">5.0%</span></div><div  class=\"odds-row\"><span>莱塔尼亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:12.69%\"></div></div><span  class=\"odds-pct\">3.8%</span></div><div  class=\"odds-row\"><span>玻利瓦尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:11.94%\"></div></div><span  class=\"odds-pct\">3.6%</span></div><div  class=\"odds-row\"><span>哥伦比亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:8.96%\"></div></div><span  class=\"odds-pct\">2.7%</span></div><div  class=\"odds-row other\"><span>其余 12 个地区</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:36.57%\"></div></div><span  class=\"odds-pct\">11.1%</span></div>",
+        "text": "",
+        "class": ""
+      },
+      "oddsAll": {
+        "html": "<div  class=\"odds-row\"><span>炎国</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:100.00%\"></div></div><span  class=\"odds-pct\">30.2%</span></div><div  class=\"odds-row\"><span>萨尔贡</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:66.42%\"></div></div><span  class=\"odds-pct\">20.1%</span></div><div  class=\"odds-row\"><span>乌萨斯</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:38.06%\"></div></div><span  class=\"odds-pct\">11.5%</span></div><div  class=\"odds-row\"><span>阿戈尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:22.39%\"></div></div><span  class=\"odds-pct\">6.8%</span></div><div  class=\"odds-row\"><span>雷姆必拓</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:17.16%\"></div></div><span  class=\"odds-pct\">5.2%</span></div><div  class=\"odds-row\"><span>维多利亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:16.42%\"></div></div><span  class=\"odds-pct\">5.0%</span></div><div  class=\"odds-row\"><span>莱塔尼亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:12.69%\"></div></div><span  class=\"odds-pct\">3.8%</span></div><div  class=\"odds-row\"><span>玻利瓦尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:11.94%\"></div></div><span  class=\"odds-pct\">3.6%</span></div><div  class=\"odds-row\"><span>哥伦比亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:8.96%\"></div></div><span  class=\"odds-pct\">2.7%</span></div><div  class=\"odds-row\"><span>卡西米尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:7.84%\"></div></div><span  class=\"odds-pct\">2.4%</span></div><div  class=\"odds-row\"><span>东国</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:5.60%\"></div></div><span  class=\"odds-pct\">1.7%</span></div><div  class=\"odds-row\"><span>伊比利亚</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:4.85%\"></div></div><span  class=\"odds-pct\">1.5%</span></div><div  class=\"odds-row\"><span>杜林</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:3.73%\"></div></div><span  class=\"odds-pct\">1.1%</span></div><div  class=\"odds-row\"><span>米诺斯</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:2.99%\"></div></div><span  class=\"odds-pct\">0.90%</span></div><div  class=\"odds-row\"><span>拉特兰</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:2.24%\"></div></div><span  class=\"odds-pct\">0.68%</span></div><div  class=\"odds-row\"><span>卡兹戴尔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:2.24%\"></div></div><span  class=\"odds-pct\">0.68%</span></div><div  class=\"odds-row\"><span>萨米</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:1.87%\"></div></div><span  class=\"odds-pct\">0.56%</span></div><div  class=\"odds-row\"><span>龙门</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:1.87%\"></div></div><span  class=\"odds-pct\">0.56%</span></div><div  class=\"odds-row\"><span>叙拉古</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:1.49%\"></div></div><span  class=\"odds-pct\">0.45%</span></div><div  class=\"odds-row\"><span>谢拉格</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:1.49%\"></div></div><span  class=\"odds-pct\">0.45%</span></div><div  class=\"odds-row\"><span>汐斯塔</span><div  class=\"odds-track\"><div  class=\"odds-fill\" style=\"width:0.37%\"></div></div><span  class=\"odds-pct\">0.11%</span></div>",
+        "text": "",
+        "class": ""
+      },
+      "rollName": {
+        "html": "",
+        "text": "炎国",
+        "class": ""
+      },
+      "rollMeta": {
+        "html": "",
+        "text": "概率：38.1%",
+        "class": ""
+      },
+      "certNumber": {
+        "html": "",
+        "text": "No. YAN-1040-EA8F607D",
+        "class": ""
+      },
+      "certName": {
+        "html": "",
+        "text": "陈疏影",
+        "class": ""
+      },
+      "certStory": {
+        "html": "",
+        "text": "泰拉历 1040 年，你出生在炎国的龙门外城，一个勉强度日的家庭。你是龙女孩，家住工业与蓝领区。",
+        "class": ""
+      },
+      "certPace": {
+        "html": "",
+        "text": "走到预期寿命约需 60 分钟（1 年 ≈ 47 秒）。准备好之后，开始这一生。",
+        "class": ""
+      },
+      "certFields": {
+        "html": "<div><dt>性别</dt><dd>女性</dd></div><div><dt>出生国家 / 地区</dt><dd>炎国</dd></div><div><dt>出生地</dt><dd>龙门外城</dd></div><div><dt>种族</dt><dd>龙</dd></div><div><dt>出身阶层</dt><dd>工业与蓝领区</dd></div><div><dt>家境</dt><dd>●●○○○ 第2分位</dd></div><div><dt>父母年龄</dt><dd>母亲 36 岁 · 父亲 40 岁</dd></div><div><dt>父母的工作</dt><dd>母亲：牧民；父亲：文书</dd></div><div><dt>源石技艺适应性</dt><dd>微弱</dd></div><div><dt>社会预期寿命</dt><dd>80.8 岁</dd></div><div><dt>种族生理寿命区间</dt><dd>130–190 岁</dd></div><div><dt>矿石病</dt><dd>未感染</dd></div>",
+        "text": "",
+        "class": ""
+      },
+      "certOdds": {
+        "html": "这是你指定的出生地。在按人口抽签的模型中，有 <b>38.1%</b> 的人会在炎国开始人生。<br></br><span  class=\"landing-small\">抽签权重、预期寿命与生理寿命为本项目的设定模型。</span>",
+        "text": "",
+        "class": ""
+      },
+      "certPeers": {
+        "html": "<li>徐昭华 · 龙 · 女</li><li>董重光 · 龙 · 男</li><li>程若薇 · 龙 · 女</li><li>黄若薇 · 卡普里尼 · 女</li>",
+        "text": "",
+        "class": ""
+      }
+    }
+  }
+}

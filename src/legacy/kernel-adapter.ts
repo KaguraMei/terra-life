@@ -36,7 +36,11 @@ export function installKernel(target: object) {
     catastrophe: (state, payload) => { legacy.catastrophe(state, payload); },
     sync: state => { legacy.syncOrganization?.(state); },
     endYear: state => legacy.endYear(state),
-    error: failure => console.error('[ev]', failure.eventId, failure.cause)
+    error: failure => console.error('[ev]', failure.eventId, failure.rollback, failure.cause),
+    // A failed dispatch rewinds the stream too, so a throwing event cannot shift
+    // every later draw. An unseeded generator has no checkpoint to return.
+    randomCheckpoint: () => random.snapshot(),
+    randomRestore: checkpoint => random.restore(checkpoint as RandomSnapshot)
   });
   Object.assign(target, {
     kernel: { random, events: engine },

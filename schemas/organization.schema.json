@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terra-life.local/schemas/organization.schema.json",
+  "title": "Core organization registry entry",
+  "type": "object",
+  "required": ["name", "fromYear", "source", "sourceType", "confidence", "rulesSource", "yearBasis", "employmentModel", "routes"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "fromYear": { "type": "integer" },
+    "untilYear": { "type": "integer" },
+    "recruitUntil": { "type": "integer" },
+    "source": { "type": "string", "minLength": 1, "format": "uri" },
+    "sourceType": { "type": "string", "minLength": 1, "description": "Setting/source provenance; keep distinct from project-specific gameplay rules." },
+    "confidence": { "type": "string", "enum": ["documented", "inferred", "uncertain", "project-rule"] },
+    "rulesSource": { "type": "string", "minLength": 1 },
+    "yearBasis": { "type": "string", "minLength": 1 },
+    "employmentModel": { "type": "string", "minLength": 1 },
+    "nations": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+    "contacts": { "type": "array", "items": { "type": "object", "required": ["id", "name", "chance", "fromYear", "untilYear"], "properties": { "id": { "type": "string" }, "name": { "type": "string" }, "chance": { "type": "number", "minimum": 0, "maximum": 1 }, "fromYear": { "type": "integer" }, "untilYear": { "type": "integer" } } } },
+    "routes": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "object", "required": ["name", "minAge", "ranks"], "properties": { "name": { "type": "string" }, "minAge": { "type": "number", "minimum": 0 }, "jobs": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }, "ranks": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["needYears"], "properties": { "needYears": { "type": "number", "minimum": 0 } } } } } } }
+  }
+}

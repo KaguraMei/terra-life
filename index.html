@@ -224,7 +224,7 @@
             <div class="fieldset"><label for="seedInput">随机种子（可选，用于复现同一局）</label><div class="seed-row"><input id="seedInput" placeholder="留空 = 随机"><button class="birth-back" id="seedBtn">应用</button></div></div>
             <p class="landing-option-hint" id="regionNote"></p>
           </details>
-          <div class="birth-actions"><button id="startBtn" class="birth-cta">出生</button><p>不必更改设置，直接出生也没关系。</p></div>
+          <div class="birth-actions"><button id="resumeBtn" class="birth-cta" hidden>继续上次人生</button><button id="startBtn" class="birth-cta">出生</button><p>不必更改设置，直接出生也没关系。</p></div>
         </div>
       </section>
       <aside class="landing-side">
@@ -236,7 +236,7 @@
           <div id="oddsTable"></div>
           <details class="odds-rest"><summary>查看全部 21 个国家与地区</summary><div id="oddsAll"></div></details>
         </section>
-        <section class="landing-archive"><h2>在这片大地留下的人生</h2><p>这里只记录已结束人生的摘要；进行中的人生暂不支持断点续玩。</p><div id="saves"></div></section>
+        <section class="landing-archive"><h2>在这片大地留下的人生</h2><p>这里记录已结束人生的摘要。进行中的人生每年结算后自动存档一局，可在上方「继续上次人生」接着走。</p><div id="saves"></div></section>
       </aside>
     </div>
     <section class="landing-notes">

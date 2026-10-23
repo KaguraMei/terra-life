@@ -1,3 +1,4 @@
+import {LANG} from '../dist-runtime/simulation.mjs';
 import {simulation} from './sim-context.mjs';
 import {runtimeFiles} from './runtime-files.mjs';
 /* ==========================================================================
@@ -9,7 +10,7 @@ import {runtimeFiles} from './runtime-files.mjs';
  *
  * 这个脚本做四件事（全部静态，不需要浏览器）：
  *   ① 抽出 render.js / main.js 里所有 $('...') 的 id，对照 index.html 检查
- *   ② 抽出所有 TL.t('...') 的键，对照 region.js 的 TL.LANG 检查
+ *   ② 抽出所有 TL.t('...') 的键，对照 src/content/locales.ts 的 LANG 检查
  *   ③ 抽出 TL.scheduleEvents 里所有池子的字符串，对照 TL.EVMAP 检查
  *   ④ 抽出所有 querySelector('#x ...') 的根 id 一并检查
  *
@@ -80,10 +81,8 @@ if (!missingIds.length) {
 /* ---------------------------------------------------------------------- */
 /* ② TL.t() 的键                                                          */
 /* ---------------------------------------------------------------------- */
-const ctx0 = vm.createContext({ window: {}, console, Math, JSON, Date, Intl,
-  parseFloat, parseInt, isFinite, isNaN, Object, Array, String, Number, Boolean });
-vm.runInContext(read('js/engine/region.js'), ctx0, { filename: 'region.js' });
-const LANG = ctx0.window.TL.LANG;
+// The UI dictionary now lives in src/content/locales.ts, so read it from the built
+// runtime instead of loading the legacy script in a VM.
 const zhKeys = new Set(Object.keys(LANG.zh));
 const enKeys = new Set(Object.keys(LANG.en));
 

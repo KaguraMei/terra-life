@@ -57,10 +57,10 @@
     run(S) {
       const n = TL.NATION_BY_ID[S.nation];
       if (S.urban) {
-        TL.eff(S, { so: 4, h: 4 });
+        TL.applyEffects(S, [{ kind: 'attributes', so: 4, h: 4 }]);
         return TL.L`你和巷子里的孩子们玩到天黑。没有人问你是哪个种族的。`;
       }
-      TL.eff(S, { so: 3, h: 4, hl: 2 });
+      TL.applyEffects(S, [{ kind: 'attributes', so: 3, h: 4, hl: 2 }]);
       return TL.L`你在${S.city}外的野地里跑了一整天，回家时鞋上全是泥。`;
     }
   });
@@ -103,7 +103,7 @@
     title: '夜里的争吵', book: '家庭',
     when: S => S.age >= 4 && S.age <= 16 && S.fam.mom.alive && S.fam.dad.alive,
     run(S) {
-      TL.eff(S, { h: -7, so: -3 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -7, so: -3 }]);
       const lines = [
         TL.L`他们在隔壁房间吵。你听得清每一个字，但假装睡着了。`,
         TL.L`母亲说钱不够，父亲说他知道。然后两个人都不说话了。`,
@@ -117,7 +117,7 @@
     title: '少见的温柔', book: '家庭',
     when: S => S.age >= 4 && S.age <= 18,
     run(S) {
-      TL.eff(S, { h: 8, so: 6 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: 8, so: 6 }]);
       return TL.L`父亲今天回来得很早，还带了一小块糖。他没说什么，放在你桌上就走了。`;
     }
   });
@@ -139,7 +139,7 @@
     when: S => S.age >= 5 && S.age <= 14 && TL.discrimination(S) > 0.35,
     run(S) {
       const d = TL.discrimination(S);
-      TL.eff(S, { h: -9, so: -4 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -9, so: -4 }]);
       if (S.race === 'sarkaz') {
         return TL.L`一个大人在巷口拦住你，看清你的角之后，把手里的面包收了回去。「萨卡兹。」他说。就这两个字。`;
       }
@@ -157,7 +157,7 @@
     title: '被看见', book: '求学',
     when: S => S.school && S.st.sm > 55,
     run(S) {
-      TL.eff(S, { sm: 4, h: 6, so: 2 });
+      TL.applyEffects(S, [{ kind: 'attributes', sm: 4, h: 6, so: 2 }]);
       return TL.L`教习在你的作业本上写了一行字，还念给全班听。你把那一页留了很多年。`;
     }
   });
@@ -166,7 +166,7 @@
     title: '跟不上', book: '求学',
     when: S => S.school && S.st.sm < 40,
     run(S) {
-      TL.eff(S, { h: -7, sm: -1 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -7, sm: -1 }]);
       return TL.L`你又一次没答上来。教习没有骂你，只是让你坐下。这比骂更让人想消失。`;
     }
   });
@@ -185,7 +185,7 @@
     title: '有人替你说话', book: '求学',
     when: S => S.school && TL.totalDiscrimination(S) > 0.3,
     run(S) {
-      TL.eff(S, { h: 10, sm: 3, so: 4 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: 10, sm: 3, so: 4 }]);
       return TL.L`教习当着全班的面说：「他的成绩比你们都高。谁再拿他的角说事，就站到外面去。」`;
     }
   });
@@ -261,8 +261,7 @@
       // 歧视与感染者身份显著抬高被裁概率
       const d = TL.totalDiscrimination(S);
       if (TL.chance(d * 0.8 + 0.2)) {
-        S.flags.lastJob = S.job;
-        S.job = 'seeking';
+        TL.dismissFromJob(S);
         TL.eff(S, { h: -12, so: -3 });
         if (S.ori && S.ori.known) {
           return TL.L`厂里统一体检。三天后你收到一张纸，上面写着「因健康原因不再续用」。`;
@@ -303,7 +302,7 @@
     title: '扣工钱', book: '职业',
     when: S => TL.isWorking(S) && S.q <= 3 && !TL.organizationBlocksEvent?.(S, 'wage_theft') && TL.chance(0.5),
     run(S) {
-      TL.eff(S, { h: -6, so: -2 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -6, so: -2 }]);
       return TL.L`月底结账，数目对不上。你去问，对方说「规矩就是这样」。`;
     }
   });
@@ -399,7 +398,7 @@
     title: '提不起劲', book: '心理',
     when: S => S.age >= 14 && S.st.h < 40,
     run(S) {
-      TL.eff(S, { h: -6, hl: -3, so: -2 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -6, hl: -3, so: -2 }]);
       const lines = [
         TL.L`你开始记不清上一次觉得高兴是什么时候。`,
         TL.L`你躺着，看着天花板。天从黑变亮，你一动没动。`,
@@ -511,7 +510,7 @@
     title: '疼', book: '矿石病',
     when: S => S.ori && S.ori.stage >= 2,
     run(S) {
-      TL.eff(S, { hl: -5, h: -7 });
+      TL.applyEffects(S, [{ kind: 'attributes', hl: -5, h: -7 }]);
       const lines = [
         TL.L`结晶顶到了骨缝。疼起来的时候，你只能蹲下来等它过去。`,
         TL.L`夜里疼醒了。你摸黑坐着，数自己还能动的手指。`,
@@ -525,7 +524,7 @@
     title: '有人不躲', book: '矿石病',
     when: S => S.ori && S.ori.known && S.age >= 10,
     run(S) {
-      TL.eff(S, { h: 14, so: 8 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: 14, so: 8 }]);
       const lines = [
         TL.L`卖饼的老板娘照旧把饼递给你，还多给了一个。「别多想。」她说。`,
         TL.L`一个孩子跑过来问你手上的石头会不会发光。他母亲远远喊他，他没动。`,
@@ -546,8 +545,7 @@
       }
       const d = TL.oriStigma(S);
       if (TL.chance(d + 0.25)) {
-        S.flags.lastJob = S.job;
-        S.job = 'seeking';
+        TL.dismissFromJob(S);
         TL.eff(S, { h: -16, so: -4 });
         const lines = [
           TL.L`厂门口的告示换了新的：禁止感染者入内。你站在那儿看了一会儿，然后回去了。`,
@@ -644,7 +642,7 @@
     when: S => S.affiliation === 'reunion' && TL.organizationAvailable(S, 'reunion'),
     cd: 2,
     run(S) {
-      TL.eff(S, { so: 5, h: 3, hl: -2 });
+      TL.applyEffects(S, [{ kind: 'attributes', so: 5, h: 3, hl: -2 }]);
       return TL.pick([
         TL.L`营地里的人来自各个国家。有人教你他们的语言，你也教他们你的。`,
         TL.L`训练时有人倒下了。结晶率太高。大家把他抬到帐篷里，但没有药。`,
@@ -661,10 +659,10 @@
     cd: 3,
     run(S) {
       if (TL.chance(0.15)) {
-        TL.eff(S, { hl: -15, h: -10 });
+        TL.applyEffects(S, [{ kind: 'attributes', hl: -15, h: -10 }]);
         return TL.L`纠察队找到了营地。你们撤得很狼狈，有人没跟上来。`;
       }
-      TL.eff(S, { h: -5, hl: -3 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -5, hl: -3 }]);
       return TL.pick([
         TL.L`有人提议去袭击城市的源石运输车。队长说：那样我们就真的变成他们口中的暴徒了。`,
         TL.L`营地里有人吵了起来。一派说要反抗，一派说要藏起来。最后不欢而散。`,
@@ -697,7 +695,7 @@
     when: S => S.ori && !S.ori.known && S.flags.oriHiding && !S.flags.oriExposed,
     cd: 2,
     run(S) {
-      TL.eff(S, { h: -5, so: -3 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -5, so: -3 }]);
       return TL.pick([
         TL.L`有人问你为什么一直戴着手套。你说习惯了。对方笑了笑，没再问。`,
         TL.L`体检的日子快到了。你开始考虑要不要辞职。`,
@@ -721,8 +719,11 @@
         TL.eff(S, { h: -15, so: -10 });
 
         if (tol < 20) {
-          S.job = 'seeking';
-          return TL.L`你倒在了工作的地方。醒来时周围围了一圈人。有人看到了你手臂上的结晶。第二天你被开除了。没有人跟你说再见。`;
+          // 暴露本身对所有人生效；「被开除」只对当时确实在职的人生效。
+          if (TL.dismissFromJob(S)) {
+            return TL.L`你倒在了工作的地方。醒来时周围围了一圈人。有人看到了你手臂上的结晶。第二天你被开除了。没有人跟你说再见。`;
+          }
+          return TL.L`你倒在路上，醒来时周围围了一圈人。有人看到了你手臂上的结晶，人群散开了。你原本也没有可以回去的岗位。`;
         } else if (tol < 40) {
           return TL.L`袖子在工作时被勾住了，撕开了一条口子。结晶暴露在阳光下。同事们后退了一步。你听到有人说：感染者。`;
         } else {
@@ -797,9 +798,9 @@
     title: '水', book: '荒野', max: 6, w: 0.9,
     when: S => !TL.stratum(S.stratum).urban,
     run(S) {
-      TL.eff(S, { hl: -3, h: -4 });
+      TL.applyEffects(S, [{ kind: 'attributes', hl: -3, h: -4 }]);
       if (TL.chance(0.22)) {
-        TL.eff(S, { hl: -8 });
+        TL.applyEffects(S, [{ kind: 'attributes', hl: -8 }]);
         return TL.L`井里的水今年是苦的。喝了的人都在拉肚子，小孩拉得最厉害。`;
       }
       return TL.pick([
@@ -813,7 +814,7 @@
     title: '城内', book: '城市', max: 8, w: 1.0,
     when: S => TL.stratum(S.stratum).urban && S.age >= 16,
     run(S) {
-      TL.eff(S, { so: 3, h: 2 });
+      TL.applyEffects(S, [{ kind: 'attributes', so: 3, h: 2 }]);
       return TL.pick([
         TL.L`电梯停了一次，卡在四十七层。你在里面站了二十分钟，没有人说话。`,
         TL.L`市政厅贴出告示，说下个季度的过滤芯会按时更换。上一次这么说是在三年前。`,
@@ -950,9 +951,8 @@
       S.ori.known = true;
       if (TL.chance(ti.arrest)) {
         if (TL.chance(0.42)) { TL.die(S, 'exec'); return TL.L`他们把你按在墙上，看了你的手腕。之后的事你没能记住。`; }
-        S.flags.lastJob = S.job;
-        S.job = 'slave';
-        S.flags.slaveAt = S.age;
+        // 强制劳役会结束退休/在职身份；不能只改 job 而留下矛盾的退休旗标。
+        TL.enterCoercedLabour(S, 'slave');
         TL.eff(S, { hl: -20, h: -22, so: -8 });
         return TL.L`你被押上了北去的列车。车门关上之前，你看见站台上有人在数人头。`;
       }
@@ -1083,9 +1083,9 @@
     when: S => TL.NATION_BY_ID[S.nation].war > 0.4 && S.age >= 12,
     run(S) {
       const r = TL.rnd();
-      if (r < 0.4) { TL.eff(S, { h: -8, so: -4 }); return TL.L`城里戒严了。你隔着窗看外面，路灯一盏一盏地灭。`; }
-      if (r < 0.7) { TL.eff(S, { hl: -8, h: -6 }); return TL.L`街上有人打起来了。你只是想回家，结果被卷了进去。`; }
-      TL.eff(S, { so: 5, h: 3 }); return TL.L`邻居们把巷口堵了起来，轮流守夜。你也去了。`;
+      if (r < 0.4) { TL.applyEffects(S, [{ kind: 'attributes', h: -8, so: -4 }]); return TL.L`城里戒严了。你隔着窗看外面，路灯一盏一盏地灭。`; }
+      if (r < 0.7) { TL.applyEffects(S, [{ kind: 'attributes', hl: -8, h: -6 }]); return TL.L`街上有人打起来了。你只是想回家，结果被卷了进去。`; }
+      TL.applyEffects(S, [{ kind: 'attributes', so: 5, h: 3 }]); return TL.L`邻居们把巷口堵了起来，轮流守夜。你也去了。`;
     }
   });
 
@@ -1118,10 +1118,10 @@
     run(S) {
       const d = TL.discrimination(S);
       if (TL.chance(1 - d - 0.2)) {
-        TL.eff(S, { h: 6, so: 2 });
+        TL.applyEffects(S, [{ kind: 'attributes', h: 6, so: 2 }]);
         return TL.L`检查站的人看了你的证件很久，最后挥手放行。「过去吧。」`;
       }
-      TL.eff(S, { h: -10, so: -3, money: -TL.NATION_BY_ID[S.nation].ppp * 0.5 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -10, so: -3 }, { kind: 'money', amount: -TL.NATION_BY_ID[S.nation].ppp * 0.5 }]);
       return TL.L`「萨卡兹走另一条通道。」他们说。另一条通道排了六个小时，还要交一笔钱。`;
     }
   });
@@ -1130,7 +1130,7 @@
     title: '海里来的', book: '身份',
     when: S => S.race === 'aegir' && S.nation !== 'AEG' && S.age >= 8,
     run(S) {
-      TL.eff(S, { h: -7, so: -4, sm: 3 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -7, so: -4, sm: 3 }]);
       return TL.L`他们问你海底下是什么样子。你说了，他们不信。后来你就不说了。`;
     }
   });
@@ -1140,9 +1140,9 @@
     when: S => S.ori && S.ori.known && S.age >= 15,
     run(S) {
       const r = TL.rnd();
-      if (r < 0.35) { TL.eff(S, { so: 10, h: 8 }); return TL.L`感染者上街了。你走在队伍中间，第一次不用把手藏起来。`; }
-      if (r < 0.65) { TL.eff(S, { hl: -10, h: -8 }); return TL.L`队伍被冲散了。你跑回巷子里，蹲了很久才敢出来。`; }
-      TL.eff(S, { so: 6, h: 4, hl: -3 }); return TL.L`你们在广场上站了一整夜。没有人来驱散，也没有人来回应。`;
+      if (r < 0.35) { TL.applyEffects(S, [{ kind: 'attributes', so: 10, h: 8 }]); return TL.L`感染者上街了。你走在队伍中间，第一次不用把手藏起来。`; }
+      if (r < 0.65) { TL.applyEffects(S, [{ kind: 'attributes', hl: -10, h: -8 }]); return TL.L`队伍被冲散了。你跑回巷子里，蹲了很久才敢出来。`; }
+      TL.applyEffects(S, [{ kind: 'attributes', so: 6, h: 4, hl: -3 }]); return TL.L`你们在广场上站了一整夜。没有人来驱散，也没有人来回应。`;
     }
   });
 
@@ -1196,7 +1196,7 @@
     title: '集市', book: '童年',
     when: S => S.age >= 5 && S.age <= 14,
     run(S) {
-      TL.eff(S, { sm: 2, so: 2, h: 2 });
+      TL.applyEffects(S, [{ kind: 'attributes', sm: 2, so: 2, h: 2 }]);
       return TL.pick([
         TL.L`你跟着大人去赶集。第一次见到那么多不认识的人挤在一条街上。`,
         TL.L`集市上有人卖一种很甜的糕。你站在摊子前面看了很久，最后没买。`,
@@ -1222,7 +1222,7 @@
     title: '一句记住的话', book: '童年',
     when: S => S.age >= 7 && S.age <= 18,
     run(S) {
-      TL.eff(S, { sm: 3, h: 3 });
+      TL.applyEffects(S, [{ kind: 'attributes', sm: 3, h: 3 }]);
       return TL.pick([
         TL.L`先生说过一句话你一直记着：「先看清楚，再动手。」`,
         TL.L`父亲只教过你一件事：答应别人的事，做不到就别答应。`,
@@ -1251,8 +1251,8 @@
     when: S => S.age >= 11 && S.age <= 22,
     run(S) {
       const win = TL.chance(TL.clamp(0.45 + S.st.hl / 200, 0.2, 0.8));
-      if (win) { TL.eff(S, { hl: -3, so: 2, h: -2 }); return TL.L`有人先动的手。你还手了，而且赢了。之后没人再找你麻烦。`; }
-      TL.eff(S, { hl: -8, h: -6, so: -2 });
+      if (win) { TL.applyEffects(S, [{ kind: 'attributes', hl: -3, so: 2, h: -2 }]); return TL.L`有人先动的手。你还手了，而且赢了。之后没人再找你麻烦。`; }
+      TL.applyEffects(S, [{ kind: 'attributes', hl: -8, h: -6, so: -2 }]);
       return TL.L`你打输了。躺在地上的时候，你听见有人在笑。`;
     }
   });
@@ -1275,7 +1275,7 @@
     title: '散了', book: '少年',
     when: S => S.age >= 16 && S.age <= 35,
     run(S) {
-      TL.eff(S, { h: -11, so: -4, sm: 2 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -11, so: -4, sm: 2 }]);
       return TL.pick([
         TL.L`你们分开了。理由说了很多，其实只有一个。`,
         TL.L`他/她走了，没有留地址。你把能扔的都扔了，只留下一件。`,
@@ -1289,8 +1289,8 @@
     when: S => S.school && S.age >= 12,
     run(S) {
       const pass = TL.chance(TL.clamp(0.25 + S.st.sm / 130, 0.15, 0.9));
-      if (pass) { TL.eff(S, { sm: 4, h: 8, so: 2 }); return TL.L`成绩下来那天，你的名字在上面。你把它抄了一遍带回家。`; }
-      TL.eff(S, { h: -9, sm: 1 });
+      if (pass) { TL.applyEffects(S, [{ kind: 'attributes', sm: 4, h: 8, so: 2 }]); return TL.L`成绩下来那天，你的名字在上面。你把它抄了一遍带回家。`; }
+      TL.applyEffects(S, [{ kind: 'attributes', h: -9, sm: 1 }]);
       return TL.L`你没考过。教习说还有机会，但你知道那个机会不太属于你。`;
     }
   });
@@ -1299,7 +1299,7 @@
     title: '有人资助', book: '求学',
     when: S => S.school && S.q <= 3 && S.st.sm >= 60,
     run(S) {
-      TL.eff(S, { sm: 4, h: 12, so: 4 });
+      TL.applyEffects(S, [{ kind: 'attributes', sm: 4, h: 12, so: 4 }]);
       return TL.L`有人替你交了学费。对方只说了一句：「别浪费。」你连他的名字都不知道。`;
     }
   });
@@ -1322,7 +1322,7 @@
     title: '同事', book: '职业',
     when: S => TL.isWorking(S) && S.age >= 18,
     run(S) {
-      TL.eff(S, { so: 6, h: 4 });
+      TL.applyEffects(S, [{ kind: 'attributes', so: 6, h: 4 }]);
       return TL.pick([
         TL.L`有个老工人教了你怎么省力气。他说这行干久了，省力气就是保命。`,
         TL.L`你和一个同事关系不错。休息的时候他会分你一半的干粮。`,
@@ -1346,7 +1346,7 @@
     title: '城市在走', book: '天灾',
     when: S => TL.NATION_BY_ID[S.nation].cat >= 0.8 && S.age >= 8,
     run(S) {
-      TL.eff(S, { sm: 2, so: -3, h: -2 });
+      TL.applyEffects(S, [{ kind: 'attributes', sm: 2, so: -3, h: -2 }]);
       return TL.pick([
         TL.L`你第一次站到城墙上看城市移动。地面在往后退，像整片大地都在让路。`,
         TL.L`迁徙的时候你趴在窗口看了很久：原来城市底下的履带比房子还高。`,
@@ -1359,7 +1359,7 @@
     title: '感染者街区', book: '矿石病',
     when: S => S.ori && S.age >= 12,
     run(S) {
-      TL.eff(S, { so: 9, h: 6, hl: -2 });
+      TL.applyEffects(S, [{ kind: 'attributes', so: 9, h: 6, hl: -2 }]);
       return TL.pick([
         TL.L`你找到了一个住的都是感染者的街区。那里没有人会因为你把手露出来而多看一眼。`,
         TL.L`有个感染者开了间铺子，只做同类的生意。他给你算的价钱比外面低一半。`,
@@ -1372,7 +1372,7 @@
     title: '医疗车', book: '矿石病',
     when: S => S.ori && S.ori.treated && S.ori.provider === 'rhodes',
     run(S) {
-      TL.eff(S, { h: 8, hl: 3 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: 8, hl: 3 }]);
       return TL.pick([
         TL.L`罗德岛的医疗车又来了。医生看了你的记录，说控制得比上次好。`,
         TL.L`排在你前面的人出来的时候在哭。轮到你的时候，医生说：「你的还在控制范围内。」`,
@@ -1388,7 +1388,7 @@
     when: S => S.ori && S.ori.treated && S.ori.provider === 'rhodes',
     cd: 3,
     run(S) {
-      TL.eff(S, { hl: -5, h: -3 });
+      TL.applyEffects(S, [{ kind: 'attributes', hl: -5, h: -3 }]);
       return TL.pick([
         TL.L`抑制药让你总是感到疲惫。医生说这是正常反应，但你每天都得硬撑着工作。`,
         TL.L`注射部位红肿了。说明书上写着「偶见」，但现在就发生在你身上。`,
@@ -1454,7 +1454,7 @@
     max: 2,
     cd: 5,
     run(S) {
-      TL.eff(S, { h: -3, hl: -5, money: -TL.NATION_BY_ID[S.nation].ppp * 0.8 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -3, hl: -5 }, { kind: 'money', amount: -TL.NATION_BY_ID[S.nation].ppp * 0.8 }]);
       return TL.pick([
         TL.L`有人说某种草药可以抑制结晶。你试了一个月，结晶还在长，钱倒是花了不少。`,
         TL.L`听说泡温泉能缓解矿石病。你去了，泡完之后结晶还在，倒是风湿好了一点。`,
@@ -1484,7 +1484,7 @@
     title: '黑市', book: '身份',
     when: S => S.urban && S.age >= 16 && (S.ori || TL.discrimination(S) > 0.3),
     run(S) {
-      TL.eff(S, { sm: 3, so: 3, h: 2 });
+      TL.applyEffects(S, [{ kind: 'attributes', sm: 3, so: 3, h: 2 }]);
       return TL.pick([
         TL.L`你摸到了一个黑市的路子。那里什么证件都能做，包括让你看起来不像你自己。`,
         TL.L`黑市上有人卖抑制药，也卖别的。老板只认现钱，不问你是谁。`,
@@ -1501,7 +1501,7 @@
     when: S => S.nation === 'YAN' && S.age >= 8 && S.urban,
     cd: 4,
     run(S) {
-      TL.eff(S, { h: 6, so: 3 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: 6, so: 3 }]);
       return TL.pick([
         TL.L`街上有人在卖糖葫芦。你买了一串，边走边吃，糖浆粘在了嘴角上。`,
         TL.L`巷子口的包子铺早上五点就开了。老板认得你，多给了你一个。`,
@@ -1516,7 +1516,7 @@
     when: S => S.nation === 'YAN' && S.age >= 5,
     cd: 5,
     run(S) {
-      TL.eff(S, { h: 9, so: 6 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: 9, so: 6 }]);
       return TL.pick([
         TL.L`今天是岁首。街上挂满了灯笼，你听见远处有人在放爆竹。`,
         TL.L`中元节的夜晚，河里漂满了莲花灯。你放了一盏，看着它慢慢飘远。`,
@@ -1533,10 +1533,10 @@
     cd: 6,
     run(S) {
       if (TL.chance(0.3) && S.arts >= 70) {
-        TL.eff(S, { sm: 8, arts: 5, h: 10 });
+        TL.applyEffects(S, [{ kind: 'attributes', sm: 8, arts: 5, h: 10 }]);
         return TL.L`天师府的人来过，看了你施术的手法。他们留了一卷书，说：「有缘再见。」你把那卷书读了三遍。`;
       }
-      TL.eff(S, { sm: 3, h: 5 });
+      TL.applyEffects(S, [{ kind: 'attributes', sm: 3, h: 5 }]);
       return TL.L`听说天师府在招学徒。他们找的是能施术又懂古文的人。你想去试试，但不确定自己够不够格。`;
     }
   });
@@ -1547,7 +1547,7 @@
     when: S => S.nation === 'URS',
     cd: 3,
     run(S) {
-      TL.eff(S, { hl: -4, h: -3 });
+      TL.applyEffects(S, [{ kind: 'attributes', hl: -4, h: -3 }]);
       return TL.pick([
         TL.L`今天特别冷。你把所有的衣服都穿上了，还是冻得发抖。`,
         TL.L`暴风雪持续了三天。出门的人有的没回来。你把门窗都堵严实了。`,
@@ -1580,7 +1580,7 @@
     when: S => S.nation === 'URS' && S.age >= 14,
     cd: 3,
     run(S) {
-      TL.eff(S, { h: -6, so: -3 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -6, so: -3 }]);
       return TL.pick([
         TL.L`纠察队在街上检查证件。你把证件递过去，手在抖。他看了一眼，扔了回来。`,
         TL.L`听说隔壁街区昨晚被纠察队封了。有人说是抓感染者，也有人说是抓逃兵。`,
@@ -1596,7 +1596,7 @@
     when: S => S.nation === 'VIC' && S.urban,
     cd: 4,
     run(S) {
-      TL.eff(S, { h: -2, hl: -2 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -2, hl: -2 }]);
       return TL.pick([
         TL.L`今天的雾特别浓。走在街上，三米外的人都看不清脸。`,
         TL.L`工厂的烟囱一天到晚都在冒烟。雾里混着煤灰的味道，你已经习惯了。`,
@@ -1612,10 +1612,10 @@
     cd: 5,
     run(S) {
       if (S.q >= 4) {
-        TL.eff(S, { h: 5, so: 4 });
+        TL.applyEffects(S, [{ kind: 'attributes', h: 5, so: 4 }]);
         return TL.L`你参加了一场庄园聚会。宾客们谈论政治、艺术，还有谁家的公爵又换了情人。你礼貌地笑着，心里想着别的事。`;
       }
-      TL.eff(S, { h: -4, so: -2 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -4, so: -2 }]);
       return TL.pick([
         TL.L`贵族的马车从你身边驶过，溅了你一身泥。车里的人连看都没看一眼。`,
         TL.L`听说某个公爵的私宅占了整整三条街。你算了算，那比你住的整个街区还大。`,
@@ -1629,7 +1629,7 @@
     when: S => S.nation === 'VIC' && ['factory', 'construct', 'smith'].indexOf(S.job) >= 0,
     cd: 3,
     run(S) {
-      TL.eff(S, { hl: -5, h: -4 });
+      TL.applyEffects(S, [{ kind: 'attributes', hl: -5, h: -4 }]);
       return TL.pick([
         TL.L`工厂里的机器一天十六个小时不停。你的耳朵里总是嗡嗡响，即使回到家也停不下来。`,
         TL.L`今天又有人被卷进了机器。工头说了句「小心点」，就让大家继续干活。`,
@@ -1645,7 +1645,7 @@
     when: S => S.nation === 'SRG',
     cd: 4,
     run(S) {
-      TL.eff(S, { hl: -3, h: -2 });
+      TL.applyEffects(S, [{ kind: 'attributes', hl: -3, h: -2 }]);
       return TL.pick([
         TL.L`今天的沙暴持续了一整天。出门的人都把脸蒙得严严实实。`,
         TL.L`正午的阳光把地面晒得发烫。你看见远处有东西在晃动，但那只是热浪。`,
@@ -1660,7 +1660,7 @@
     when: S => S.nation === 'SRG' && S.age >= 14,
     cd: 5,
     run(S) {
-      TL.eff(S, { so: 4, h: 3, sm: 2 });
+      TL.applyEffects(S, [{ kind: 'attributes', so: 4, h: 3, sm: 2 }]);
       return TL.pick([
         TL.L`商队来了。他们带来了远方的货物和新闻。你听说北方的战争还没结束。`,
         TL.L`你跟商队的人换了些东西。他们见多识广，讲了很多外面的事。`,
@@ -1676,7 +1676,7 @@
     when: S => S.nation === 'KAZ' && S.age >= 10,
     cd: 5,
     run(S) {
-      TL.eff(S, { h: 7, so: 4 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: 7, so: 4 }]);
       return TL.pick([
         TL.L`今天有骑士比赛。全城的人都去看了。你站在人群最后面，只能看见一点影子，但欢呼声震耳欲聋。`,
         TL.L`听说一位热门骑士要出场。售票处排了几条街的队。你没去，但在收音机里听了实况。`,
@@ -1692,10 +1692,10 @@
     cd: 6,
     run(S) {
       if (S.q >= 3) {
-        TL.eff(S, { h: 4, money: TL.NATION_BY_ID[S.nation].ppp * 1.5 });
+        TL.applyEffects(S, [{ kind: 'attributes', h: 4 }, { kind: 'money', amount: TL.NATION_BY_ID[S.nation].ppp * 1.5 }]);
         return TL.L`商业联合会的人找到你，说有个合作机会。你签了合同，拿了一笔预付款。`;
       }
-      TL.eff(S, { h: -3 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -3 }]);
       return TL.pick([
         TL.L`商业联合会又涨价了。所有人都在抱怨，但没有人敢不交钱。`,
         TL.L`听说商业联合会控制了全国的骑士赛事。骑士头衔现在是可以买的。`,
@@ -1711,10 +1711,10 @@
     cd: 4,
     run(S) {
       if (S.st.sm >= 70) {
-        TL.eff(S, { h: 8, money: TL.NATION_BY_ID[S.nation].ppp * 2 });
+        TL.applyEffects(S, [{ kind: 'attributes', h: 8 }, { kind: 'money', amount: TL.NATION_BY_ID[S.nation].ppp * 2 }]);
         return TL.L`科技公司在招人。你去面试了，当场就拿到了offer。薪水是你上一份工作的三倍。`;
       }
-      TL.eff(S, { h: 2, sm: 3 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: 2, sm: 3 }]);
       return TL.pick([
         TL.L`新开了一家科技公司的展厅。里面展示的东西你大部分都看不懂，但很酷。`,
         TL.L`听说某个科技巨头又发布了新产品。城里到处都是广告。`,
@@ -1728,7 +1728,7 @@
     when: S => S.nation === 'CLB' && !S.urban && S.age >= 16,
     cd: 5,
     run(S) {
-      TL.eff(S, { hl: -6, h: -4, so: 3 });
+      TL.applyEffects(S, [{ kind: 'attributes', hl: -6, h: -4, so: 3 }]);
       return TL.pick([
         TL.L`拓荒队又往西推进了一段。他们说那边有矿，有地，什么都有。但你知道那边也有天灾。`,
         TL.L`有人在荒野上建了新的聚落。拓荒法案说，占到的地就是你的。前提是你能守住。`,
@@ -1744,7 +1744,7 @@
     when: S => S.nation === 'LEI' && S.arts >= 40,
     cd: 5,
     run(S) {
-      TL.eff(S, { sm: 5, arts: 3, h: 6 });
+      TL.applyEffects(S, [{ kind: 'attributes', sm: 5, arts: 3, h: 6 }]);
       return TL.pick([
         TL.L`你在图书馆找到了一本古老的法术书。上面的文字你只认得一半，但光看图就学到了不少。`,
         TL.L`有个术师愿意指点你。他说你的天赋不错，但基础太差了。接下来三个月你每天都去找他。`,
@@ -1761,10 +1761,10 @@
     cd: 8,
     run(S) {
       if (TL.chance(0.2)) {
-        TL.eff(S, { h: -8, sm: 6, arts: 8 });
+        TL.applyEffects(S, [{ kind: 'attributes', h: -8, sm: 6, arts: 8 }]);
         return TL.L`有人在深夜找到你，说他们掌握着巫王留下的知识。他们给了你一本笔记，让你自己决定要不要深入。你翻开了第一页。`;
       }
-      TL.eff(S, { h: -4 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -4 }]);
       return TL.L`听说又有术师被抓了。罪名是「与巫王残党勾结」。你把家里的几本书藏得更深了。`;
     }
   });
@@ -1868,7 +1868,7 @@
     title: '父母老了', book: '家庭',
     when: S => S.age >= 30 && S.fam.mom.alive && S.fam.dad.alive,
     run(S) {
-      TL.eff(S, { h: -5, so: 5, money: -2 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: -5, so: 5 }, { kind: 'money', amount: -2 }]);
       return TL.pick([
         TL.L`母亲的手开始抖了。她还想自己做饭，你没拦。`,
         TL.L`父亲第一次让你扶他下台阶。他什么也没说。`,
@@ -1882,7 +1882,7 @@
     when: S => S.fam.kids.some(k => k.alive && k.age >= 5 && k.age <= 20),
     run(S) {
       const k = S.fam.kids.filter(x => x.alive && x.age >= 5 && x.age <= 20)[0];
-      TL.eff(S, { h: 7, so: 5 });
+      TL.applyEffects(S, [{ kind: 'attributes', h: 7, so: 5 }]);
       if (!k) return TL.L`孩子们在长大。`;
       return TL.pick([
         TL.L`${k.name}第一次自己去上学，回来的时候手里攥着一朵不知从哪摘的花。`,
@@ -1897,7 +1897,7 @@
     title: '邻居', book: '日常',
     when: S => S.age >= 10,
     run(S) {
-      TL.eff(S, { so: 6, h: 4 });
+      TL.applyEffects(S, [{ kind: 'attributes', so: 6, h: 4 }]);
       return TL.pick([
         TL.L`隔壁的人家送了一碗菜过来，说是做多了。其实你知道不是。`,
         TL.L`下大雨那天，邻居帮你把晾在外面的东西收了。`,

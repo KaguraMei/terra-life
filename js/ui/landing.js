@@ -54,7 +54,9 @@
     active = true;
     clearTimeout(timer);
     const odds = TL.lotteryOdds(settings.mode);
-    const target = odds.find(o => o.id === S.nation);
+    // 出生时的身份事实只派生一次，掷签目标与证书共用同一份视图。
+    const view = TL.deriveLifeView(S);
+    const target = odds.find(o => o.id === view.identity.nation);
     S.paused = true;
     $('start').hidden = true;
     $('game').hidden = true;
@@ -69,20 +71,26 @@
 
     function certificate() {
       if (!active) return;
-      const n = TL.NATION_BY_ID[S.nation], r = TL.RACE_BY_ID[S.race];
-      const family = ['一贫如洗','勉强度日','尚能温饱','生活宽裕','家境殷实'][S.q - 1];
-      $('certNumber').textContent = `No. ${S.nation}-${S.bornYear}-${S.sceneSeed.toString(16).toUpperCase().padStart(8,'0')}`;
-      $('certName').textContent = S.fullName;
-      $('certStory').textContent = `泰拉历 ${S.bornYear} 年，你出生在${n.name}的${S.city}，一个${family}的家庭。你是${r.name}${S.sex === 'M' ? '男孩' : '女孩'}，家住${S.stratumName}。`;
+      // 证书上的身份事实取自进入时派生的视图；只有节奏（paceKey / yearSec）属于播放器。
+      const id = view.identity;
+      const n = TL.NATION_BY_ID[id.nation], r = TL.RACE_BY_ID[id.race];
+      const family = ['一贫如洗','勉强度日','尚能温饱','生活宽裕','家境殷实'][id.familyTier - 1];
+      $('certNumber').textContent = `No. ${id.nation}-${id.bornYear}-${view.scene.seed.toString(16).toUpperCase().padStart(8,'0')}`;
+      $('certName').textContent = id.name;
+      $('certStory').textContent = `泰拉历 ${id.bornYear} 年，你出生在${n.name}的${id.city}，一个${family}的家庭。你是${r.name}${id.sex === 'M' ? '男孩' : '女孩'}，家住${id.stratumName}。`;
       $('certPace').textContent = `走到预期寿命约需 ${TL.PACES[S.paceKey].min} 分钟（1 年 ≈ ${S.yearSec.toFixed(0)} 秒）。准备好之后，开始这一生。`;
-      const fields = [['性别', S.sex === 'M' ? '男性' : '女性'], ['出生国家 / 地区',n.name], ['出生地',S.city],
-        ['种族',r.name + (S.courtName && S.court !== 'none' ? ' · ' + S.courtName : '')], ['出身阶层',S.stratumName], ['家境','●'.repeat(S.q) + '○'.repeat(5-S.q) + ' 第' + S.q + '分位'],
-        ['父母年龄',`母亲 ${S.fam.mom.age} 岁 · 父亲 ${S.fam.dad.age} 岁`], ['父母的工作',`母亲：${TL.jobLabel(S.fam.mom.job)}；父亲：${TL.jobLabel(S.fam.dad.job)}`], ['源石技艺适应性',TL.artRankName(TL.artRank(S))],
-        ['社会预期寿命',S.lt.e0.toFixed(1) + ' 岁'], ['种族生理寿命区间',S.lifeMax.join('–') + ' 岁'], ['矿石病','未感染']];
-      $('certFields').innerHTML = fields.map(([k,v]) => `<div><dt>${escape(k)}</dt><dd>${escape(v)}</dd></div>`).join('');
+      const fields = [['性别', id.sex === 'M' ? '男性' : '女性'], ['出生国家 / 地区',n.name], ['出生地',id.city],
+        ['种族',r.name + (id.courtName && id.court ? ' · ' + id.courtName : '')], ['出身阶层',id.stratumName],
+        ['家境','●'.repeat(id.familyTier) + '○'.repeat(5-id.familyTier) + ' 第' + id.familyTier + '分位'],
+        ['父母年龄',`母亲 ${view.family.mother.age} 岁 · 父亲 ${view.family.father.age} 岁`],
+        ['父母的工作',`母亲：${TL.jobLabel(view.family.mother.job)}；父亲：${TL.jobLabel(view.family.father.job)}`],
+        ['源石技艺适应性',TL.artRankName(id.artsRank)],
+        ['社会预期寿命',view.survival.expectedAge.toFixed(1) + ' 岁'],
+        ['种族生理寿命区间',[id.lifeRange.min, id.lifeRange.max].join('–') + ' 岁'], ['矿石病','未感染']];
+      $('certFields').innerHTML = fields.map(([k,v2]) => `<div><dt>${escape(k)}</dt><dd>${escape(v2)}</dd></div>`).join('');
       $('certOdds').innerHTML = `${settings.specified ? '这是你指定的出生地。' : ''}在${settings.mode === 'birth' ? '按年出生人数' : '按人口'}抽签的模型中，有 <b>${pct(target.p)}</b> 的人会在${escape(n.name)}开始人生。<br><span class="landing-small">抽签权重、预期寿命与生理寿命为本项目的设定模型。</span>`;
-      $('certPeers').innerHTML = S.cohort.peers.slice(0,4).map(p => `<li>${escape(p.fullName)} · ${escape(TL.RACE_BY_ID[p.race].name)} · ${p.sex === 'M' ? '男' : '女'}</li>`).join('');
-      drawMap('certMap', odds, S.nation);
+      $('certPeers').innerHTML = view.peers.people.slice(0,4).map(p => `<li>${escape(p.name)} · ${escape(TL.RACE_BY_ID[p.race].name)} · ${p.sex === 'M' ? '男' : '女'}</li>`).join('');
+      drawMap('certMap', odds, id.nation);
       $('birthRoller').hidden = true;
       $('birthCertificate').hidden = false;
       $('certName').focus({preventScroll:true});

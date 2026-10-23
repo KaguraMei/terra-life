@@ -7,6 +7,12 @@ import { simulation } from '../tools/sim-context.mjs';
 import { runtimeFiles } from '../tools/runtime-files.mjs';
 
 const baseline=JSON.parse(fs.readFileSync(new URL('./fixtures/legacy-89055db.json',import.meta.url),'utf8'));
+// Lives whose behaviour changed on purpose: the archived end hash is replaced by a
+// frozen one and the reason is written down, so the remaining cases stay exact.
+const changes=JSON.parse(fs.readFileSync(new URL('./fixtures/legacy-89055db-changes.json',import.meta.url),'utf8')).changes;
+const changedBySeed=new Map(changes.map(entry=>[entry.seed,entry]));
+/** The end-state hash this build must produce for an archived case. */
+const expectedEnd=(row)=>changedBySeed.get(row.config.seed)?.endHash ?? row.checks[1].hash;
 const hash=state=>crypto.createHash('sha256').update(JSON.stringify(state)).digest('hex');
 function step(runtime,state) {
   if(!state.focus)state.focus=runtime.autoFocus(state);
@@ -23,9 +29,11 @@ test('42 pre-refactor complete lives preserve state, event logs and subsequent R
   for(const row of baseline.cases) {
     const runtime=createSimulation();
     const state=runtime.newLife(row.config);
+    const documented=changedBySeed.get(row.config.seed);
     assert.equal(hash(state),row.checks[0].hash,`birth ${row.config.seed}`);
     finish(runtime,state);
-    assert.equal(hash(state),row.checks[1].hash,`end ${row.config.seed}`);
+    assert.equal(hash(state),documented?documented.endHash:row.checks[1].hash,
+      documented?`end ${row.config.seed} (documented change: ${documented.reason})`:`end ${row.config.seed}`);
     assert.deepEqual(Array.from({length:8},()=>runtime.rnd()),row.randomTail);
   }
 });
@@ -38,7 +46,7 @@ test('two simulations in the same JS realm can advance interleaved without inter
   while(states.some(s=>s.phase==='life')&&guard++<30000) {
     for(let i=0;i<2;i++)if(states[i].phase==='life')step(engines[i],states[i]);
   }
-  states.forEach((s,i)=>assert.equal(hash(s),rows[i].checks[1].hash));
+  states.forEach((s,i)=>assert.equal(hash(s),expectedEnd(rows[i])));
   assert.notEqual(engines[0].EVMAP,engines[1].EVMAP);
   assert.notEqual(engines[0].INTERVIEW_QUESTIONS,engines[1].INTERVIEW_QUESTIONS);
   engines[0].EVMAP.probe={title:'only one instance'};
@@ -50,8 +58,8 @@ test('classic offline bundle and native ESM use equivalent assembly', () => {
   const row=baseline.cases[15];
   const state=TL.newLife(row.config);
   finish(TL,state);
-  assert.equal(hash(state),row.checks[1].hash);
-  assert.equal(runtimeFiles.length,23);
+  assert.equal(hash(state),expectedEnd(row));
+  assert.equal(runtimeFiles.length,19);
   assert.equal(new Set(runtimeFiles).size,runtimeFiles.length);
   const kernelFiles=['random.ts','events.ts'];
   for(const file of kernelFiles) {

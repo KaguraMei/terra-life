@@ -143,7 +143,7 @@ assert.ok(TL.organizationDef('penguin_logistics').nations.includes('CLB'));
 assert.equal(TL.organizationEmploymentModel('karlan_trade').retirement.replacementRate, 0.60);
 
 for (const mutate of [S=>S.nation='YAN', S=>S.year=1084, S=>S.age=15,
-  S=>S.school='university', S=>S.flags.retired=true, S=>S.serveLeft=1,
+  S=>S.school='university', S=>{S.flags.retired=true;S.job='retired';}, S=>S.serveLeft=1,
   S=>S.job='prison', S=>S.eduLevel=0, S=>S.orgCooldowns.rhine_life=S.year+1]) {
   const S = fixture(); mutate(S);
   assert.equal(TL.joinOrganization(S, 'rhine_life', 'research'), false);
@@ -174,7 +174,7 @@ for (const mutate of [S=>S.nation='YAN', S=>S.year=1084, S=>S.age=15,
   S.orgHistory[0].reason = 'changed';
   assert.equal(S.report.orgHistory[0].reason, 'test', 'report is a snapshot');
 }
-for (const mutate of [S=>S.job='seeking', S=>S.flags.retired=true, S=>S.age=65, S=>S.school='university', S=>S.serveLeft=1]) {
+for (const mutate of [S=>S.job='seeking', S=>{S.flags.retired=true;S.job='retired';}, S=>S.age=65, S=>S.school='university', S=>S.serveLeft=1]) {
   const S = join(); mutate(S); TL.syncOrganization(S); assert.equal(S.affiliation, null);
 }
 // Historical fork: no new old-family contracts; incumbents can remain, transfer, or leave.
@@ -228,7 +228,7 @@ TL.setOrganizationInterviewAdapter(null);
   assert.equal(TL.completeOrganizationInterview(S,{token:a.token,status:'passed'}),false);
   assert.equal(S.orgHistory.length,1);
 }
-for (const mutate of [S=>S.year++, S=>S.school='university', S=>S.flags.retired=true,
+for (const mutate of [S=>S.year++, S=>S.school='university', S=>{S.flags.retired=true;S.job='retired';},
   S=>S.nation='YAN', S=>TL.joinOrganization(S,'melander','investigation')]) {
   const S=fixture(); const a=TL.beginOrganizationInterview(S,'rhine_life','research');
   mutate(S); assert.equal(TL.completeOrganizationInterview(S,{token:a.token,status:'passed'}),false);

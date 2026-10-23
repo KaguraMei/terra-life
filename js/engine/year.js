@@ -52,26 +52,8 @@
     const st = S.st;
 
     /* ---------- ① 重心效果加权结算 ---------- */
-    let tot = 0;
-    for (const k in S.fT) tot += S.fT[k];
-    if (tot > 0) {
-      for (const k in S.fT) {
-        const F = TL.FOCUS[k];
-        if (!F) continue;
-        const w = S.fT[k] / tot;
-        for (const s in F.e) {
-          if (s === 'sm' || s === 'arts' || s === 'money') continue;
-          st[s] = TL.clamp(st[s] + F.e[s] * w, 0, 100);
-        }
-        // 学识与技艺走独立成长曲线（边际递减）
-        if (F.e.sm) TL.knowAdd(S, F.e.sm * w);
-        if (F.e.arts) TL.artsAdd(S, F.e.arts * w);
-      }
-      S.focusW = {};
-      for (const k in S.fT) S.focusW[k] = S.fT[k] / tot;
-    } else {
-      S.focusW = {};
-    }
+    // 份额归一化与"学识/技艺不走加法"的规则在 src/model/focus.ts：总权重为 0 时整段跳过。
+    TL.focusYear(S);
 
     /* ---------- ② 爱好成长 ---------- */
     for (const hb of S.hobbies) hb.lv += 0.35;
@@ -87,50 +69,16 @@
     TL.finances(S);
 
     /* ---------- ⑤ 体质回归 ---------- */
-    // 目标体质 = 年龄基准 + 各种生活方式修正
-    const eh = TL.expHealth(a + 1);
-    // 慢性病的拖累：已控制的病只算一半
-    let condLoad = 0;
-    for (const k in S.conds) condLoad += S.conds[k].treated ? 2.5 : 5;
-    const hTarget =
-      eh
-      + (S.flags.diet ? 1.5 : 0)
-      + (S.flags.exercise ? 2 : 0)
-      + (S.q - 3) * 1.5
-      - (S.smoker ? 6 : 0)
-      - condLoad
-      - (S.refugee ? 6 : 0)
-      + (S.focusW.health || 0) * 6
-      - (S.debt > 0 ? 2 : 0)
-      - (S.ori && S.ori.stage > 0 ? S.ori.stage * 7 : 0)     // 矿石病直接压低目标
-      - (S.flags.tbUntreated ? 10 : 0);
-    st.hl = TL.clamp(st.hl + (hTarget - st.hl) * 0.25, 1, 100);
+    // 目标体质 = 年龄基准 + 各种生活方式修正；公式与速率在 src/model/regression.ts。
+    TL.regressHealth(S);
 
     /* ---------- ⑥ 羁绊回归 ---------- */
-    const kidsAlive = S.fam.kids.filter(k => k.alive).length;
-    const soTarget =
-      45
-      + (S.fam.partner && S.fam.partner.alive && S.fam.married ? 12 : 0)
-      + Math.min(15, kidsAlive * 4)
-      + (S.fam.mom && S.fam.mom.alive ? 3 : 0)
-      + (S.migrated ? -6 : 0)
-      + (S.hobbies.length ? 3 : 0)
-      - (S.ori && S.ori.known ? 6 : 0);                        // 公开身份会被孤立
-    // 成年后社交基线会随年龄下滑（原作 SO_K）
-    const SO_K = 12, SO_UP = 0.30;
-    const ak = TL.clamp((a - 14) / 6, 0, 1);
-    const t2 = soTarget - SO_K * ak;
-    st.so = TL.clamp(st.so + (t2 - st.so) * (st.so > t2 ? 0.12 + (SO_UP - 0.12) * ak : 0.12), 0, 100);
+    // 伴侣/子女/母亲/爱好加分，迁徙与公开感染减分；基线随年龄下滑，恢复速率也随年龄上升。
+    TL.regressSocial(S);
 
     /* ---------- ⑦ 心境回归 ---------- */
-    let hTarget2 = TL.happyBase(S);
-    hTarget2 += (st.hl - 60) * 0.16;                          // 身体好心情也好
-    hTarget2 += (st.so - 50) * 0.18;
-    hTarget2 += (S.pct - 0.5) * 22;                           // 相对收入
-    hTarget2 += (S.ori && S.ori.stage >= 2 ? -12 : 0);
-    hTarget2 -= (S.ori && S.ori.known ? 6 : 0);
-    hTarget2 += (S.stats && S.stats.pY ? Math.min(6, S.stats.pY * 0.1) : 0);
-    st.h = TL.clamp(st.h + (hTarget2 - st.h) * 0.20, 1, 100);
+    // 国家基线 + 身体（0.16）+ 羁绊（0.18）+ 相对收入（±22）+ 产出年份（封顶 6）。
+    TL.regressMood(S);
 
     /* ---------- ⑧ 学识自然增长/衰退 ---------- */
     TL.knowYear(S);
@@ -188,9 +136,7 @@
     }
     // 65 岁退休
     if (S.age >= 65 && !S.flags.retired) {
-      S.flags.retired = true;
-      if (TL.isWorking(S)) S.flags.lastJob = S.job;
-      S.job = 'retired';
+      TL.retire(S, { deferOrganizationExit: true });
     }
 
     /* ---------- ⑭b 泰拉大事件 ---------- */
@@ -206,44 +152,8 @@
   };
 
   /* ---------------------------------------------------------------------- */
-  /* 学习曲线：边际递减（对应原作 knowAdd / knowYear）                        */
+  /* 学习推进（对应原作 knowYear；曲线与上限已移入 src/model/yearly.ts）      */
   /* ---------------------------------------------------------------------- */
-  /**
-   * 学识的天花板。
-   * 早期版本让 knowAdd 无限逼近 100，结果一个 26 岁的青年就能「通才」——
-   * 因为边际递减只让增长变慢，并没有真正的上限。
-   * 现在给出一个由「学历 + 国家教育水平 + 天赋」决定的上限：
-   * 没上过学的人自学也能很强，但很难到顶。
-   */
-  TL.knowCap = function (S) {
-    const n = TL.NATION_BY_ID[S.nation];
-    const r = TL.RACE_BY_ID[S.race];
-    let cap = 34
-      + S.eduLevel * 11                    // 学历是最主要的台阶
-      + Math.min(14, (n.edu - 8) * 1.6)    // 国家教育水平
-      + (r.mod.sm || 0) * 0.9              // 种族天赋
-      + (S.q - 3) * 1.6;                   // 家境提供的资源
-    // 在学期间上限再放宽一点（正在读书的人成长空间更大）
-    if (S.school) cap += 6;
-    return TL.clamp(cap, 25, 97);
-  };
-
-  TL.knowAdd = function (S, amt) {
-    const cap = TL.knowCap(S);
-    if (amt <= 0) { S.st.sm = TL.clamp(S.st.sm + amt, 0, cap); return; }
-    // 越高越难涨：收益 × (1 - sm/cap)^0.7
-    const k = Math.pow(Math.max(0, 1 - S.st.sm / cap), 0.70);
-    S.st.sm = TL.clamp(S.st.sm + amt * (0.30 + 0.70 * k), 0, cap);
-  };
-
-  /** 技艺适应性成长（比学识更慢，且受种族天赋影响） */
-  TL.artsAdd = function (S, amt) {
-    if (amt <= 0) { S.arts = TL.clamp(S.arts + amt, 0, 100); return; }
-    const r = TL.RACE_BY_ID[S.race];
-    const talent = 1 + (r.mod.art || 0) * 0.04;
-    const k = Math.pow(1 - S.arts / 100, 0.85);
-    S.arts = TL.clamp(S.arts + amt * (0.25 + 0.75 * k) * talent, 0, 100);
-  };
 
   /** 学识的年度自然变化：在校期间增长，长期不用则衰退 */
   TL.knowYear = function (S) {
@@ -267,83 +177,32 @@
   /* ---------------------------------------------------------------------- */
   TL.schoolYear = function (S) {
     const a = S.age;
-    const n = TL.NATION_BY_ID[S.nation];
     if (S.school) {
       S.schoolLeft = (S.schoolLeft || 0) - 1;
       if (S.schoolLeft <= 0) {
         const finished = S.school;
         S.school = null;
         // 学历台阶：初等1 / 中等2 / 高等3 / 大学4 / 研究院5
-        S.eduLevel = Math.max(S.eduLevel, { primary: 1, middle: 2, high: 3, uni: 4, grad: 5 }[finished] || 1);
+        S.eduLevel = Math.max(S.eduLevel, TL.eduTier(finished));
         S.flags['grad_' + finished] = a;
         TL.log(S, TL.L`你结束了${({ primary: '初等', middle: '中等', high: '高等', uni: '大学', grad: '研究院' })[finished]}学业。`, 'mil', { key: 'grad' });
       }
       return;
     }
-    // 自动入学：只要国家教育水平够、家境撑得住
-    if (a === 6 && n.edu >= 6 && !S.flags.noSchool) {
-      TL.startSchool(S, 'primary');
-    } else if (a === 12 && n.edu >= 9 && S.q >= 2 && TL.chance(0.55 + n.ter / 200)) {
-      TL.startSchool(S, 'middle');
-    } else if (a === 15 && n.edu >= 11 && S.q >= 3 && TL.chance(0.35 + n.ter / 160)) {
-      TL.startSchool(S, 'high');
-    } else if (a === 18 && n.ter >= 30 && S.q >= 3 && S.st.sm >= 55 && TL.chance(n.ter / 130)) {
-      TL.startSchool(S, 'uni');
-    } else if (a === 22 && n.ter >= 50 && S.q >= 4 && S.st.sm >= 75 && TL.chance(n.ter / 220)) {
-      TL.startSchool(S, 'grad');
-    }
+    // 自动入学：门槛与概率在 src/model/schooling.ts，这一层只负责执行入学。
+    const level = TL.schoolGate(S);
+    if (level) TL.startSchool(S, level);
   };
 
   TL.startSchool = function (S, level) {
-    const dur = { primary: 6, middle: 3, high: 3, uni: 4, grad: 3 }[level] || 3;
     S.school = level;
-    S.schoolLeft = dur;
+    S.schoolLeft = TL.schoolDuration(level);
     S.job = 'student';
     TL.log(S, TL.L`你进入${({ primary: '初等学堂', middle: '中等学堂', high: '高等学堂', uni: '大学', grad: '研究院' })[level]}。`, 'mil', { key: 'school' });
   };
 
-  /* ---------------------------------------------------------------------- */
-  /* 心境基线（对应原作 happyBase）                                           */
-  /* ---------------------------------------------------------------------- */
-  TL.happyBase = function (S) {
-    const n = TL.NATION_BY_ID[S.nation];
-    // 用「预期寿命 + 社会安全」粗略代表国民幸福感基线
-    const base = 30 + (n.le - 60) * 0.85 + (1 - n.gi) * 14 + (1 - n.war) * 6;
-    return TL.clamp(base, 18, 78);
-  };
-
-  /* ---------------------------------------------------------------------- */
-  /* 年度财务（对应原作 finances）                                            */
-  /* ---------------------------------------------------------------------- */
-  TL.finances = function (S) {
-    const inc = S.income * 12;                 // 年收入
-    const n = TL.NATION_BY_ID[S.nation];
-    // 生活成本：与产出水平挂钩
-    let cost = n.ppp * 0.52 * (1 + (S.q - 3) * 0.10);
-    // 家庭成员增加开销
-    const kids = S.fam.kids.filter(k => k.alive && k.age < 18).length;
-    cost *= 1 + kids * 0.22;
-    if (S.fam.partner && S.fam.partner.alive && !S.working2) cost *= 1.35;
-    // 感染者治疗费
-    if (S.ori && S.ori.treated) cost += n.ppp * (S.ori.provider === 'rhodes' ? 2.2 : 1.0);
-    // 慢性病
-    cost += Object.keys(S.conds).length * n.ppp * 0.28;
-
-    const support = TL.organizationSubsistence ? TL.organizationSubsistence(S) : 0;
-    const net = inc - Math.max(0, cost - support);
-    S.money += net;
-    if (S.money < 0) {
-      // 负债：借款有利息
-      S.debt += -S.money * 0.06;
-      S.money = 0;
-    }
-    // 有余钱则还债
-    if (S.money > 0 && S.debt > 0) {
-      const pay = Math.min(S.money * 0.4, S.debt);
-      S.debt -= pay; S.money -= pay;
-    }
-    return net;
-  };
+  /* 心境基线（happyBase）与年度财务（finances）已迁入 src/model/yearly.ts：      */
+  /* 两者只做算术，装配层把它们接回 TL.happyBase / TL.finances。               */
 
   /* ---------------------------------------------------------------------- */
   /* 家庭年度推进（对应原作 familyYear）                                      */
@@ -417,31 +276,22 @@
   /** 生育判定 */
   TL.tryBirth = function (S) {
     const F = S.fam;
-    if (!F.partner || !F.partner.alive || !F.married) return;
-    if (S.sex !== 'F' && S.age > 60) return;
-    const moAge = S.sex === 'F' ? S.age : F.partner.age;
-    if (moAge < 16 || moAge > 46) return;
-    const n = TL.NATION_BY_ID[S.nation];
-    // 生育率：国家 TFR 的近似（用 le 与 urb 反推）
-    let tfr = TL.clamp(6.2 - n.urb / 22 - n.edu / 6, 1.0, 6.0);
-    if (S.ori && S.ori.stage >= 2) tfr *= 0.55;
-    if (S.q >= 4) tfr *= 0.8;
-    const want = (F.kids.length < Math.round(tfr)) ? 1 : 0.15;
-    const p = want * 0.32 * (1 - Math.abs(moAge - 27) / 30);
-    if (!TL.chance(TL.clamp(p, 0, 0.6))) return;
+    // 资格门槛与概率都在 src/model/birth.ts：返回 null 表示这一对不能生育（不消耗随机数）。
+    const p = TL.birthChance(S);
+    if (p == null) return;
+    if (!TL.chance(p)) return;
 
-    const sex = TL.chance(0.512) ? 'M' : 'F';
+    const sex = TL.chance(TL.SON_RATIO) ? 'M' : 'F';
     const nm = TL.makeName(S.nation, sex, S.race);
     const kid = {
       name: nm.given, sex: sex, age: 0, alive: true,
       ori: null, race: S.race, born: S.year,
       job: 'child'
     };
-    // 母婴传播（泰拉特有）：感染母亲的孩子有概率先天感染
-    if ((S.sex === 'F' && S.ori && S.ori.stage > 0) ||
-        (S.sex === 'M' && F.partner.ori && F.partner.ori.stage > 0)) {
-      if (TL.chance(0.12)) {
-        kid.ori = { at: 0, stage: 1, crystal: TL.range(3, 9), treated: false, known: false, art: false, congenital: true };
+    // 母婴传播（泰拉特有）：感染方所生的孩子有概率先天感染
+    if (TL.congenitalRisk(S)) {
+      if (TL.chance(TL.CONGENITAL_CHANCE)) {
+        kid.ori = TL.congenitalOri(TL.range(3, 9));
       }
     }
     F.kids.push(kid);

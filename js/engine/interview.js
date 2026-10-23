@@ -5,7 +5,10 @@
   const own = (o,k) => Object.prototype.hasOwnProperty.call(o,k);
   const key = /^[a-z][a-z0-9_]*$/;
   const questions = Object.create(null), pools = Object.create(null), packs = Object.create(null);
+  const packSources = Object.create(null), poolPack = Object.create(null);
   TL.INTERVIEW_QUESTIONS = questions; TL.INTERVIEW_POOLS = pools; TL.INTERVIEW_PACKS = packs;
+  // Registry of the registered pack objects, for content locks and diagnostics.
+  TL.INTERVIEW_PACK_SOURCES = packSources;
   function assert(ok, message) { if (!ok) throw new Error('Interview format: ' + message); }
   function fields(o, allowed, at) {
     assert(o && typeof o === 'object' && !Array.isArray(o), at + ' must be an object');
@@ -93,36 +96,21 @@
     const checked=TL.validateInterviewPack(pack);
     Object.assign(questions,clone(checked.questions)); Object.assign(pools,clone(checked.pools));
     packs[pack.id]={version:pack.version,questionCount:pack.questions.length,poolCount:pack.pools.length};
+    // Keep the source pack so a save can record what the content actually was,
+    // and remember which pack each pool came from so a session can name it.
+    packSources[pack.id]=pack;
+    // A pool belongs to the pack that *declares* it. An extension pack only adds
+    // questions to an existing pool, so ownership (and the session's provenance)
+    // stays with the declaring pack; the save's content lock still lists every
+    // pack in play.
+    for(const pool of pack.pools || []) if(!poolPack[pool.id]) poolPack[pool.id]=pack.id;
   };
   TL.registerInterviewPack(TL.CORE_INTERVIEW_PACK);
 
-  const shuffle = items => {
-    const out=items.slice();
-    for(let i=out.length-1;i>0;i--) {const j=Math.floor(TL.rnd()*(i+1));[out[i],out[j]]=[out[j],out[i]];}
-    return out;
-  };
-  TL.interviewQuestionAvailable = (S,q) => (q.fromYear == null || S.year >= q.fromYear) &&
-    (q.untilYear == null || S.year <= q.untilYear);
-  TL.evaluateOrganizationInterview = function(application) {
-    const session=application && application.session;
-    if(!session || session.answers.length !== session.questions.length) return {status:'incomplete'};
-    const axes=session.pool.axes.map(axis=>{
-      let total=0, maximum=0;
-      session.questions.forEach((q,i)=>{
-        const answer=session.answers[i];
-        const option=q.options.find(o=>o.id === answer.option);
-        if(!option || answer.question !== q.id) throw new Error('Interview answer mismatch');
-        total+=option.scores[axis.id]; maximum+=Math.max(...q.options.map(o=>o.scores[axis.id]));
-      });
-      return {id:axis.id,label:TL.INTERVIEW_AXES[axis.id],value:total/maximum*100,
-        minimum:axis.minimum,weight:axis.weight};
-    });
-    const score=axes.reduce((s,a)=>s+a.value*a.weight,0);
-    const gaps=axes.filter(a=>a.value < a.minimum);
-    const status=score >= session.pool.passScore && !gaps.length ? 'passed'
-      : score >= session.pool.waitlistScore ? 'waitlisted' : 'rejected';
-    return {status,score,axes,passScore:session.pool.passScore,gaps:gaps.map(a=>a.id)};
-  };
+  /** Which pack a pool belongs to; null for pools registered outside a pack. */
+  TL.interviewPoolPack = poolId => (poolPack[poolId] ? {id:poolPack[poolId], version:packs[poolPack[poolId]].version} : null);
+
+  /* 洗牌（Fisher–Yates）与选取规则已迁入 src/model/interview-deck.ts。 */
   function record(S,a,result) {
     const report=Object.assign({token:a.token,organization:a.organization,route:a.route,year:a.year,
       pool:a.spec ? a.spec.questionPool : null,answers:clone(a.session ? a.session.answers : [])},result);
@@ -211,17 +199,16 @@
   TL.defaultOrganizationInterviewAdapter = function(S,a) {
     const pool=a.spec && pools[a.spec.questionPool];
     const available=pool ? pool.questionIds.map(id=>questions[id]).filter(q=>TL.interviewQuestionAvailable(S,q)) : [];
-    const selected=[];
-    for(const kind of ['organization','role']) {
-      const candidates=available.filter(q=>q.kind === kind);
-      if(!pool || candidates.length < pool.draw[kind]) {
-        S.orgApplication=null;
-        record(S,a,{status:'unavailable',reason:'当前无法安排面谈，申请暂缓，原有工作不受影响。'});
-        TL.continueOrganizationInterview(S); return {status:'unavailable'};
-      }
-      selected.push(...shuffle(candidates).slice(0,pool.draw[kind]));
+    // 选取与「题库不足则取消面谈」的规则在 src/model/interview-deck.ts。
+    const selection = pool ? TL.selectInterviewQuestions(available, pool.draw) : {ok:false, kind:'organization'};
+    if(!pool || !selection.ok) {
+      S.orgApplication=null;
+      record(S,a,{status:'unavailable',reason:'当前无法安排面谈，申请暂缓，原有工作不受影响。'});
+      TL.continueOrganizationInterview(S); return {status:'unavailable'};
     }
-    a.session={version:1,pool:clone(pool),questions:clone(selected).map(q=>Object.assign(q,{options:shuffle(q.options)})),answers:[]};
+    // 选项顺序也要打乱：每道题用自己的 n-1 次抽取。
+    const questions_ = TL.prepareSessionQuestions(selection.selected);
+    a.session={version:1,pack:TL.interviewPoolPack(pool && pool.id),pool:clone(pool),questions:questions_,answers:[]};
     TL.continueOrganizationInterview(S);
     return {status:'interview',token:a.token};
   };

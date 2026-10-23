@@ -112,14 +112,28 @@ node tools/serve.mjs 8814
 在项目根目录运行：
 
 ```bash
+npm ci
+npm run check          # 类型检查 → 单元/契约/回归测试 → 结构自检
+npm run regress:model  # 1000 局固定种子完整人生分布报告
+npm run test:browser   # 浏览器冒烟（需先安装 Playwright 浏览器）
+```
+
+逐项关卡也可以单独运行：
+
+```bash
 node tools/verify.mjs
-node tools/verify-birth.mjs
-node tools/verify-reliability.mjs
-node tools/verify-events.mjs 1000
+node tools/verify-organizations.mjs
+node tools/verify-runtime-boundaries.mjs
+node tools/scan-state-writes.mjs --check   # 内容层直写账本：只允许下降
+node --test tests/
 node tools/headless.mjs
 ```
 
-这些命令检查结构与引用、出生流程、自动模式与记录边界、事件可达性和批量人生模拟。本轮结果见[执行与验收记录](docs/本轮执行与验收-2026-10-18.md)。
+这些命令检查结构与引用、组织与面试边界、装配清单与导入一致性、状态不变量、事件效果等价性、
+存档续存一致性与存储端口行为，以及批量人生模拟的分布。规则或内容变更后先看分布报告，再决定是否调整
+[模型护栏区间](docs/data/model-baseline.json)；相关约定见
+[状态不变量与转换守卫](docs/状态不变量与转换守卫.md)、[事件效果契约](docs/事件效果契约.md)
+与 [存档版本协议](docs/存档版本协议.md)。
 
 GitHub Pages 首次启用、发布文件范围和更新方式见[部署说明](docs/GitHub-Pages部署.md)。
 

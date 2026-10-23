@@ -9,16 +9,18 @@
   "scripts": {
     "prepare": "npm run build:runtime",
     "dev": "vite --host 127.0.0.1",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "node ./node_modules/typescript/lib/tsc.js --noEmit",
     "build:runtime": "node tools/build-runtime.mjs",
     "build": "npm run typecheck && npm run build:runtime && vite build",
     "build:offline": "npm run typecheck && npm run build:runtime && node tools/build-offline.mjs",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "npm run build:runtime && node --test tests/*.test.mjs",
-    "verify": "node tools/verify.mjs && node tools/verify-birth.mjs && node tools/verify-reliability.mjs && node tools/verify-organizations.mjs && node tools/verify-interviews.mjs && node tools/verify-faction-boundaries.mjs && node tools/validate-interview-pack.mjs docs/examples/dlc-blacksteel-interviews.json",
+    "test": "npm run build:runtime && node tools/run-tests.mjs",
+    "verify": "node tools/verify.mjs && node tools/verify-birth.mjs && node tools/verify-reliability.mjs && node tools/verify-organizations.mjs && node tools/verify-interviews.mjs && node tools/verify-faction-boundaries.mjs && node tools/verify-runtime-boundaries.mjs && node tools/scan-state-writes.mjs --check && node tools/validate-interview-pack.mjs docs/examples/dlc-blacksteel-interviews.json",
     "check": "npm run typecheck && npm test && npm run verify",
-    "simulate": "node tools/headless.mjs"
-    ,"test:browser": "node tools/verify-browser.mjs"
+    "simulate": "node tools/headless.mjs",
+    "regress:model": "node tools/model-regression.mjs --samples 1000 --seed 292000",
+    "regress:model:archive": "node tools/model-regression.mjs --samples 1000 --seed 292000 --out docs/data/model-regression-2026-10-21.json",
+    "test:browser": "node tools/verify-browser.mjs"
   },
   "devDependencies": {
     "esbuild": "0.28.2",

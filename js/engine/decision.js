@@ -110,25 +110,8 @@
   TL.autoChoose = function (S) {
     const p = S.pending;
     if (!p) return;
-    const st = S.st;
-    let best = 0, bestScore = -1e9;
-    for (let i = 0; i < p._opts.length; i++) {
-      const o = p._opts[i];
-      if (o.autoExclude) continue;
-      const e = o.eff || {};
-      // 打分：把四维变化按「当前短缺程度」加权
-      let s = 0;
-      s += (e.hl || 0) * (110 - st.hl) / 55;
-      s += (e.h || 0) * (110 - st.h) / 55;
-      s += (e.sm || 0) * (110 - st.sm) / 55;
-      s += (e.so || 0) * (110 - st.so) / 55;
-      // 缺钱时钱更值钱
-      if (e.money && S.money < 0) s += e.money * 0.02;
-      // 一点随机，避免每次自动都走同一条路
-      s += TL.rnd() * 1.5;
-      if (s > bestScore) { bestScore = s; best = i; }
-    }
-    TL.choose(S, best);
+    // 打分与抽签规则在 src/model/decision.ts：每个可选选项恰好消耗一个随机值。
+    TL.choose(S, TL.pickAutoOption(p._opts, S.st, S.money, TL.rnd));
   };
 
   /* ---------------------------------------------------------------------- */
@@ -147,14 +130,10 @@
     const add = (id, at, p) => {
       const d = TL.DECISIONS[id];
       if (!TL.contentAvailable(S, d)) return;
+      // once / cd 的判定在 src/model/decision.ts：没有 cd 时默认 5 年，
+      // 否则「要不要孩子」会在 26~42 岁每年都弹一次。
       const last = S.flags['dec_' + id];
-      // once：一生只问一次
-      if (d.once && last != null) return;
-      // cd：允许重复，但两次之间至少隔这么多年。
-      // 没有 cd 时，「要不要孩子」会在 26~42 岁的每一年都弹一次，
-      // 一生被问十几遍同样的问题。
-      const cd = d.cd == null ? (d.once ? 0 : 5) : d.cd;
-      if (cd > 0 && last != null && a - last < cd) return;
+      if (!TL.decisionMayFire(d, last, a)) return;
       if (d.when && !d.when(S)) return;
       out.push({ id: id, at: at == null ? TL.rnd() : at, p: p });
     };
@@ -175,7 +154,7 @@
     if (infected) {
       if (a === S.ori.at + 1) add('ori_disclose', 0.3);
       if (a === S.ori.at + 2) add('ori_treatment', 0.35);
-      if (a >= 16 && S.ori.known) add('ori_job_loss', 0.6);
+      if (a >= 16 && S.ori.known && TL.canBeDismissed(S)) add('ori_job_loss', 0.6);
       if (a >= 15 && TL.reunionContactCurrent(S)) add('reunion_invite', 0.6);
       if (S.ori.stage >= 2) add('ori_despair', 0.6);
       if (S.ori.stage >= 3) add('ori_last', 0.7);

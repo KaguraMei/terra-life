@@ -1,8 +1,10 @@
 name: Deploy GitHub Pages
 
 on:
+  # 只有 main 的推送会触发；其他分支的推送一律忽略。
   push:
-    branches: [main, refactor-ts]
+    branches: [main]
+  # 向 main 提 PR 时仍跑一次 check + build（不部署），用于合并前把关。
   pull_request:
     branches: [main]
   workflow_dispatch:
