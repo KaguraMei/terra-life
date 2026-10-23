@@ -41,6 +41,8 @@
   /* ---------------------------------------------------------------------- */
   TL.openDecision = function (S, id, p) {
     const d = TL.DECISIONS[id];
+    if (TL.syncResidence) TL.syncResidence(S);
+    if (d && d.growth && p && (p.placeId !== S.residence?.placeId || p.revision !== S.residence?.revision)) return;
     if (!TL.contentAvailable(S, d) || (d.when && !d.when(S))) return;
     // 过滤不可用选项
     const sourceOptions = typeof d.options === 'function' ? d.options(S) : (d.options || []);
@@ -60,6 +62,8 @@
       })),
       _def: d,
       _opts: opts,
+      placeId: S.residence?.placeId,
+      residenceRevision: S.residence?.revision,
       age: S.age
     };
     S.paused = true;
@@ -76,6 +80,14 @@
     if (!p) return null;
     const o = p._opts[index];
     if (!o) return null;
+    if (p._def.growth) {
+      TL.syncResidence(S);
+      if (p.placeId !== S.residence?.placeId || p.residenceRevision !== S.residence?.revision || !TL.contentAvailable(S, p._def) ||
+          (p._def.when && !p._def.when(S)) || (o.require && !o.require(S))) {
+        S.pending = null; S.paused = false;
+        return '所在地或资格已经变化，本次成长机会取消。';
+      }
+    }
 
     // 应用四维效果
     if (o.eff) TL.eff(S, o.eff);
@@ -91,8 +103,12 @@
       result: typeof result === 'string' ? result : null
     });
 
-    S.pending = null;
-    S.paused = false;
+    // A choice can trigger a follow-up choice (for example, a second fatal
+    // condition while resuming a timeline event). Preserve the new pending
+    // object instead of clearing it with the choice that just completed.
+    const nextPending = S.pending !== p ? S.pending : null;
+    S.pending = nextPending;
+    S.paused = !!nextPending;
     if (TL.syncOrganization) TL.syncOrganization(S);
     // 面试等多轮流程可在旧题清空后排下一题，避免 run() 内打开的题被覆盖。
     if (TL.afterDecision) TL.afterDecision(S, p, index);
@@ -179,6 +195,7 @@
       if (a >= 15 && TL.reunionContactCurrent(S)) add('reunion_invite', 0.6);
       if (S.ori.stage >= 2) add('ori_despair', 0.6);
       if (S.ori.stage >= 3) add('ori_last', 0.7);
+      if (S.nation === 'RMB' && a >= 16 && S.ori.known && !S.flags.oriCareRoute) add('ori_care_route', 0.58);
     }
 
     /* --- 天灾 --- */
@@ -197,6 +214,7 @@
     /* --- 老年 --- */
     if (a >= 62) add('elder_legacy', 0.6);
 
+    if (TL.scheduledGrowthDecisions) out.push(...TL.scheduledGrowthDecisions(S));
     return out;
   };
 

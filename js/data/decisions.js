@@ -64,7 +64,7 @@
         run(S) {
           S.job = 'courier';
           // 行商的路很长，认识的人一路换
-          if (TL.chance(0.35)) { S.flags.migrations = (S.flags.migrations || 0) + 1; S.city = TL.cityOf(S.nation); }
+          if (TL.chance(0.35)) TL.moveResidence(S, S.nation);
           return TL.L`你跟着一支商队上了路。原来世界比${S.city}大得多，也比它危险得多。`;
         }
       },
@@ -122,10 +122,8 @@
         eff: { sm: 3, so: -4, h: 2 },
         run(S) {
           const big = { YAN: 'LMN', VIC: 'VIC', CLB: 'CLB', LEI: 'LEI', URS: 'URS' }[S.nation] || S.nation;
-          S.flags.migratedTo = big;
-          S.city = TL.cityOf(big);
-          S.flags.migrations = (S.flags.migrations || 0) + 1;
-          return TL.L`你去了${TL.cityOf(big)}。房租比想象中贵。`;
+          TL.moveResidence(S, big);
+          return TL.placeHas(S, 'materialGuarantee') ? `你到了${S.city}的新生活区，开始熟悉周围的设施。` : TL.L`你去了${S.city}。房租比想象中贵。`;
         }
       },
       {
@@ -375,6 +373,70 @@
     ]
   });
 
+  /* 源石技艺只在具体的致命场景中出现，不再给所有感染者一个统一的
+   * “借结晶施术/收住力量”年度按钮。TL.die() 会在坠落、火灾、坍塌、
+   * 战斗等场景触发这个短决策；能力类型和训练由角色自己的 profile 决定。 */
+  D('arts_rescue', {
+    title: S => S.flags.artsRescueContext?.title || '最后的施术机会',
+    text: S => S.flags.artsRescueContext?.text || TL.L`危险逼近了。你知道自己手里还有一条不稳妥的路。`,
+    when: S => !!(S.flags && S.flags.artsRescueContext),
+    options: S => {
+      const c = S.flags.artsRescueContext || {};
+      const opts = [{
+        label: '尝试以技艺脱险', hint: '按先天亲和度、方向训练与控制力判定',
+        run(S) { return TL.resolveArtsRescue(S, false); }
+      }];
+      if (S.ori && S.ori.stage > 0) opts.push({
+        label: '感染者：拼上性命', hint: '成功率↑；血液密度、器官负担与健康代价↑',
+        eff: { hl: -8, h: -4 },
+        run(S) { return TL.resolveArtsRescue(S, true); }
+      });
+      opts.push({
+        label: '放弃抵抗', hint: c.cause === 'ori' ? '接受病程结局' : '不再冒险施术',
+        run(S) { return TL.resolveArtsDeath(S); }
+      });
+      return opts;
+    }
+  });
+
+  D('ori_care_route', {
+    title: '矿区的照护安排',
+    text: () => TL.L`工会和家里都在问：确诊之后，你要怎么过日子？这里没有完美的方案，只有谁来承担代价。`,
+    options: [
+      {
+        label: '留在家里照护', hint: '家庭与工会互助↑ 收入与时间↓',
+        eff: { so: 10, h: 5, money: -2 },
+        run(S) {
+          S.flags.oriCareRoute = 'family';
+          S.flags.protectionPractice = TL.clamp((S.flags.protectionPractice || 0) + 0.04, 0, 0.35);
+          return TL.L`家里把一间屋子收拾出来。工友轮流送饭，谁也没有说“隔离”两个字。`;
+        }
+      },
+      {
+        label: '接受集中隔离', hint: '医疗监测↑ 羁绊与自由↓',
+        eff: { so: -8, h: -6, hl: 3 },
+        run(S) {
+          S.flags.oriCareRoute = 'isolation';
+          S.ori.treated = true;
+          S.ori.provider = 'clinic';
+          S.ori.bloodDensity = TL.clamp(S.ori.bloodDensity - 0.025, 0.08, 1.2);
+          S.ori.stage = TL.oriStageOf(S.ori.bloodDensity);
+          return TL.L`隔离点在矿区边上。床位不多，但每天有人记录你的血液密度。`;
+        }
+      },
+      {
+        label: '自己离开矿区', hint: '躲开工厂与标签，失去原有网络',
+        eff: { so: -14, h: -10, hl: -3 },
+        run(S) {
+          S.flags.oriCareRoute = 'exile';
+          S.flags.selfExiled = true;
+          S.refugee = true;
+          return TL.L`你把工具和旧工牌留在门口，带着药和一只水壶往外走。后来很少有人知道你去了哪里。`;
+        }
+      }
+    ]
+  });
+
   D('reunion_invite', {
     organization: 'reunion',
     when: S => !S.flags.reunion && TL.canJoinOrganization(S, 'reunion', 'infected'),
@@ -502,8 +564,7 @@
         label: '去', hint: '收入↑ 羁绊↓',
         eff: { so: -6, sm: 2, money: 2 },
         run(S) {
-          S.city = TL.cityOf(S.nation);
-          S.flags.migrations = (S.flags.migrations || 0) + 1;
+          TL.moveResidence(S, S.nation);
           const j = TL.rollJob(S);
           if (j) S.job = j;
           return TL.L`你去了${S.city}。新工钱确实高了一些。`;
@@ -563,10 +624,7 @@
         run(S) {
           const opts = S.race === 'sarkaz' ? ['KDZ', 'CLB', 'LEI'] : ['CLB', 'VIC', 'YAN', 'LMN', 'LEI', 'KAZ', 'SST'];
           const dest = TL.pick(opts.filter(x => x !== S.nation)) || 'CLB';
-          S.nation = dest;
-          S.city = TL.cityOf(dest);
-          S.flags.migrations = (S.flags.migrations || 0) + 1;
-          TL.applyPace(S, S.paceKey);
+          TL.moveResidence(S, dest);
           return TL.L`你去了${TL.NATION_BY_ID[dest].name}。语言不太一样，别的都得重新学。`;
         }
       },
@@ -648,7 +706,7 @@
    */
   const ONCE = [
     'buy_home', 'elder_legacy', 'ori_job_loss', 'reunion_invite',
-    'ori_despair', 'ori_last'
+    'ori_despair', 'ori_last', 'ori_care_route'
   ];
   const CD = {
     have_kid: 5,

@@ -89,7 +89,7 @@
     },
     /* ---- 泰拉特有 ---- */
     arts_training: {
-      name: '修习源石技艺', en: 'Study Originium Arts', d: '技艺↑↑ 体质↓（有感染风险）', enD: 'Arts↑↑ Health↓ (infection risk)',
+      name: '修习源石技艺', en: 'Study Originium Arts', d: '技艺↑↑ 体质↓（施术事故另计）', enD: 'Arts↑↑ Health↓ (casting accidents are separate)',
       e: { arts: 7, sm: 2, hl: -2, h: -1 }
     },
     ori_care: {
@@ -111,6 +111,11 @@
       name: '天灾避难演练', en: 'Catastrophe drill', d: '天灾存活率↑ 心境↓', enD: 'Catastrophe survival↑ Happiness↓',
       e: { sm: 2, hl: 1, h: -2 },
       special: 'drill'
+    },
+    protection: {
+      name: '源石防护训练', en: 'Originium safety training', d: '暴露风险↓ 学识↑ 心境↓', enD: 'Exposure risk↓ Knowledge↑ Happiness↓',
+      e: { sm: 2, hl: 1, h: -1 },
+      special: 'protection'
     }
   };
 
@@ -160,6 +165,7 @@
       base.push('fellowship');
     }
     if (S.age >= 10 && TL.NATION_BY_ID[S.nation].cat >= 0.8) base.push('disaster_drill');
+    if (S.age >= 12 && (TL.JOBS[S.job]?.ori > 1.4 || S.affiliation === 'blacksteel' || S.affiliation === 'rhodes')) base.push('protection');
 
     return base;
   };
@@ -179,6 +185,7 @@
     // 简单启发：先保命，再补短板，最后推长处
     const st = S.st;
     if (S.ori && S.ori.stage >= 2 && opts.indexOf('ori_care') >= 0) return 'ori_care';
+    if (opts.indexOf('protection') >= 0 && (S.flags.protectionPractice || 0) < 0.22 && S.ori?.stage < 3) return 'protection';
     if (st.hl < 30 && opts.indexOf('health') >= 0) return 'health';
     if (st.h < 25 && opts.indexOf('rest') >= 0) return 'rest';
     if (st.so < 30 && opts.indexOf('family') >= 0) return 'family';

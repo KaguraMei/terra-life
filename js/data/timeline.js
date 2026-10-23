@@ -66,6 +66,7 @@
   }
   TL.contentAvailable = function (S, item) {
     if (!item || item.disabledReason) return false;
+    if (TL.localContentAvailable && !TL.localContentAvailable(S, item)) return false;
     let orgOK = true;
     if (item.organization) {
       const os = TL.organizationState ? TL.organizationState(S, item.organization) : null;
@@ -745,40 +746,57 @@
       if (S.flags[key]) continue;
       S.flags[key] = 1;
       TL.fireTimeline(S, ev, n);
-      if (S.phase !== 'life') break;
+      if (S.phase !== 'life' || S.pending) break;
     }
   };
 
-  TL.fireTimeline = function (S, ev, n) {
+  TL.fireTimeline = function (S, ev, n, resume) {
     n = n || TL.NATION_BY_ID[S.nation];
     const lv = levelOf(ev, S, n);
 
     /* --- ① 全国 / 全球的一次性效果 --- */
-    const f = ev.fx && ev.fx[S.nation];
-    immEff(S, f);
-    if (ev.globals) immEff(S, ev.globals);
+    if (!resume) {
+      const f = ev.fx && ev.fx[S.nation];
+      immEff(S, f);
+      if (ev.globals) immEff(S, ev.globals);
 
-    /* --- ② 旁白 --- */
-    const text = ev[lv] || ev.far;
-    if (text) TL.log(S, text, 'tl', { key: ev.id, tag: ev.title });
+      /* --- ② 旁白 --- */
+      const text = ev[lv] || ev.far;
+      if (text) TL.log(S, text, 'tl', { key: ev.id, tag: ev.title });
+    }
 
     /* --- ③ 条件性的个人后果 --- */
     let died = false;
-    for (const at of (ev.at || [])) {
-      if (at.when && !at.when(S)) continue;
-      if (at.flag) S.flags[at.flag] = 1;
-      if (at.money) S.money = Math.max(0, S.money + at.money * n.ppp);
-      if (at.text) TL.log(S, at.text, 'tl', { key: ev.id + '_at', tag: ev.title });
-      if (at.eff) TL.eff(S, at.eff);
+    const atList = ev.at || [];
+    const startAt = resume ? resume.atIndex : 0;
+    for (let atIndex = startAt; atIndex < atList.length; atIndex++) {
+      const at = atList[atIndex];
+      const continuingFatalAt = !!(resume && atIndex === resume.atIndex);
+      if (!continuingFatalAt) {
+        if (at.when && !at.when(S)) continue;
+        if (at.flag) S.flags[at.flag] = 1;
+        if (at.money) S.money = Math.max(0, S.money + at.money * n.ppp);
+        if (at.text) TL.log(S, at.text, 'tl', { key: ev.id + '_at', tag: ev.title });
+        if (at.eff) TL.eff(S, at.eff);
 
-      // 条件致死先于逃离；一次抽样，具体死因不额外增加死亡概率。
-      if (at.die && !died && TL.chance(at.die)) {
-        died = true;
-        const outcomes = (at.fatalOutcomes || []).filter(o => !o.when || o.when(S));
-        const outcome = outcomes.length ? TL.pick(outcomes) : null;
-        if (outcome) TL.log(S, outcome.text, 'tl', { key: ev.id + '_fatal', tag: ev.title });
-        TL.die(S, outcome ? outcome.cause : (at.dieCause || 'war'), 'timeline:' + ev.id);
-        break;
+        // 条件致死先于逃离；一次抽样，具体死因不额外增加死亡概率。
+        if (at.die && !died && TL.chance(at.die)) {
+          died = true;
+          const outcomes = (at.fatalOutcomes || []).filter(o => !o.when || o.when(S));
+          const outcome = outcomes.length ? TL.pick(outcomes) : null;
+          if (outcome) TL.log(S, outcome.text, 'tl', { key: ev.id + '_fatal', tag: ev.title });
+          const diedNow = TL.die(S, outcome ? outcome.cause : (at.dieCause || 'war'), 'timeline:' + ev.id);
+          if (diedNow === false) {
+            died = false;
+            if (S.pending) {
+              if (S.flags.artsRescueContext) {
+                S.flags.artsRescueContext.continuation = { eventId: ev.id, atIndex };
+              }
+              break;
+            }
+          }
+          break;
+        }
       }
 
       // 迁徙：换一座城市，或直接沦为流民
@@ -790,15 +808,22 @@
           S.flags.atHome = false;
         }
         else {
-          const c = TL.cityOf(S.nation);
-          if (c) S.city = c;
+          TL.moveResidence(S, S.nation);
           S.flags.atHome = false;
         }
+        TL.syncResidence(S);
         TL.log(S, TL.L`你搬走了。新地方的名字你念了三天才念顺。`, 'tl', { key: ev.id + '_move' });
       }
 
     }
     return !died;
+  };
+
+  TL.resumeTimelineAfterArtsRescue = function (S, continuation) {
+    if (!continuation || !continuation.eventId || !Number.isInteger(continuation.atIndex)) return false;
+    const ev = TL.TL_BY_ID[continuation.eventId];
+    if (!ev) return false;
+    return TL.fireTimeline(S, ev, TL.NATION_BY_ID[S.nation], continuation);
   };
 
   /**

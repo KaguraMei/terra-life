@@ -26,6 +26,17 @@
     rhodes: {
       name: '罗德岛', en: 'Rhodes Island', kind: 'operator',
       fromYear: 1095, sourceType: 'project-rule', confidence: 'inferred',
+      departments: [
+        { id: 'medical', name: '医疗与康复', scope: ['诊疗', '康复', '矿石病资料分析', '药物研发'] },
+        { id: 'engineering', name: '工程与设施', scope: ['舰船维护', '医疗设备研发', '个人装备改造'] },
+        { id: 'field', name: '外勤与训练', scope: ['能力评估', '作战训练', '行动执行'] },
+        { id: 'personnel', name: '人事与后勤', scope: ['背景评估', '入职培训', '心理与感染记录', '生活支持'] }
+      ],
+      oripathyRole: {
+        scope: ['矿石病药物研发', '跨地区疾病资料采集', '感染者长期抑制治疗', '医疗与康复'],
+        evidence: '《TERRA: A JOURNEY》罗德岛生活指南及医疗部介绍，印刷页约 400–416；游戏年份和治疗效率属于玩法规则。',
+        confidence: 'documented'
+      },
       contacts: [
         { id: 'doctor', name: '博士', en: 'The Doctor', chance: 0.035, minRank: 1 },
         { id: 'amiya', name: '阿米娅', en: 'Amiya', chance: 0.045, minRank: 0 }
@@ -145,6 +156,18 @@
     blacksteel: {
       name: '黑钢国际', en: 'Blacksteel Worldwide', kind: 'security-company',
       fromYear: 1031, sourceType: 'prts', confidence: 'project-rule',
+      departments: [
+        { id: 'security', name: '武装人力派遣', scope: ['安保合同', '战术训练', '行动支援'] },
+        { id: 'equipment', name: '装备与应用技术', scope: ['装备维护', '使用训练', '实地测试'] },
+        { id: 'biosecurity', name: '矿石病与生化威胁处置', scope: ['工业源石污染', '感染生物危机', '现场防护与撤离'] }
+      ],
+      onboarding: { maxTrainingYears: 2, attrition: 0.76,
+        evidence: '《TERRA: A JOURNEY》黑钢国际，印刷页 374；游戏招募不按该比例淘汰玩家角色。' },
+      oripathyRole: {
+        scope: ['工业源石污染处置', '感染生物危机响应', '雇员源石防护与安全训练'],
+        evidence: '《TERRA: A JOURNEY》组织介绍，印刷页 366；材料同时指出防护服不能消除意外感染风险。',
+        confidence: 'documented'
+      },
       source: 'https://prts.wiki/w/泰拉大典:组织/黑钢国际',
       contacts: [
         { id: 'franka', name: '芙兰卡', en: 'Franka', chance: 0.025, minRank: 1 },
@@ -164,6 +187,13 @@
           require: S => S.st.sm >= 48,
           interview: profile(['engineering', 'safety', 'teamwork'], 'blacksteel_engineering'),
           ranks: [r('技术助理', 'Technical Assistant', { needYears: 0 }), r('装备技师', 'Equipment Technician', { needYears: 2 }), r('技术主管', 'Technical Lead', { needYears: 8 })]
+        },
+        biosecurity: {
+          name: '矿石病与生化威胁处置', en: 'Oripathy and Biohazard Response', minAge: 18, edu: 1,
+          jobs: ['oridoc', 'doctor', 'engineer', 'mechanic', 'soldier', 'mercenary'],
+          require: S => S.st.sm >= 42 && (S.st.hl >= 40 || TL.combatValue(S) >= 35),
+          interview: profile(['safety', 'risk', 'teamwork'], 'blacksteel_biosecurity'),
+          ranks: [r('响应培训员', 'Response Trainee', { needYears: 0 }), r('响应专员', 'Response Specialist', { needYears: 2 }), r('现场组长', 'Field Lead', { needYears: 8 })]
         }
       }
     },

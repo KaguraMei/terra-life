@@ -213,7 +213,7 @@
       if (bad) {
         TL.eff(S, { hl: -10, h: -4 });
         // 施术事故是一次高强度暴露，但结果仍由统一的感染模型裁定
-        if (TL.tryInfect(S, 5)) return TL.L`术式反噬得很快。你的手臂上留下了一道疤——以及疤下面一点点黑色的东西。`;
+        if (TL.expose(S, 'active_dust')) return TL.L`术式反噬得很快。你的手臂上留下了一道疤——以及疤下面一点点黑色的东西。`;
         return TL.L`术式在你手里炸开了。没人受伤，除了你自己。`;
       }
       TL.eff(S, { arts: 4, sm: 2 });
@@ -464,10 +464,13 @@
   def('ori_expose', {
     title: '尘', book: '矿石病',
     when: S => !S.ori && S.age >= 6,
-    run(S) {
-      TL.infect(S);
-      const route = S.flags.postCatastrophe ? '天灾过后，你们被派去清理废墟。地上的源石碎得像玻璃。'
-        : (TL.JOBS[S.job] && TL.JOBS[S.job].ori > 2.5) ? '爆破面刚刚清完，粉尘还没落，你们就下去了。'
+    run(S, p) {
+      const type = p && p.type ? p.type : TL.exposureTypeFor(S);
+      TL.expose(S, type, { guaranteed: true });
+      const route = type === 'active_dust' ? '天灾过后，你们被派去清理废墟。地上的源石碎得像玻璃。'
+        : type === 'refinery_leak' ? '精炼炉的密封圈爆了。你们戴着布口罩往外跑，白色的粉尘糊了一脸。'
+        : type === 'mine_contact' ? '爆破面刚刚清完，粉尘还没落，你们就下去了。'
+        : type === 'stable_crystal' ? '你加工了一批已经固化的源石。结晶本身没有动，搬运时却有一片碎屑划开了手套。'
         : '你在路边捡到一块漂亮的黑色石头，揣在兜里揣了一整天。';
       return TL.L`${route} 手上的那块黑斑洗不掉。`;
     }
@@ -479,14 +482,16 @@
     title: '一次暴露', book: '矿石病',
     when: S => !S.ori && S.age >= 6,
     run(S) {
-      S.flags.oriSurge = 1;                 // 由 oriRisk 读取，本年风险 ×9
+      const type = TL.exposureTypeFor(S);
+      const infected = TL.expose(S, type);
       TL.eff(S, { hl: -4, h: -3 });
       const lines = [
         TL.L`井下塌方，你被困在渗出源石的岩层里六个小时。出来的时候，你觉得嘴里有铁锈味。`,
         TL.L`精炼炉的密封圈爆了。你们戴着布口罩往外跑，白色的粉尘糊了一脸。`,
         TL.L`你徒手搬了一整天的源石原矿。晚上洗手的时候，指甲缝里的黑洗不掉。`
       ];
-      return TL.pick(lines);
+      const line = TL.pick(lines);
+      return infected ? line : line + ' 这次你及时离开了现场，检查结果暂时没有显示感染。';
     }
   });
 
@@ -899,7 +904,7 @@
       // 这里只是「被正面命中」的那一部分，所以致死率必须压低，否则双重计数。
       if (sev < 0.15) {
         // 致死 / 致残合计 15%，其中真正死亡的是少数
-        if (TL.chance(0.15)) { TL.die(S, 'cat'); return TL.L`它来得比风还快。你没有跑出去。`; }
+        if (TL.chance(0.15)) { if (TL.die(S, 'cat') !== false) return TL.L`它来得比风还快。你没有跑出去。`; return TL.L`它来得比风还快。你在最后一秒找到了施术的角度。`; }
         S.flags.crippled = (S.flags.crippled || 0) + 1;
         TL.eff(S, { hl: -30, h: -18, so: -6 });
         if (TL.tryInfect(S, 3)) return TL.L`你活下来了，但腿上留下了治不好的伤。后来伤口边上长出了一些硬的东西。`;
@@ -925,7 +930,7 @@
     title: '毁灭级源石风暴', book: '天灾', max: 3, w: 1.0,
     when: S => !TL.stratum(S.stratum).urban && S.age >= 8,
     run(S) {
-      if (TL.chance(0.12)) { TL.die(S, 'cat'); return TL.L`风暴的边缘扫过时，连影子都被撕开了。`; }
+      if (TL.chance(0.12)) { if (TL.die(S, 'cat') !== false) return TL.L`风暴的边缘扫过时，连影子都被撕开了。`; return TL.L`风暴的边缘扫过时，你用技艺撑住了几秒钟，躲进了裂隙。`; }
       TL.eff(S, { hl: -26, h: -24, so: -10 });
       S.flags.homeLost = 1;
       S.flags.displaced = (S.flags.displaced || 0) + 1;
@@ -949,7 +954,7 @@
       }
       S.ori.known = true;
       if (TL.chance(ti.arrest)) {
-        if (TL.chance(0.42)) { TL.die(S, 'exec'); return TL.L`他们把你按在墙上，看了你的手腕。之后的事你没能记住。`; }
+        if (TL.chance(0.42)) { if (TL.die(S, 'exec') !== false) return TL.L`他们把你按在墙上，看了你的手腕。之后的事你没能记住。`; return TL.L`他们把你按在墙上。你抓住了那一瞬间的空隙，从巷子的另一头逃了出去。`; }
         S.flags.lastJob = S.job;
         S.job = 'slave';
         S.flags.slaveAt = S.age;
@@ -970,7 +975,7 @@
     when: S => S.job === 'slave',
     run(S) {
       TL.eff(S, { hl: -9, h: -6, so: -2 });
-      if (TL.chance(0.10)) { TL.die(S, 'slave'); return TL.L`坑道塌了。你在最里面。`; }
+      if (TL.chance(0.10)) { if (TL.die(S, 'slave') !== false) return TL.L`坑道塌了。你在最里面。`; return TL.L`坑道塌了。你用重力与屏障撑出一条缝，和另外两个人一起爬了出来。`; }
       return TL.pick([
         TL.L`井下没有白天。你们按铃上下工，铃声一天响十二次。`,
         TL.L`同棚的一个人昨夜没了。天亮时有人把床板抬走，铺上了新的草。`,
@@ -1052,7 +1057,7 @@
       // 阵亡：这里不直接 die()，交给当年的死亡判定，但显著抬高当年风险
       TL.eff(S, { hl: -30, h: -20 });
       S.flags.wounded = (S.flags.wounded || 0) + 1;
-      if (TL.chance(0.4)) { TL.die(S, 'war'); return TL.L`你倒在了阵地上。`; }
+      if (TL.chance(0.4)) { if (TL.die(S, 'war') !== false) return TL.L`你倒在了阵地上。`; return TL.L`你倒在了阵地上，却用最后的力气挡开了下一轮冲击。`; }
       return TL.L`你受了重伤，被抬了回来。军医说能保住命已经是运气。`;
     }
   });
@@ -1097,11 +1102,10 @@
     when: S => S.age >= 16 && S.age <= 45,
     run(S) {
       // 不要把「搬到 A」写成「搬到 A」—— 换一个和当前不同的城市
-      const pool = (TL.CITIES[S.nation] || []).filter(c => c !== S.city);
-      S.city = pool.length ? TL.pick(pool) : TL.cityOf(S.nation);
-      S.flags.migrations = (S.flags.migrations || 0) + 1;
+      const pool = Object.values(TL.PLACES).filter(p => p.nation === S.nation && p.id !== S.residence?.placeId);
+      TL.moveResidence(S, S.nation, pool.length ? TL.pick(pool).id : undefined);
       TL.eff(S, { h: -5, so: -8, sm: 2 });
-      const why = TL.pick([
+      const why = TL.placeHas(S, 'materialGuarantee') ? '你申请换了住处' : TL.pick([
         '房东把房子卖了',
         '原来那条街要拆',
         '有一份活在这边',
@@ -1471,7 +1475,7 @@
       const pay = TL.NATION_BY_ID[S.nation].ppp * TL.range(1.2, 4.0);
       S.money += pay;
       TL.eff(S, { hl: -7, h: -4, sm: 2 });
-      if (TL.chance(0.12)) { TL.die(S, 'inj'); return TL.L`这一单出了岔子。你没有回来。`; }
+      if (TL.chance(0.12)) { if (TL.die(S, 'inj') !== false) return TL.L`这一单出了岔子。你没有回来。`; return TL.L`这一单出了岔子。你用熟悉的技艺撬开了封锁，带着伤回来了。`; }
       return TL.pick([
         TL.L`这一单护送的是货，不是人。你问了不该问的，对方加了三成钱让你别问。`,
         TL.L`你们在荒野上走了六天。回来的时候少了一个人，钱按人头分了。`,
@@ -2106,8 +2110,11 @@
   /* 排程：每年该发生什么（对应原作的事件调度）                                */
   /* ====================================================================== */
   TL.scheduleEvents = function (S) {
+    if (TL.syncResidence) TL.syncResidence(S);
     const a = S.age;
     const n = TL.NATION_BY_ID[S.nation];
+    if (S.age >= 10 && TL.placeHas(S, 'emergencyTerminal') && TL.chance(0.035)) TL.queueEvent(S, 0.8, 'ev', 'aeg_equipment_fault');
+    if (S.age === 20 && TL.currentPlace(S)?.regime === 'coalition') TL.queueEvent(S, 0.35, 'dec', 'blv_professional_army');
     if (TL.organizationScheduledDecisions) {
       for (const d of TL.organizationScheduledDecisions(S)) TL.queueEvent(S, d.at, 'dec', d.id);
     }
@@ -2243,11 +2250,12 @@
 
     // ⑦ 感染判定：即使没有专门事件，也每年独立判定一次
     if (!S.ori && a >= 3) {
+      // 急性暴露的加成只属于发生暴露的那一年；上一年末的状态先清掉。
+      S.flags.oriSurge = 0;
       const p = TL.oriRisk(S);
       if (TL.chance(p)) {
-        TL.queueEvent(S, TL.rnd(), 'ev', 'ori_expose');
+        TL.queueEvent(S, TL.rnd(), 'ev', 'ori_expose', { type: TL.exposureTypeFor(S) });
       }
-      S.flags.oriSurge = 0;      // 急性暴露只影响当年
     }
 
     // ⑧ 慢病发病：独立风险，不占事件位
@@ -2259,7 +2267,7 @@
   /* ====================================================================== */
   TL.catastrophe = function (S, p) {
     const e = TL.EVMAP['cat_warning'];
-    if (e) e.run(S, p);
+    if (e && TL.contentAvailable(S, e)) e.run(S, p);
   };
 
   /* ====================================================================== */
@@ -2291,6 +2299,7 @@
         if (TL.combatValue(S) < 45) continue;
       }
       let w = 1;
+      if (TL.growthJobWeight) w *= TL.growthJobWeight(S, id);
       // 学识匹配度
       w *= 0.4 + J.hi;
       // 歧视：越体面的工作越排斥异族与感染者

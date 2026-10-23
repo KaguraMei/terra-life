@@ -278,7 +278,7 @@
       const colors = [
         '#a06ac0',  // Ⅰ期：浅紫
         '#8050a0',  // Ⅱ期：深紫
-        '#6030 80'   // Ⅲ期：暗紫红
+        '#603080'   // Ⅲ期：暗紫红
       ];
       const crystalColor = colors[Math.min(stage - 1, 2)];
 
@@ -334,15 +334,36 @@
       <div class="track"><div class="fill ar" style="width:${ar}%"></div></div>
     </div>`;
 
-    // 矿石病结晶率独立显示（仅感染者）
+    // 技艺不是单一的“法术等级”：个体有先天亲和度、主/副方向和训练。
+    // 这里显示方向与控制力，方便玩家理解为什么同样的适应性在不同事故
+    // 中会得到不同的一线生机机会。
+    const ap = TL.ensureArtsProfile ? TL.ensureArtsProfile(S) : S.artsProfile;
+    if (ap) {
+      const primary = TL.ARTS_TYPES?.[ap.primary];
+      const secondary = TL.ARTS_TYPES?.[ap.secondary];
+      const primaryTraining = Math.round(Number(ap.training?.[ap.primary]) || 0);
+      const secondaryTraining = ap.secondary ? Math.round(Number(ap.training?.[ap.secondary]) || 0) : 0;
+      html += `<div class="artsProfile" style="margin-top:5px;font-size:11px;color:var(--muted)">
+        <div>${TL.lang === 'zh' ? '主方向' : 'Primary'}：<b>${esc(primary ? TL.nameOf(primary) : '—')}</b> · ${primaryTraining}</div>
+        ${ap.secondary ? `<div>${TL.lang === 'zh' ? '副方向' : 'Secondary'}：<b>${esc(secondary ? TL.nameOf(secondary) : '—')}</b> · ${secondaryTraining}</div>` : ''}
+        <div>${TL.lang === 'zh' ? '控制力' : 'Control'}：${Math.round(ap.control || 0)} · ${TL.lang === 'zh' ? '亲和度' : 'Affinity'}：${Math.round((ap.affinity || 0) * 100)}%</div>
+      </div>`;
+    }
+
+    // 分开显示不可逆的体细胞融合与可波动的血液检测值。
     if (S.ori && S.ori.stage > 0) {
       const crystal = Math.round(S.ori.crystal);
       const stage = S.ori.stage;
       const stageName = TL.oriStageName(stage);
       html += `<div class="statRow oriRow" style="margin-top:8px;padding-top:7px;border-top:1px solid var(--violet)">
-        <div class="statTop"><span class="k" style="color:var(--violet)">${TL.lang === 'zh' ? '结晶率' : 'Crystal'}</span>
+        <div class="statTop"><span class="k" style="color:var(--violet)">${TL.lang === 'zh' ? '体细胞融合率' : 'Cell fusion'}</span>
           <span class="v ori">${crystal}%</span><span class="w oriStage">${esc(stageName)}</span></div>
         <div class="track ori"><div class="fill ori" style="width:${crystal}%"></div></div>
+        <div class="statTop" style="margin-top:5px"><span class="k" style="color:var(--violet)">${TL.lang === 'zh' ? '血液结晶密度' : 'Blood crystal density'}</span>
+          <span class="v ori">${Number(S.ori.bloodDensity == null ? 0.12 + S.ori.crystal * 0.003 : S.ori.bloodDensity).toFixed(2)}u/L</span>
+          <span class="w">${S.ori.treated ? (TL.lang === 'zh' ? '抑制治疗中' : 'Suppression') : (TL.lang === 'zh' ? '未治疗' : 'Untreated')}</span></div>
+        <div class="statTop"><span class="k">${TL.lang === 'zh' ? '最近暴露' : 'Last exposure'}</span>
+          <span class="w">${esc(TL.oriExposureName ? TL.oriExposureName(S.ori.exposure) : S.ori.exposure || '—')}</span></div>
       </div>`;
     }
 
@@ -382,11 +403,25 @@
         esc(TL.fmt.pct(S.pct, 0)));
     if (S.debt > 0) add(TL.lang === 'zh' ? '负债' : 'Debt', esc(TL.moneyStr(S.debt)), 'neg');
     add(TL.t('livingWithParents'),
-        (S.age < 18 || S.flags.atHome) ? `<span style="color:var(--amber)">${TL.t('yes')}</span>` : TL.t('no'));
+        ((S.age < 18 && S.fam.care?.mode !== 'nursery') || S.flags.atHome) ? `<span style="color:var(--amber)">${TL.t('yes')}</span>` : TL.t('no'));
+    if (S.upbringing) {
+      add('成长环境', esc(TL.careLabel(S)));
+      const learned = Object.entries(S.upbringing.skills).filter(([, v]) => v > 0)
+        .map(([k, v]) => (TL.GROWTH_SKILLS[k] || k) + ' ' + Math.round(v));
+      if (learned.length) add('成长训练', esc(learned.join(' · ')));
+      const histories = S.upbringing.history.filter(h => h.accepted);
+      if (histories.length) add('经历', esc(histories.map(h => h.title).join(' · ')));
+      if (S.equipment?.guardianGun) add('守护铳', S.equipment.guardianGun.received ? '已领取，自行保管' : '资格登记，暂缓领取');
+      if (S.equipment?.launcher) add('发射器', '受指导的榴弹发射器训练');
+    }
     if (S.school) add(TL.lang === 'zh' ? '在校' : 'In school', TL.L`还剩 ${S.schoolLeft} 年`);
     if (S.serveLeft > 0) add(TL.lang === 'zh' ? '服役' : 'In service', TL.L`还剩 ${S.serveLeft} 年`);
-    if (S.ori && S.ori.stage > 0) {
-      add(TL.t('crystalRate'), Math.round(S.ori.crystal) + '%', 'neg');
+      if (S.ori && S.ori.stage > 0) {
+        add(TL.lang === 'zh' ? '体细胞融合率' : 'Cell fusion', Math.round(S.ori.crystal) + '%', 'neg');
+        add(TL.lang === 'zh' ? '血液结晶密度' : 'Blood crystal density',
+          Number(S.ori.bloodDensity == null ? 0.12 + S.ori.crystal * 0.003 : S.ori.bloodDensity).toFixed(2) + 'u/L', 'neg');
+      add(TL.lang === 'zh' ? '最近暴露' : 'Last exposure',
+        esc(TL.oriExposureName ? TL.oriExposureName(S.ori.exposure) : S.ori.exposure || '—'));
       add(TL.lang === 'zh' ? '感染年龄' : 'Infected at', S.ori.at + TL.t('ageWord'));
     }
     add(TL.lang === 'zh' ? '年度死亡风险' : 'Annual mortality',
@@ -518,6 +553,9 @@
     if (f.mom) add(TL.t('mother'), f.mom.name, f.mom.age, f.mom.job ? TL.jobLabel(f.mom.job) : '—', f.mom.alive);
     if (f.dad) add(TL.t('father'), f.dad.name, f.dad.age, f.dad.job ? TL.jobLabel(f.dad.job) : '—', f.dad.alive);
     (f.sibs || []).forEach(s => add(TL.t('siblings'), s.name, s.age, s.job ? TL.jobLabel(s.job) : '—', s.alive));
+    for (const p of [...(f.care?.caregivers || []), ...(f.care?.peers || [])]) {
+      add(p.role + (p.remote ? '（异地）' : ''), p.name, p.age, p.job ? TL.jobLabel(p.job) : '—', p.alive);
+    }
     if (f.partner) add(TL.t('partner'), f.partner.name, f.partner.age,
                        f.partner.job ? TL.jobLabel(f.partner.job) : '—', f.partner.alive !== false);
     (f.kids || []).forEach(k => add(TL.t('children'), k.name, k.age,
@@ -803,7 +841,7 @@
       { n: TL.t('happy'), c: C.h, f: y => y.h },
       { n: TL.t('knowledge'), c: C.sm, f: y => y.sm },
       { n: TL.t('social'), c: C.so, f: y => y.so },
-      { n: zh ? '结晶率' : 'Crystal', c: C.ori, f: y => (y.stage > 0 ? Math.min(100, y.ori) : null), dash: true }
+      { n: zh ? '体细胞融合率' : 'Cell fusion', c: C.ori, f: y => (y.stage > 0 ? Math.min(100, y.ori) : null), dash: true }
     ], 176);
   };
 

@@ -13,6 +13,8 @@
   /* 原作里 q 由「种族地位 + 王庭 + 种姓」共同决定，本作加上「矿石病身份」    */
   /* ---------------------------------------------------------------------- */
   TL.drawWealth = function (nationId, raceId, rnd) {
+    // 用户约定：正常阿戈尔海底城均富。种族不会把公共保障挤回贫富两端。
+    if (nationId === 'AEG') return 4;
     const n = TL.NATION_BY_ID[nationId];
     const r = TL.RACE_BY_ID[raceId];
     // 国家基尼越高，两极越厚、中间越薄
@@ -37,19 +39,101 @@
 
   /* ---------------------------------------------------------------------- */
   /* 源石技艺适应性 arts（0-100）                                            */
-  /* 泰拉特有的天赋维度：决定你能不能成为术师/医疗/辅助，也决定感染后       */
-  /* 恶化得更快还是更慢。原作没有这一维，是本作的核心扩展。                  */
+  /* 泰拉特有的天赋维度：决定技艺的广度、学习速度与使用上限；先天适应性     */
+  /* 不等同于病情，感染后进展另由血液负担、治疗和健康状态共同决定。          */
   /* ---------------------------------------------------------------------- */
   TL.drawArts = function (nationId, raceId, rnd) {
     const n = TL.NATION_BY_ID[nationId];
     const r = TL.RACE_BY_ID[raceId];
-    // 基线：国家普及度 × 30，种族天赋加成
-    let base = n.art * 34 + (r.mod.art || 0) * 3.0;
+    // 国别影响教育机会；先天适应性不因国籍直接增加。
+    let base = 20 + (r.mod.art || 0) * 3.0;
     // 个体差异：三均匀分布近似正态
     base += (rnd() + rnd() + rnd() - 1.5) * 22;
     // 极小概率的「天生异禀」
     if (rnd() < 0.012) base += 28 + rnd() * 20;
     return Math.round(TL.clamp(base, 2, 99));
+  };
+
+  /* ---------------------------------------------------------------------- */
+  /* 源石技艺原型                                                            */
+  /* ---------------------------------------------------------------------- */
+  /*
+   * PRTS 的干员技艺名称极多，但在人生模拟里不需要为每位干员复制一套
+   * 规则。这里保存“能量/作用原型”：具体技艺只需映射到一个或两个原型，
+   * 事件再用场景标签寻找可用的原型。这样既保留点火、反重力、电、铝热
+   * 剑等差异，也不会把事件表膨胀成干员名单。
+   */
+  TL.ARTS_TYPES = {
+    // school 对应《源石技艺》列出的宽泛理论派系；type 是可以继续扩充的
+    // 实际能力原型。新增干员技艺时，优先复用 tags，而不是新增专属规则。
+    ignition:       { name: '点火与热能', en: 'Ignition / heat', school: 'conversion', tags: ['heat', 'burn', 'area'] },
+    gravity:        { name: '重力与反重力', en: 'Gravity / anti-gravity', school: 'conjuration', tags: ['force', 'mobility', 'control'] },
+    electricity:    { name: '电与电磁', en: 'Electricity / electromagnetic', school: 'conversion', tags: ['electric', 'stun', 'power'] },
+    thermite_blade: { name: '铝热切割', en: 'Thermite cutting', school: 'conversion', tags: ['heat', 'cut', 'armor'] },
+    barrier:        { name: '屏障与防护', en: 'Barrier / protection', school: 'conjuration', tags: ['defense', 'barrier'] },
+    perception:     { name: '感知与侦测', en: 'Perception / detection', school: 'telepathy', tags: ['detect', 'scouting'] },
+    kinetic:        { name: '动能与冲击', en: 'Kinetic force', school: 'conjuration', tags: ['force', 'impact', 'repel'] },
+    restoration:    { name: '恢复与疗愈', en: 'Restoration / healing', school: 'healing', tags: ['heal', 'stabilize'] },
+    frost:          { name: '冷却与冻结', en: 'Cooling / frost', school: 'conversion', tags: ['cold', 'slow', 'control'] },
+    transmutation:  { name: '塑形与重构', en: 'Shaping / transmutation', school: 'shaping', tags: ['shape', 'repair', 'material'] },
+    physiology:     { name: '生理强化与调节', en: 'Physiology / enhancement', school: 'physiology', tags: ['body', 'reflex', 'stabilize'] }
+  };
+  TL.ARTS_TYPE_IDS = Object.keys(TL.ARTS_TYPES);
+
+  function pickArtsType(rnd, nationId, raceId) {
+    const n = TL.NATION_BY_ID[nationId] || {};
+    const r = TL.RACE_BY_ID[raceId] || {};
+    const bias = [];
+    for (const id of TL.ARTS_TYPE_IDS) {
+      let w = 1;
+      if (id === 'perception' || id === 'transmutation') w += (n.edu || 0) / 20;
+      if (id === 'ignition' || id === 'frost') w += (n.cat || 0) * 0.8;
+      if (id === 'gravity' || id === 'kinetic') w += Math.max(0, (r.mod && r.mod.hl) || 0) / 30;
+      if (id === 'electricity') w += (n.art || 0) * 0.25;
+      bias.push({ id, w });
+    }
+    const total = bias.reduce((s, x) => s + x.w, 0);
+    let x = rnd() * total;
+    for (const item of bias) { x -= item.w; if (x <= 0) return item.id; }
+    return bias[bias.length - 1].id;
+  }
+
+  TL.drawArtsProfile = function (nationId, raceId, arts, rnd) {
+    rnd = rnd || TL.rnd;
+    const primary = pickArtsType(rnd, nationId, raceId);
+    let secondary = null;
+    if (rnd() < 0.30) {
+      secondary = pickArtsType(rnd, nationId, raceId);
+      if (secondary === primary) secondary = TL.ARTS_TYPE_IDS[(TL.ARTS_TYPE_IDS.indexOf(primary) + 1) % TL.ARTS_TYPE_IDS.length];
+    }
+    const affinity = TL.clamp(0.18 + (arts || 0) / 125, 0.18, 0.98);
+    const training = {};
+    for (const id of TL.ARTS_TYPE_IDS) training[id] = 0;
+    training[primary] = Math.round(6 + affinity * 18);
+    if (secondary) training[secondary] = Math.round(3 + affinity * 10);
+    return {
+      primary, secondary, affinity,
+      training,
+      control: Math.round(TL.clamp(28 + affinity * 22 + rnd() * 18, 18, 82)),
+      fatigue: 0,
+      uses: 0,
+      lastType: null,
+      lastAge: null
+    };
+  };
+
+  TL.ensureArtsProfile = function (S) {
+    if (S.artsProfile && S.artsProfile.primary && S.artsProfile.training) return S.artsProfile;
+    S.artsProfile = TL.drawArtsProfile(S.nation, S.race, S.arts || 0, TL.rnd);
+    return S.artsProfile;
+  };
+
+  TL.trainArts = function (S, type, amount) {
+    const p = TL.ensureArtsProfile(S);
+    const id = TL.ARTS_TYPES[type] ? type : p.primary;
+    p.training[id] = TL.clamp((p.training[id] || 0) + (amount || 0), 0, 100);
+    p.control = TL.clamp((p.control || 0) + Math.max(0, amount || 0) * 0.12, 0, 100);
+    return p.training[id];
   };
 
   /* ---------------------------------------------------------------------- */
@@ -142,8 +226,11 @@
     /* --- ⑤ 阶层 / 居住区域 --- */
     // 这是泰拉最残酷的分野：在城墙的哪一侧，比你生在哪个国家更决定命运。
     // 宏观上约 45% 的人住在移动城市里，55% 在荒野。
+    const bornYear = (o.bornYear && o.bornYear > 900) ? (o.bornYear | 0)
+      : (TL.drawBirthYear ? TL.drawBirthYear(TL.rnd) : 1085);
+    const place = TL.drawPlace(nationId, bornYear, TL.rnd, o.placeId);
     const q0 = TL.drawWealth(nationId, raceId, TL.rnd);
-    const stratum = TL.drawStratum(nationId, q0, TL.rnd);
+    const stratum = TL.placeStratum(place, q0, TL.rnd);
     const urban = TL.stratum(stratum).urban;
 
     /* --- ⑥ 家庭财富分位 --- */
@@ -151,10 +238,11 @@
 
     /* --- ⑦ 姓名与城市 --- */
     const nm = TL.makeName(nationId, sex, raceId);
-    const city = TL.cityOf(nationId);
+    const city = TL.placeName(place, bornYear);
 
     /* --- ⑧ 天赋 --- */
     const arts = TL.drawArts(nationId, raceId, TL.rnd);
+    const artsProfile = TL.drawArtsProfile(nationId, raceId, arts, TL.rnd);
 
     /* --- ⑨ 父母 --- */
     const momAge = Math.round(TL.clamp(
@@ -204,6 +292,9 @@
     const S = {
       /* 身份 */
       nation: nationId,
+      birthNation: nationId,
+      birthPlace: TL.placeSnapshot(place, bornYear),
+      residence: TL.placeSnapshot(place, bornYear),
       race: raceId,
       court: court ? court.id : null,
       courtName: court ? court.name : null,
@@ -233,7 +324,10 @@
       /* 四维 + 天赋 */
       st: st,
       arts: arts,
-      ori: null,          // 矿石病 {at, stage, crystal, treated, known, art}
+      // arts 是历史兼容的总体技艺值；affinity 是出生时抽定的先天亲和度，
+      // training/control 则记录具体方向的后天训练与操控能力。
+      artsProfile: artsProfile,
+      ori: null,          // 矿石病 {at, stage(按血液密度), crystal(融合率), bloodDensity, exposure, organLoad, treated, known, art}
 
       /* 经济 */
       money: 0,
@@ -307,9 +401,9 @@
     S.cityName = city;                     // 兼容旧字段名
     /* 泰拉历：出生年份从年表区间里抽，不是固定值。
        你没法选择自己生在哪个时代 —— 这本来就是这游戏的第一条规则。 */
-    S.bornYear = (o.bornYear && o.bornYear > 900) ? (o.bornYear | 0)
-      : (TL.drawBirthYear ? TL.drawBirthYear(TL.rnd) : 1085);
+    S.bornYear = bornYear;
     S.year = S.bornYear;
+    if (TL.initUpbringing) TL.initUpbringing(S);
     if (TL.timelineBackstory) TL.timelineBackstory(S);
     if (TL.timelineLegend) TL.timelineLegend(S);
     // 像素场景的种子：同一个人的场景在一生中保持同一套构图，
@@ -472,6 +566,10 @@
       base *= 1 - TL.clamp(d, 0, 0.75) * 0.42;
       // 家境惯性：出身好的人起点高
       base *= 1 + (S.q - 3) * 0.06;
+    }
+    // 均富城市：公共供给之外仍有个人资源差异，但不沿用贫富悬殊的工资倍率。
+    if (TL.placeHas?.(S, 'materialGuarantee') && !S.affiliation && pensionAmount == null) {
+      base = n.ppp * (S.age < 18 ? 0.1 : TL.clamp(base / n.ppp, 0.45, 0.65));
     }
     S.income = Math.max(0, base);
     S.subsistenceAnnual = TL.organizationSubsistence ? TL.organizationSubsistence(S) : 0;

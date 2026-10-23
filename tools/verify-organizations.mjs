@@ -174,6 +174,23 @@ for (const mutate of [S=>S.nation='YAN', S=>S.year=1084, S=>S.age=15,
   S.orgHistory[0].reason = 'changed';
   assert.equal(S.report.orgHistory[0].reason, 'test', 'report is a snapshot');
 }
+{
+  const S=join('blacksteel','biosecurity');
+  S.artsProfile={primary:'gravity',secondary:null,affinity:0.7,
+    training:{gravity:20},control:55,fatigue:0,uses:0};
+  const training=S.artsProfile.training.gravity;
+  const control=S.artsProfile.control;
+  const chance=TL.chance; TL.chance=()=>false;
+  try {
+    S.year++; S.age++; TL.organizationYear(S);
+    TL.organizationYear(S);
+  } finally { TL.chance=chance; }
+  assert.equal(S.orgService,1,'blacksteel biosecurity service counts once per year');
+  assert.ok(S.flags.protectionPractice>0,'biosecurity route trains contamination procedures');
+  assert.ok(S.flags.protectiveGear>0,'biosecurity route supplies protective equipment');
+  assert.ok(S.artsProfile.training.gravity>training,'field response improves the character’s own arts direction');
+  assert.ok(S.artsProfile.control>control,'field response improves casting control');
+}
 for (const mutate of [S=>S.job='seeking', S=>S.flags.retired=true, S=>S.age=65, S=>S.school='university', S=>S.serveLeft=1]) {
   const S = join(); mutate(S); TL.syncOrganization(S); assert.equal(S.affiliation, null);
 }

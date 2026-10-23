@@ -166,8 +166,7 @@
   /* 死亡率                                                                  */
   /* ---------------------------------------------------------------------- */
   TL.deathProb = function (S) {
-    // 100% 结晶率是本模拟的终末阈值：抵达时在当年结算中必然死亡。
-    if (S.ori && S.ori.stage > 0 && S.ori.crystal >= 100) return 1;
+    // 结构融合率是不可逆组织改变的近似值，不作为单次读数的必死开关。
     const n = TL.NATION_BY_ID[S.nation];
     const lt = TL.LT(S);
     const a = S.age;
@@ -494,7 +493,7 @@
   };
 
   TL.pickCause = function (S, a, other) {
-    if (!other && S.ori && S.ori.stage > 0 && S.ori.crystal >= 100) return 'ori';
+    if (!other && S.ori && S.ori.stage >= 3 && S.st.hl < 12) return 'ori';
     return TL.wpick(TL.causeWeights(S, a, other));
   };
 
@@ -543,6 +542,157 @@
     const ti = TL.tolInfo(S.nation, S.year);
     if (ti.lifeK < 1) k *= 1 / Math.max(0.15, ti.lifeK);
     return k;
+  };
+
+  /* ---------------------------------------------------------------------- */
+  /* 源石技艺：场景交互与一线生机                                           */
+  /* ---------------------------------------------------------------------- */
+  /* 具体干员技艺先归入少数原型；死亡事件只提供场景标签。 */
+  TL.ARTS_SCENES = {
+    cat:       { title: '天灾中的一瞬间', prompt: '碎石、尘暴和源石簇正一齐压来。', tags: ['detect', 'defense', 'mobility', 'cold'] },
+    fall:      { title: '坠落中的几秒', prompt: '你正在坠落，地面迅速逼近。', tags: ['mobility', 'defense', 'force'] },
+    fire:      { title: '火场里的退路', prompt: '热浪封住了出口，烟已经灌进肺里。', tags: ['heat', 'defense', 'cold'] },
+    explosion: { title: '爆炸后的冲击', prompt: '冲击波和飞散的碎片已经到了眼前。', tags: ['defense', 'force', 'mobility', 'electric'] },
+    collapse:  { title: '坍塌下的空隙', prompt: '承重结构正在断裂，你得在下一次震动前找到支点。', tags: ['mobility', 'defense', 'detect', 'cut', 'shape', 'force'] },
+    shock:     { title: '失控设备旁', prompt: '裸露的电弧正在爬过设备外壳。', tags: ['electric', 'defense', 'heal', 'stabilize'] },
+    machine:   { title: '机器故障现场', prompt: '机械结构卡死，失控部件开始转动。', tags: ['electric', 'detect', 'shape', 'power'] },
+    lock:      { title: '被封死的出口', prompt: '门闩变形卡住，烟和热都在逼近。', tags: ['electric', 'cut', 'shape'] },
+    war:       { title: '交火中的掩体', prompt: '弹片、火力和倒下的结构只留给你一个动作的时间。', tags: ['defense', 'force', 'electric', 'heat', 'mobility', 'cut'] },
+    beast:     { title: '荒野袭击', prompt: '野兽扑来，你来不及跑远，只能制造脱身的空隙。', tags: ['heat', 'electric', 'defense', 'force', 'control'] },
+    cold:      { title: '失温前的挣扎', prompt: '寒冷正在夺走你的行动能力。', tags: ['heat', 'defense', 'heal', 'body'] },
+    heat:      { title: '热灾中的呼吸', prompt: '热浪让你几乎无法呼吸，必须先稳住身体。', tags: ['cold', 'defense', 'heal', 'stabilize'] },
+    ori:       { title: '病程急剧恶化', prompt: '结晶正在逼近要害，你需要争取时间稳定身体。', tags: ['heal', 'defense', 'shape', 'stabilize', 'body'] },
+    surgery:   { title: '紧急救治', prompt: '伤处被结晶和异物卡住，必须先处理伤口。', tags: ['cut', 'heal', 'shape', 'precision'] },
+    debris:    { title: '废墟下的脱身', prompt: '沉重的碎片压住了你，周围仍在继续坍落。', tags: ['defense', 'mobility', 'force', 'shape'] },
+    ambush:    { title: '伏击的第一击', prompt: '袭击已经开始，你只有一瞬间判断来向并避开要害。', tags: ['detect', 'defense', 'electric', 'force'] },
+    mine:      { title: '矿坑事故', prompt: '粉尘弥漫，支护结构发出断裂声。', tags: ['detect', 'mobility', 'defense', 'electric'] },
+    rescue:    { title: '救援现场', prompt: '有人被困在危险区域，你必须开出一条通路。', tags: ['mobility', 'defense', 'detect', 'force', 'shape'] },
+    drowning:  { title: '溺水前的最后一口气', prompt: '水已经灌进胸腔，岸边有人伸手却差了一截。', tags: ['mobility', 'force', 'defense', 'heal', 'stabilize'] },
+    chernobog_escape: { title: '切尔诺伯格撤离线', prompt: '天灾碎石和街区袭击同时封住去路，你必须抢出一条撤离线。', tags: ['detect', 'mobility', 'defense', 'force', 'shape'] },
+    mine_riot: { title: '矿场镇压中的矿道', prompt: '矿道支护开始崩裂，粉尘与人群都向唯一出口涌来。', tags: ['detect', 'mobility', 'defense', 'force', 'shape'] },
+    yumen_core: { title: '玉门动力核心失控', prompt: '动力核心遭到破坏，城防结构震动，关外的巨兽正在逼近。', tags: ['electric', 'detect', 'defense', 'force', 'shape'] },
+    twinight_backlash: { title: '崔林特尔梅之夜的术式反噬', prompt: '术式失控，冲击沿着施术媒介反卷回来。', tags: ['electric', 'defense', 'heal', 'stabilize', 'body'] }
+  };
+  TL.ARTS_CAUSE_SITUATION = {
+    cat: 'cat', fall: 'fall', fire: 'fire', inj: 'debris', road: 'machine',
+    drown: 'drowning', cold: 'cold', heat: 'heat', war: 'war', slave: 'collapse',
+    exec: 'ambush', hom: 'ambush', beast: 'beast', sea: 'rescue', art: 'shock', ori: 'ori'
+  };
+  TL.ARTS_TRIGGER_SITUATION = {
+    urs_cherobog: 'chernobog_escape',
+    urs_koval: 'mine_riot',
+    yan_yumen: 'yumen_core',
+    lei_twinight: 'twinight_backlash'
+  };
+
+  TL.artsSituationForCause = function (cause, trigger) {
+    const eventId = String(trigger || '').replace(/^timeline:/, '');
+    return TL.ARTS_TRIGGER_SITUATION[eventId] || TL.ARTS_CAUSE_SITUATION[cause] || null;
+  };
+
+  TL.artsCandidates = function (S, situation) {
+    const scene = TL.ARTS_SCENES[situation];
+    if (!S || !scene) return [];
+    const p = TL.ensureArtsProfile ? TL.ensureArtsProfile(S) : S.artsProfile;
+    if (!p) return [];
+    const ids = [p.primary, p.secondary].filter(Boolean);
+    const sceneTags = new Set(scene.tags);
+    return Object.keys(TL.ARTS_TYPES || {}).filter(id => {
+      const type = TL.ARTS_TYPES[id];
+      const trained = Number(p.training && p.training[id]) || 0;
+      const relevant = (type.tags || []).some(tag => sceneTags.has(tag));
+      return relevant && (ids.includes(id) || trained >= 18);
+    }).map(id => ({ id, training: Number(p.training && p.training[id]) || 0,
+      primary: id === p.primary }));
+  };
+
+  TL.artsRescueAvailable = function (S, cause, trigger) {
+    const situation = TL.artsSituationForCause(cause, trigger);
+    return situation && TL.artsCandidates(S, situation).length > 0 ? situation : null;
+  };
+
+  TL.artsRescueCheck = function (S, options) {
+    options = options || {};
+    const situation = options.situation || TL.artsSituationForCause(options.cause, options.trigger);
+    const candidates = TL.artsCandidates(S, situation);
+    if (!candidates.length) return { available: false, success: false, situation };
+    const p = TL.ensureArtsProfile(S);
+    const candidate = candidates.slice().sort((a, b) => {
+      const av = a.training + (a.primary ? 9 : 0), bv = b.training + (b.primary ? 9 : 0);
+      return bv - av;
+    })[0];
+    let score = (S.arts || 0) * 0.30
+      + (p.affinity || 0) * 30
+      + candidate.training * 0.38
+      + (p.control || 0) * 0.18
+      + (candidate.primary ? 5 : 0)
+      - (p.fatigue || 0) * 0.08;
+    if (S.affiliation === 'rhodes') score += 8;
+    if (S.affiliation === 'blacksteel') score += 6;
+    if (S.ori && S.ori.art) score += 3;
+    score += TL.range(-8, 8);
+    const lastStand = !!options.lastStand && !!(S.ori && S.ori.stage > 0);
+    if (lastStand) score += 13 + S.ori.stage * 2;
+    const difficulty = Number(options.difficulty || ({ cat: 72, collapse: 70, war: 74, ori: 78 }[situation] || 66));
+    const success = score >= difficulty;
+
+    p.uses = (p.uses || 0) + 1;
+    p.fatigue = TL.clamp((p.fatigue || 0) + (lastStand ? 24 : 10), 0, 100);
+    p.lastType = candidate.id;
+    p.lastAge = S.age;
+    if (success) {
+      p.successes = (p.successes || 0) + 1;
+      TL.eff(S, { hl: lastStand ? -10 : -4, h: lastStand ? -7 : -2 });
+      if (lastStand && S.ori) {
+        const o = S.ori;
+        o.bloodDensity = TL.clamp((o.bloodDensity || 0.12) + 0.014 + o.stage * 0.008, 0.08, 1.2);
+        o.bloodSetPoint = Math.max(o.bloodSetPoint || 0, o.bloodDensity);
+        o.organLoad = o.organLoad || {};
+        o.organLoad.nerve = TL.clamp((o.organLoad.nerve || 0) + 0.045 + o.stage * 0.015, 0, 1);
+        o.organLoad.core = TL.clamp((o.organLoad.core || 0) + 0.018, 0, 1);
+        o.stage = TL.oriStageOf(o.bloodDensity);
+        S.flags.artsLastStandAt = S.age;
+      }
+    } else {
+      p.failures = (p.failures || 0) + 1;
+      if (lastStand && S.ori) {
+        const o = S.ori;
+        o.bloodDensity = TL.clamp((o.bloodDensity || 0.12) + 0.008 + o.stage * 0.006, 0.08, 1.2);
+        o.stage = TL.oriStageOf(o.bloodDensity);
+      }
+    }
+    return { available: true, success, situation, type: candidate.id,
+      score: Math.round(score), difficulty, lastStand };
+  };
+
+  TL.resolveArtsRescue = function (S, lastStand) {
+    const c = S.flags.artsRescueContext || {};
+    const result = TL.artsRescueCheck(S, { cause: c.cause, situation: c.situation,
+      difficulty: c.difficulty, lastStand });
+    delete S.flags.artsRescueContext;
+    delete S.flags.artsRescueOffered;
+    if (result.success) {
+      if (TL.resumeTimelineAfterArtsRescue) TL.resumeTimelineAfterArtsRescue(S, c.continuation);
+      const label = TL.ARTS_TYPES[result.type]?.name || '源石技艺';
+      return lastStand
+        ? TL.L`你把体内的结晶推到极限，用${label}撕开一条生路。你活下来了，但血液检测值又升了一截。`
+        : TL.L`你用${label}抓住了坠落的间隙，或许只是运气终于站在你这边。`;
+    }
+    S.flags.artsRescueFailedAt = S.age;
+    S.flags.artsRescueResolving = true;
+    TL.die(S, c.cause, c.trigger || 'arts_rescue');
+    delete S.flags.artsRescueResolving;
+    return TL.L`你试着施术，但${TL.ARTS_TYPES[result.type]?.name || '技艺'}没有按预想回应。`;
+  };
+
+  TL.resolveArtsDeath = function (S) {
+    const c = S.flags.artsRescueContext || {};
+    delete S.flags.artsRescueContext;
+    delete S.flags.artsRescueOffered;
+    S.flags.artsRescueResolving = true;
+    TL.die(S, c.cause, c.trigger || 'event');
+    delete S.flags.artsRescueResolving;
+    return TL.L`你没有强行施术。最后一刻，你选择接受眼前的结局。`;
   };
 
   /** 源石技艺适应性等级 */

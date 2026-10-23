@@ -29,24 +29,94 @@
   /* 分期定义                                                               */
   /* ---------------------------------------------------------------------- */
   TL.ORI_STAGES = [
-    { id: 0, name: '未感染', en: 'Uninfected', short: '—',  desc: '体内未检出源石结晶。' },
-    { id: 1, name: 'Ⅰ期',   en: 'Stage I',   short: 'Ⅰ期', desc: '体表出现零星结晶，体检可检出。日常活动不受限。' },
-    { id: 2, name: 'Ⅱ期',   en: 'Stage II',  short: 'Ⅱ期', desc: '结晶扩散至肢体与内脏周边，间歇性剧痛，体力明显下降。' },
-    { id: 3, name: 'Ⅲ期',   en: 'Stage III', short: 'Ⅲ期', desc: '结晶侵入主要脏器，器官功能持续衰竭，预期生存以年计。' }
+    { id: 0, name: '未感染', en: 'Uninfected', short: '—',  desc: '尚未确诊矿石病；接触史仍会影响风险。' },
+    { id: 1, name: '轻度感染', en: 'Mild infection', short: '轻度', desc: '血液源石结晶密度低于 0.30u/L；症状和工作影响通常有限。' },
+    { id: 2, name: '中度感染', en: 'Moderate infection', short: '中度', desc: '血液源石结晶密度处于 0.30–0.40u/L；需要持续管理。' },
+    { id: 3, name: '重度感染', en: 'Severe infection', short: '重度', desc: '血液源石结晶密度高于 0.40u/L；器官负担和死亡风险显著上升。' }
   ];
 
-  /** 结晶率 0..100 的分期门槛：Ⅰ期 0-25，Ⅱ期 25-60，Ⅲ期 60-100 */
-  const STAGE_GATE = [0, 25, 60, 100];
+  /**
+   * 临床严重程度以血液源石结晶密度为准（NGA 档案整理的经验分档）：
+   * 轻度 <0.30u/L，中度 0.30–0.40u/L（含），重度 >0.40u/L。
+   * 体细胞融合率是独立的慢变量，不应代理临床严重程度。
+   */
+  const BLOOD_GATE = [0, 0.30, 0.40];
+  /* OCR/NGA 案例中的体细胞融合率最高约 19%；它是慢变量的显示上限，
+   * 不是临床分期。旧存档若超过该值，在迁移和下一次年度推进时压回。 */
+  const FUSION_MAX = 19;
+  TL.ORI_FUSION_MAX = FUSION_MAX;
 
-  TL.oriStageOf = function (crystal) {
-    if (crystal >= STAGE_GATE[2]) return 3;
-    if (crystal >= STAGE_GATE[1]) return 2;
-    if (crystal > 0) return 1;
+  TL.oriStageOf = function (bloodDensity) {
+    if (!(bloodDensity > 0)) return 0;
+    if (bloodDensity > BLOOD_GATE[2]) return 3;
+    if (bloodDensity >= BLOOD_GATE[1]) return 2;
+    if (bloodDensity > 0) return 1;
     return 0;
   };
   /** 分期的显示名：按当前界面语言取（见 region.js 的 TL.nameOf） */
   TL.oriStageName = function (stage) {
     return TL.nameOf(TL.ORI_STAGES[stage] || TL.ORI_STAGES[0]);
+  };
+
+  /* ---------------------------------------------------------------------- */
+  /* 暴露类型与防护                                                         */
+  /* ---------------------------------------------------------------------- */
+  /*
+   * OCR 中的感染路径不是一条“职业倍率”：活性粉尘、碎片划伤、矿井接触、
+   * 精炼泄漏与固化源石的风险不同。这里把它们保存为可追踪的暴露记录，
+   * 方便事件、组织训练和 UI 解释同一套结果。
+   */
+  TL.ORI_EXPOSURES = {
+    active_dust:       { name: '活性源石粉尘', en: 'Active Originium dust', factor: 5.8, blood: [0.19, 0.31], organ: { lung: 0.08, core: 0.02 } },
+    fragment_wound:    { name: '源石碎片划伤', en: 'Originium fragment wound', factor: 3.2, blood: [0.16, 0.25], organ: { skin: 0.10, limb: 0.06 } },
+    mine_contact:      { name: '矿井接触', en: 'Mine contact', factor: 4.4, blood: [0.17, 0.28], organ: { lung: 0.05, skin: 0.05 } },
+    refinery_leak:    { name: '精炼炉泄漏', en: 'Refinery leak', factor: 6.6, blood: [0.20, 0.34], organ: { lung: 0.12, core: 0.03 } },
+    stable_crystal:   { name: '固化源石加工', en: 'Stable crystal handling', factor: 0.28, blood: [0.14, 0.20], organ: { limb: 0.05 }, injury: true },
+    protective_failure:{ name: '防护失效', en: 'Protective failure', factor: 2.1, blood: [0.17, 0.27], organ: { lung: 0.04, skin: 0.04 } }
+  };
+  TL.oriExposureName = function (id) {
+    const e = TL.ORI_EXPOSURES[id] || TL.ORI_EXPOSURES.fragment_wound;
+    return TL.nameOf(e);
+  };
+
+  TL.protectionScore = function (S) {
+    let score = 0;
+    score += TL.clamp(Number(S.flags && S.flags.protectionPractice) || 0, 0, 0.35);
+    score += TL.clamp(Number(S.flags && S.flags.protectiveGear) || 0, 0, 0.25);
+    // 儿时学到的规程须配合实际防护装备；知识本身不提供感染免疫。
+    if (S.flags.protectiveGear > 0 && TL.growthSkill) score += Math.min(0.08, TL.growthSkill(S, 'protection') / 100);
+    if (S.affiliation === 'blacksteel' && TL.isWorking && TL.isWorking(S)) score += 0.22;
+    if (S.affiliation === 'rhodes' && TL.isWorking && TL.isWorking(S)) score += 0.14;
+    return TL.clamp(score, 0, 0.62);
+  };
+
+  TL.exposureModifier = function (S, type) {
+    const e = TL.ORI_EXPOSURES[type] || TL.ORI_EXPOSURES.fragment_wound;
+    const protection = TL.protectionScore(S);
+    // 防护降低粉尘与泄漏概率，但不会把碎片伤口变成零风险。
+    const floor = type === 'fragment_wound' || type === 'stable_crystal' ? 0.42 : 0.24;
+    return Math.max(floor, 1 - protection);
+  };
+
+  TL.exposureTypeFor = function (S) {
+    if (S.flags && S.flags.postCatastrophe) return 'active_dust';
+    if (S.flags && S.flags.protectiveGear && TL.chance(0.18)) return 'protective_failure';
+    if (S.job === 'refiner' || S.job === 'factory') return 'refinery_leak';
+    if (S.job === 'oriminer' || S.job === 'miner' || S.job === 'stormcaller') return 'mine_contact';
+    if (S.job === 'smith' || S.job === 'construct' || S.job === 'artsmith') {
+      return TL.chance(0.22) ? 'stable_crystal' : 'fragment_wound';
+    }
+    return 'fragment_wound';
+  };
+
+  TL.recordExposure = function (S, type) {
+    const id = TL.ORI_EXPOSURES[type] ? type : 'fragment_wound';
+    S.flags.oriExposure = id;
+    S.flags.oriExposureAt = S.age;
+    if (!Array.isArray(S.flags.oriExposureHistory)) S.flags.oriExposureHistory = [];
+    S.flags.oriExposureHistory.push({ age: S.age, year: S.year, type: id });
+    if (S.flags.oriExposureHistory.length > 12) S.flags.oriExposureHistory.shift();
+    return TL.ORI_EXPOSURES[id];
   };
 
   /* ---------------------------------------------------------------------- */
@@ -121,7 +191,6 @@
     if (r) k *= 0.65 + (r.ori || 1) * 0.42;              // 源石亲和（瓦伊凡/萨卡兹/龙更易感）
     k *= 1 + (3 - S.q) * 0.14;                            // 贫困：住得近、买不起防护
     k *= 1.15 - (TL.NATION_BY_ID[S.nation].med || 0.5) * 0.30;  // 医疗与劳保
-    k *= 1 + TL.artRank(S) * 0.07;                        // 技艺适应性高 = 对源石更「敏感」
     // 大事件：柯瓦尔矿场暴动后的北原矿区、大静谧后的沿海、大荒城失败的治理
     if (TL.tlMods) {
       const tl = TL.tlMods(S.nation, S.year);
@@ -171,6 +240,9 @@
     if (S.job === 'slave') p *= 3.2;         // 矿坑苦役
     if (S.age < EXPOSE_FROM) p *= 0.5;
 
+    // 防护服、滤网、通风训练与组织安全规程只降低接触概率，不能抹除感染。
+    p *= 1 - TL.protectionScore(S) * 0.72;
+
     return TL.clamp(p, 0, 0.55);
   };
 
@@ -178,33 +250,42 @@
    * 判定是否感染。所有感染路径都必须走这里 ——
    * 否则会出现绕过校准的旁路，让终生感染率远远偏离设定。
    */
-  TL.tryInfect = function (S, k) {
+  TL.tryInfect = function (S, k, options) {
     let p = TL.oriRisk(S);
     if (p <= 0) return false;
     if (k && k > 0) p = TL.clamp(p * k, 0, 0.65);
     if (!TL.chance(p)) return false;
-    TL.infect(S);
+    TL.infect(S, false, options);
     return true;
   };
 
   /* ---------------------------------------------------------------------- */
   /* 感染                                                                   */
   /* ---------------------------------------------------------------------- */
-  TL.infect = function (S, silent) {
+  TL.infect = function (S, silent, options) {
+    options = options || {};
     const ar = TL.artRank(S);
+    const exposure = TL.ORI_EXPOSURES[options.type || S.flags.oriExposure] || null;
+    const bloodBand = exposure && exposure.blood ? exposure.blood : [0.16, 0.26];
+    const infectionBlood = options.bloodDensity == null ? TL.range(bloodBand[0], bloodBand[1]) : options.bloodDensity;
+    if (options.type && S.flags.oriExposure !== options.type) TL.recordExposure(S, options.type);
     S.ori = {
       at: S.age,
       stage: 1,
-      crystal: TL.range(4, 14),
+      crystal: TL.range(3, 11),
+      // crystal 暂作为旧接口兼容，语义固定为体细胞融合率（%）。
+      bloodDensity: infectionBlood,
+      bloodSetPoint: infectionBlood,
+      exposure: options.type || S.flags.oriExposure || 'unknown',
+      organLoad: { skin: 0.12, limb: 0.04, lung: 0.02, nerve: 0.01, core: 0.01 },
       treated: false,
       known: false,
       art: ar >= 2,
       provider: null
     };
-    S.ori.stage = TL.oriStageOf(S.ori.crystal);
+    S.ori.stage = TL.oriStageOf(S.ori.bloodDensity);
 
-    // 感染后源石技艺适应性上升 —— 代价与馈赠同时到来
-    S.arts = TL.clamp(S.arts + (6 + ar * 4 + TL.range(0, 8)), 0, 100);
+    // 感染者可借体内结晶施术；感染本身不代表瞬间获得大量适应性。
 
     TL.eff(S, { h: -18, hl: -6 });
     if (!silent) {
@@ -212,6 +293,32 @@
     }
     S.flags.infectedAt = S.age;
     return S.ori;
+  };
+
+  /** 记录一次具体接触。未感染者按该路径独立掷骰，已感染者增加血液与器官负担。 */
+  TL.expose = function (S, type, options) {
+    options = options || {};
+    const e = TL.recordExposure(S, type);
+    const id = S.flags.oriExposure;
+    const factor = (options.factor == null ? e.factor : options.factor) * TL.exposureModifier(S, id);
+    if (e.injury) TL.eff(S, { hl: -3, h: -1 });
+    if (!S.ori || S.ori.stage <= 0) {
+      const infected = options.guaranteed ? (TL.infect(S, false, { type: id }), true) : TL.tryInfect(S, factor, { type: id });
+      if (infected && S.ori) {
+        for (const organ of Object.keys(e.organ || {})) S.ori.organLoad[organ] = TL.clamp((S.ori.organLoad[organ] || 0) + e.organ[organ], 0, 1);
+        S.ori.bloodDensity = TL.clamp(Math.max(S.ori.bloodDensity, TL.range(e.blood[0], e.blood[1])), 0.08, 1.2);
+        S.ori.bloodSetPoint = Math.max(S.ori.bloodSetPoint || 0, S.ori.bloodDensity);
+        S.ori.stage = TL.oriStageOf(S.ori.bloodDensity);
+      }
+      return infected;
+    }
+    const o = S.ori;
+    for (const organ of Object.keys(e.organ || {})) o.organLoad[organ] = TL.clamp((o.organLoad[organ] || 0) + e.organ[organ] * 0.35, 0, 1);
+    o.bloodDensity = TL.clamp(o.bloodDensity + TL.range(0.015, 0.045) * factor, 0.08, 1.2);
+    o.bloodSetPoint = Math.max(o.bloodSetPoint || 0, o.bloodDensity);
+    o.stage = TL.oriStageOf(o.bloodDensity);
+    S.flags.oriSurge = 1;
+    return true;
   };
 
   /* ---------------------------------------------------------------------- */
@@ -223,27 +330,54 @@
     const ar = TL.artRank(S);
     const o = S.ori;
     const ti = TL.tolInfo(S.nation, S.year);
+    o.organLoad = o.organLoad || { skin: 0.1, limb: 0.03, lung: 0.02, nerve: 0.01, core: 0.01 };
 
-    let grow = 2.4;
-    grow *= 1 + ar * 0.22;                    // 技艺越强，源石越活跃
-    grow *= [1, 1.0, 1.35, 1.6][o.stage];     // 晚期加速
-    grow *= 1 + (3 - S.q) * 0.10;
-    grow *= 1.6 - S.st.hl / 140;
+    // 迁移旧存档，并把融合率限制在考据可见的约 19% 内。
+    o.crystal = TL.clamp(Number(o.crystal) || 0, 0, FUSION_MAX);
+    const blood = TL.clamp(Number(o.bloodDensity) || 0.12, 0.08, 1.2);
+    // 血液源石结晶密度是病程的快变量：低密度时融合推进很慢，
+    // 进入中重度后才会明显加速。两者有关，但融合率不替代血液分期。
+    const bloodPressure = TL.clamp((blood - 0.08) / 0.32, 0.05, 1.20);
+    let grow = 1.15 * bloodPressure;
+    grow *= [1, 0.72, 1.05, 1.45][o.stage];
+    grow *= 1 + (3 - S.q) * 0.08;
+    grow *= 1.35 - S.st.hl / 180;
     // 低容忍度国家：药物流入被禁，结晶推进更快
     grow *= 1 + (1 - ti.lifeK) * 0.55;
 
     if (o.treated) {
-      grow *= (o.provider === 'rhodes' ? 0.26 : 0.50);
+      // 轻/中度且得到抑制治疗时，进展压到近似可忽略；重度仍可能缓慢恶化。
+      const controlled = blood < 0.40;
+      grow *= o.provider === 'rhodes'
+        ? (controlled ? 0.035 : 0.12)
+        : (controlled ? 0.10 : 0.32);
       const cost = TL.NATION_BY_ID[S.nation].ppp * (o.provider === 'rhodes' ? 2.6 : 1.2);
       if (S.money >= cost) S.money -= cost;
       else { o.treated = false; o.provider = null; S.flags.oriLapsed = S.age; }
     }
 
-    o.crystal = TL.clamp(o.crystal + grow * TL.range(0.75, 1.3), 0, 100);
+    const previousFusion = o.crystal;
+    o.crystal = TL.clamp(o.crystal + grow * TL.range(0.75, 1.3), 0, FUSION_MAX);
+    // 原作描述融合率增加与技艺适应性提高相关；幅度保持温和，避免一次感染跳变。
+    S.arts = TL.clamp(S.arts + Math.max(0, o.crystal - previousFusion) * 0.12, 0, 100);
+    // 血液负担是快变量：暴露、贫困与治疗影响它，融合率不再代理它。
+    const bloodNow = o.bloodDensity == null ? 0.12 + previousFusion / FUSION_MAX * 0.025 : blood;
+    const fusionPressure = TL.clamp((o.crystal / FUSION_MAX) - 0.35, 0, 0.65) * 0.020;
+    const bloodTarget = (o.bloodSetPoint == null ? bloodNow : o.bloodSetPoint)
+      + (o.treated ? 0 : 0.010)
+      + fusionPressure
+      + ((o.organLoad.core || 0) + (o.organLoad.lung || 0)) * 0.08
+      + (S.flags.oriSurge ? 0.10 : 0);
+    const bloodControl = o.treated ? (o.provider === 'rhodes' ? 0.035 : 0.018) : 0;
+    o.bloodDensity = TL.clamp(bloodNow + (bloodTarget - bloodNow) * 0.18 - bloodControl + TL.range(-0.008, 0.008), 0.08, 1.2);
+    const delta = Math.max(0, o.crystal - previousFusion) / 100;
+    for (const organ of Object.keys(o.organLoad)) o.organLoad[organ] = TL.clamp(o.organLoad[organ] + delta * (organ === 'skin' ? 0.55 : 0.12), 0, 1);
 
-    const ns = TL.oriStageOf(o.crystal);
-    if (ns > o.stage) {
-      o.stage = ns;
+    const previousStage = o.stage;
+    const ns = TL.oriStageOf(o.bloodDensity);
+    // 分期始终反映当前血液检测值；治疗把数值压回阈值以下时也允许回落。
+    o.stage = ns;
+    if (ns > previousStage) {
       TL.eff(S, { hl: -12, h: -10 });
       const line = [
         null, null,
@@ -303,6 +437,7 @@
     let v = ar * 22 + S.st.hl * 0.35 + S.st.sm * 0.15;
     if (S.ori && S.ori.stage > 0) v += S.ori.stage * 9;
     if (S.opRank) v += TL.OP_RANKS[S.opRank].need * 1.2;
+    if (TL.growthSkill) v += Math.min(5, (TL.growthSkill(S, 'shooting') + TL.growthSkill(S, 'launcher')) * 0.12);
     return Math.round(v);
   };
 

@@ -104,8 +104,8 @@
       ori: 6.5, cat: 1.3, war: 0.1, hom: 3.2, road: 17, mat: 70, alc: 1.5, smk: 32,
       net: 64, art: 0.50,
       race: ['cautus', 'feline', 'perro', 'petram', 'savra', 'sarkaz', 'vouivre'],
-      gov: '矿业联合体 · 公司领地',
-      tag: '卡特斯的血汗浇出了维多利亚的原始积累。矿井比地面更深的，是这里的人均感染率。'
+      gov: '大家庭与厂区／矿区自治 · 自治区与自治州',
+      tag: '矿业塑造生活，也有非血缘的大家庭、厂区运动会和联防组织。防护与照护都需要社群共同承担。'
     },
     {
       id: 'KAZ', name: '卡西米尔', en: 'Kazimierz', reg: 'core', pop: 1800, b: 21, le: 78.0, gap: 4.2,
@@ -140,8 +140,8 @@
       ori: 3.0, cat: 1.2, war: 0.9, hom: 22.0, road: 22, mat: 120, alc: 0.8, smk: 22,
       net: 46, art: 0.42,
       race: ['perro', 'feline', 'rebbah', 'anura', 'tiacauh', 'sarkaz', 'liberi'],
-      gov: '三方割据 · 傀儡政府 / 自治政府 / 军政府',
-      tag: '三方势力在同一片土地上打了几十年。这里的孩子学会的第一件事是分辨枪声的方向。'
+      gov: '辛嘉斯 · 联合政府 · 真正玻利瓦尔人；多索雷斯另有城市治理',
+      tag: '控制区的制度与生活条件各异；农业、歌谣、多语言生活和城市旅游，也构成孩子的成长环境。'
     },
     {
       id: 'IBE', name: '伊比利亚', en: 'Iberia', reg: 'sea', pop: 1417, b: 13, le: 72.0, gap: 4.2,
@@ -159,7 +159,7 @@
       net: 90, art: 0.74,
       race: ['sankta', 'liberi', 'feline', 'perro', 'caprinae'],
       gov: '教宗 · 教皇厅 · 律法（天堂支点）',
-      tag: '律法不是比喻，是一台还在运转的机器。这里的甜点比别处的药还准时。'
+      tag: '萨科塔与黎博利共同生活、学习和接受武器训练。守护铳资格与训练成绩分别办理，城外村镇也有修道院提供服务。'
     },
     {
       id: 'MIN', name: '米诺斯', en: 'Minos', reg: 'south', pop: 600, b: 8, le: 80.0, gap: 3.8,
@@ -213,7 +213,7 @@
       net: 88, art: 0.50,
       race: ['feline', 'perro', 'liberi', 'aegir', 'vulpo', 'sankta'],
       gov: '市议会 · 商会 · 黑曜石节筹备委员会',
-      tag: '火山挡住了天灾，也挡住了时间。每年黑曜石节，整座城都在音乐里泡着。'
+      tag: '音乐、旅游与生态教育塑造城市生活。1098 年迁入新城后的体验，不能继续沿用旧城海滩。'
     },
     {
       id: 'AEG', name: '阿戈尔', en: 'Ægir', reg: 'sea', pop: 9000, b: 60, le: 88.0, gap: 3.0,
@@ -222,7 +222,7 @@
       net: 92, art: 0.30,
       race: ['aegir', 'phidia', 'petram'],
       gov: '科学执政官 · 技术执政官 · 双院制',
-      tag: '疆域比所有陆地国家加起来还大。他们不靠源石，靠的是前文明留下的东西——以及一些不该被唤醒的东西。'
+      tag: '海底城市拥有发达技术和公共设施。公共养育、创作与工程构成日常生活；不同城市的能源与设施并不完全相同。'
     },
     {
       id: 'DUR', name: '杜林', en: 'Durin', reg: 'under', pop: 900, b: 10, le: 82.0, gap: 3.4,
@@ -231,7 +231,7 @@
       net: 74, art: 0.68,
       race: ['durin', 'petram', 'feline', 'savra'],
       gov: '诸城邦自治 · 工程师行会',
-      tag: '在萨尔贡的阿卡胡拉之下，有一整片倒过来的天空。地上的人管那里叫传说，他们管地上叫天花板。'
+      tag: '地下分布着多个杜林城邦，技术发达，各城邦又有各自的社会与生活习惯。并非全部位于阿卡胡拉地下。'
     },
     {
       id: 'LMN', name: '龙门', en: 'Lungmen', reg: 'east', pop: 500, b: 5, le: 80.0, gap: 4.0,
@@ -479,6 +479,7 @@
 
   /** 国家的亲都市程度：越富裕、越工业化的国家，城市人口占比越高 */
   TL.cityShare = function (nationId) {
+    if (nationId === 'AEG' || nationId === 'DUR') return 1;
     const n = TL.NATION_BY_ID[nationId];
     return TL.clamp(n.urb / 100 * (0.85 + n.ppp * 0.45), 0.34, 0.92);
   };
@@ -489,6 +490,8 @@
    * 再在城市内部按 core / industrial / fringe 的配比细分；家境好的人更靠内。
    */
   TL.drawStratum = function (nationId, q, rnd) {
+    if (nationId === 'AEG') return 'marine';
+    if (nationId === 'DUR') return 'subterranean';
     const cs = TL.cityShare(nationId);
     if (rnd() >= cs) return 'wild';
     const w = {
@@ -519,6 +522,7 @@
   TL.stratumLE = function (nationId, stratumId) {
     const n = TL.NATION_BY_ID[nationId];
     const s = TL.stratum(stratumId);
+    if (s.directLE) return n.le * s.leK;
     if (s.leAbs) {
       const t = TL.clamp((n.ppp - 0.3) / 1.3, 0, 1);
       return s.leAbs[0] + (s.leAbs[1] - s.leAbs[0]) * t;
