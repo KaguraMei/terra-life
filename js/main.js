@@ -687,6 +687,7 @@
 
     $('startTitle').textContent = TL.lang === 'zh' ? '泰拉人生模拟' : 'Terra Life Simulator';
     TL.renderLandingTitle();
+    TL.renderNoticeBoard();
     $('rChartLbl').textContent = TL.lang === 'zh'
       ? '一生曲线 · 体质 / 心境 / 学识 / 羁绊 / 结晶率'
       : 'Life curve · health / happiness / knowledge / bonds / crystallization';
@@ -778,6 +779,7 @@
     renderOdds();
     renderSaves();
     bind();
+    TL.initNotice();
 
     // 同步 chip 的选中态
     const mark = (boxId, val) => {

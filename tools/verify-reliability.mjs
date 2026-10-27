@@ -272,7 +272,8 @@ const app=simulation({log(){},warn(){},error(...args){errors.push(args);}});
 const U=app.TL;
 U.UI={auto:false}; U.$=element;
 for(const name of ['renderAll','renderFocus','renderTop','renderLandingOdds','initLanding',
-  'showDecision','drawLifeChart','drawWealthChart','renderFeed','renderLandingTitle']) U[name]=()=>{};
+  'showDecision','drawLifeChart','drawWealthChart','renderFeed','renderLandingTitle',
+  'renderNoticeBoard','initNotice']) U[name]=()=>{};
 U.birthIntro=(_s,_o,begin)=>begin();
 const doc={readyState:'loading',title:'Test',body:element('body'),
   getElementById:element,createElement:()=>({style:{}}),querySelectorAll:()=>[],querySelector:element,

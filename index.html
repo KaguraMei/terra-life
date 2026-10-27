@@ -179,6 +179,24 @@
 </div>
 
 <!-- ====================================================================== -->
+<!-- 首页通讯板 · 内容拓展详情                                              -->
+<!-- ====================================================================== -->
+<div id="notice" hidden>
+  <div id="noticeBox" role="dialog" aria-modal="true" aria-labelledby="noticeTitle">
+    <header class="notice-modal-head">
+      <div class="notice-head-main">
+        <div class="notice-kicker" id="noticeKicker">通讯板</div>
+        <h2 id="noticeTitle">—</h2>
+      </div>
+      <button type="button" id="noticeClose" aria-label="关闭">✕</button>
+    </header>
+    <div id="noticeMeta"></div>
+    <div id="noticeBody"></div>
+    <div id="noticeFoot"></div>
+  </div>
+</div>
+
+<!-- ====================================================================== -->
 <!-- 开局界面                                                                -->
 <!-- ====================================================================== -->
 <div class="screen entrance" id="start">
@@ -239,6 +257,14 @@
         <section class="landing-archive"><h2>在这片大地留下的人生</h2><p>这里只记录已结束人生的摘要；进行中的人生暂不支持断点续玩。</p><div id="saves"></div></section>
       </aside>
     </div>
+    <section class="landing-notice" aria-labelledby="noticeBoardTitle">
+      <div class="notice-head">
+        <h2 id="noticeBoardTitle">通讯板</h2>
+        <p class="notice-lead" id="noticeBoardLead">这个模拟还在不断调整，每次改动都记在这里。点开任意一条，就能看到具体改了什么。</p>
+        <button type="button" class="notice-all" id="noticeAllBtn">全部记录</button>
+      </div>
+      <div class="notice-list" id="noticeList"></div>
+    </section>
     <section class="landing-notes">
       <article><h3>出生之前，世界已经开始</h3><p>从 1042–1095 年间降生。历史不会等你长大，远方的战争与城市的迁徙，也会成为你人生的一部分。</p></article>
       <article><h3>每一年，认真做一件事</h3><p>求学、工作、相爱、离开。为每一年选择重心，在命运交来的抉择前，决定如何过下去。</p></article>
@@ -332,11 +358,13 @@
 <script src="js/data/interviews.js"></script>
 <script src="js/engine/interview.js"></script>
 <script src="js/data/upbringing.js"></script>
+<script src="js/data/changelog.js"></script>
 <script src="js/engine/upbringing.js"></script>
 <script src="js/engine/year.js"></script>
 <script src="js/ui/pixelart.js"></script>
 <script src="js/ui/render.js"></script>
 <script src="js/ui/landing.js"></script>
+<script src="js/ui/changelog.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

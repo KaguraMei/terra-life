@@ -37,7 +37,7 @@ const html = read('index.html');
 const htmlIds = new Set();
 for (const m of html.matchAll(/\sid="([^"]+)"/g)) htmlIds.add(m[1]);
 
-const jsFiles = ['js/ui/render.js', 'js/ui/pixelart.js', 'js/ui/landing.js', 'js/main.js'];
+const jsFiles = ['js/ui/render.js', 'js/ui/pixelart.js', 'js/ui/landing.js', 'js/ui/changelog.js', 'js/main.js'];
 
 /* 运行期才建出来的 id 也算「有定义」：
    浮层内容是用 innerHTML 拼的，errbox 是出错时才 append 的。
@@ -110,9 +110,9 @@ console.log(`· 定义了但未被 TL.t() 引用：zh ${onlyZh.length} 个、en 
 /* ---------------------------------------------------------------------- */
 const FILES = ['js/engine/rng.js', 'js/engine/text.js', 'js/engine/region.js',
   'js/data/nations.js', 'js/data/races.js', 'js/data/jobs.js', 'js/data/names.js',
-  'js/data/baseline.js', 'js/data/focus.js', 'js/data/organizations.js',
+  'js/data/locations.js', 'js/data/baseline.js', 'js/data/focus.js', 'js/data/organizations.js',
   'js/engine/lifetable.js', 'js/engine/cohort.js', 'js/engine/oripathy.js', 'js/engine/state.js',
-  'js/engine/decision.js', 'js/data/timeline.js','js/data/events.js', 'js/data/decisions.js', 'js/engine/organization.js', 'js/data/organization-events.js', 'js/data/interviews.js', 'js/engine/interview.js', 'js/engine/year.js'];
+  'js/engine/decision.js', 'js/data/timeline.js','js/data/events.js', 'js/data/decisions.js', 'js/engine/organization.js', 'js/data/organization-events.js', 'js/data/interviews.js', 'js/engine/interview.js', 'js/data/upbringing.js', 'js/engine/upbringing.js', 'js/engine/year.js'];
 const ctx = vm.createContext({ window: {}, console, Math, JSON, Date, Intl,
   parseFloat, parseInt, isFinite, isNaN, Object, Array, String, Number, Boolean, Float64Array });
 for (const f of FILES) vm.runInContext(read(f), ctx, { filename: f });
