@@ -352,6 +352,11 @@
       job: 'child',
       opClass: null,
       opRank: 0,
+      // 罗德岛的岗位方向：field=外勤，support=内勤；post 记具体部门。
+      rhodesTrack: null,
+      rhodesPost: null,
+      // 当前驻地：内勤为舰上，外勤任务期为任务地；不改变家庭住址。
+      station: null,
       serveLeft: 0,
 
       /* 组织归属独立于谋生职业；orgApplication 保存多轮面试会话。 */
@@ -550,8 +555,8 @@
       const eduK = TL.clamp(S.eduLevel / 4, 0, 1);
       const t = TL.clamp(0.35 * eduK + 0.45 * exp + 0.20 * (S.st.sm / 100), 0, 1);
       base = n.ppp * (J.lo + (J.hi - J.lo) * t);
-      // 干员阶级加成
-      if (J.cls && S.opRank > 0) base *= TL.OP_RANKS[S.opRank].pay;
+      // 干员阶级加成（旧存档带着已经不存在的阶数时按最高阶处理）
+      if (J.cls && S.opRank > 0) base *= (TL.opRankDef ? TL.opRankDef(S.opRank).pay : TL.OP_RANKS[S.opRank].pay);
       if (TL.organizationPayMultiplier) base *= TL.organizationPayMultiplier(S);
     } else if (S.job === 'retired') {
       base = pensionAmount == null ? n.ppp * 0.45 : pensionAmount;

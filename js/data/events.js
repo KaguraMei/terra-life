@@ -247,9 +247,9 @@
         // 当年现金账本按旧工资结算而快照却显示新工资。
         return '你的组织履历记录了这次表现，晋升将在年度评审时处理。';
       }
-      if (S.opClass) S.opRank = Math.min(4, S.opRank + 1);
+      if (S.opClass) S.opRank = Math.min(TL.OP_RANKS.length - 1, S.opRank + 1);
       const J = TL.JOBS[S.job];
-      if (J && J.cls) return TL.L`你的档案上多了一行字。${TL.OP_RANKS[S.opRank].name}——从今天起，别人这样叫你。`;
+      if (J && J.cls) return TL.L`你的档案上多了一行字。${TL.opRankName(S.opRank)}——从今天起，别人这样叫你。`;
       return TL.L`工头把你叫到一边，说下个月起你的工钱加两成。`;
     }
   });
@@ -2113,7 +2113,9 @@
     if (TL.syncResidence) TL.syncResidence(S);
     const a = S.age;
     const n = TL.NATION_BY_ID[S.nation];
-    if (S.age >= 10 && TL.placeHas(S, 'emergencyTerminal') && TL.chance(0.035)) TL.queueEvent(S, 0.8, 'ev', 'aeg_equipment_fault');
+    // 住舰上或驻外时，家里那套日常（街市、邻里、天灾预警）不适用。
+    const away = TL.isAwayFromHome ? TL.isAwayFromHome(S) : false;
+    if (!away && S.age >= 10 && TL.placeHas(S, 'emergencyTerminal') && TL.chance(0.035)) TL.queueEvent(S, 0.8, 'ev', 'aeg_equipment_fault');
     if (S.age === 20 && TL.currentPlace(S)?.regime === 'coalition') TL.queueEvent(S, 0.35, 'dec', 'blv_professional_army');
     if (TL.organizationScheduledDecisions) {
       for (const d of TL.organizationScheduledDecisions(S)) TL.queueEvent(S, d.at, 'dec', d.id);
@@ -2170,7 +2172,7 @@
     //              整城大迁徙每 3~5 年一次。
     //    荒野：不能移动。每 5~8 年一次中型天灾，
     //          每 20~30 年一次毁灭级源石风暴（致死/致残率可达 20%）。
-    if (a >= 3) {
+    if (a >= 3 && !away) {
       const st = TL.stratum(S.stratum);
       if (st.urban) {
         if (TL.chance(0.20 * (n.cat + 0.5))) {
@@ -2209,14 +2211,16 @@
       }
     }
 
-    // ⑥ 阶层日常：城里和荒野的日子不是同一种日子
+    // ⑥ 阶层日常：城里和荒野的日子不是同一种日子（不在家时不适用）
     const _st = TL.stratum(S.stratum);
-    if (_st.urban) {
-      if (a >= 12 && TL.chance(0.28)) pool = pool.concat(['core_screen']);
-      if (a >= 16 && TL.chance(0.22)) pool = pool.concat(['core_service']);
-    } else {
-      if (a >= 6 && TL.chance(0.30)) pool = pool.concat(['wild_beast']);
-      if (TL.chance(0.26)) pool = pool.concat(['wild_water']);
+    if (!away) {
+      if (_st.urban) {
+        if (a >= 12 && TL.chance(0.28)) pool = pool.concat(['core_screen']);
+        if (a >= 16 && TL.chance(0.22)) pool = pool.concat(['core_service']);
+      } else {
+        if (a >= 6 && TL.chance(0.30)) pool = pool.concat(['wild_beast']);
+        if (TL.chance(0.26)) pool = pool.concat(['wild_water']);
+      }
     }
     // ⑤ 高危职业的额外暴露：注意这里不能直接「保证」一次感染事件。
     //    职业暴露已经体现在 TL.oriRisk() 的 jobK 里（源石采掘工 ×14）。
@@ -2230,6 +2234,14 @@
 
     if (a >= 6) pool = pool.concat(TL.SUPPLEMENTAL_EVENTS.filter(id =>
       !id.startsWith('org_') && id !== 'organization_contact'));
+    // 不在家时，事件池换成「能带走的事」：路上、家书、驻地的傍晚，以及组织任务。
+    if (away) {
+      const portable = ['quiet_year', 'small_luck', 'mental_low', 'injury_accident', 'work_injury',
+        'work_overtime', 'work_colleague', 'kid_grow', 'old_parent', 'ori_pain', 'ori_kindness',
+        'ori_rhodes', 'away_road', 'away_letter', 'away_local'];
+      pool = pool.filter(id => portable.indexOf(id) >= 0 || id.indexOf('rhodes_') === 0);
+      nEv = Math.max(1, nEv - 1);
+    }
     // 成员每年获得一个组织事件机会，占用原有事件位，避免额外堆叠风险。
     const organizationEvent = TL.pickOrganizationEvent ? TL.pickOrganizationEvent(S) : null;
     if (organizationEvent) {

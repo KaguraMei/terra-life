@@ -452,6 +452,13 @@
       if (S.drug) w.oinf = (w.oinf || 0.5) * 12;
       const jr = (TL.JOBS[S.job] || {}).risk;
       if (jr) for (const x in jr) w[x] = (w[x] || 1) * jr[x];
+      // 罗德岛的方向差异：外勤多承担出舰与现场风险，内勤的现场风险低一些。
+      if (S.affiliation === 'rhodes' && S.rhodesTrack) {
+        const k = S.station && S.station.kind === 'deploy' ? (S.station.risk || 1.35)
+          : S.station && S.station.kind === 'ship' ? 0.85
+          : S.rhodesTrack === 'field' ? 1.18 : 0.92;
+        ['inj', 'war', 'fall', 'hom'].forEach(x => { if (w[x]) w[x] *= k; });
+      }
       if (S.alc) {
         w.cir = (w.cir || 0.5) * 6;
         ['road', 'inj', 'fall', 'hom'].forEach(x => { if (w[x]) w[x] *= 2; });

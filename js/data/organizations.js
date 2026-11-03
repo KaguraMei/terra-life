@@ -48,7 +48,7 @@
             r('实习干员', 'Trainee', { needYears: 0 }),
             r('正式干员', 'Operator', { needYears: 1 }),
             r('资深干员', 'Senior Operator', { needYears: 6 }),
-            r('精英干员', 'Elite Operator', { needYears: 16 })
+            r('精英干员', 'Elite Operator', { needYears: 16, assessment: 'rhodes_elite' })
           ],
           interview: profile(['combat', 'teamwork', 'ethics'], 'rhodes_operator')
         }
@@ -534,8 +534,8 @@
   O.rhodes.routes.operator.require = S => TL.combatValue(S) >= 55 && S.arts >= 20;
   O.rhodes.routes.operator.ranks = [
     r('实习干员', 'Trainee', { needYears: 0 }), r('正式干员', 'Operator', { needYears: 1 }),
-    r('资深干员', 'Senior Operator', { needYears: 6 }), r('精英干员', 'Elite Operator', { needYears: 16 }),
-    r('王牌干员', 'Ace Operator', { needYears: 30 })
+    r('资深干员', 'Senior Operator', { needYears: 6 }),
+    r('精英干员', 'Elite Operator', { needYears: 16, assessment: 'rhodes_elite' })
   ];
   // 接纳感染者不要求警卫履历；guard 仅复用行动风险模型，收入由 unpaid 覆盖。
   O.reunion.routes.infected.entryJob = 'guard';

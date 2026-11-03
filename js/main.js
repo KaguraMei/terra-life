@@ -186,13 +186,59 @@
   /* ---------------------------------------------------------------------- */
   /* 死亡 → 报告                                                            */
   /* ---------------------------------------------------------------------- */
+  /**
+   * 死亡不再直接跳报告：先让画面收束（卒字卡），再进报告。
+   * 卡片可以点击或按任意键跳过；系统开了「减少动态效果」时保留静态停顿。
+   */
   function finishLife(S) {
     if (raf) { cancelAnimationFrame(raf); raf = null; }
+    if (S._deathShown) return;
+    S._deathShown = true;
     const rep = S.report || TL.finalizeLife(S);
-    renderReport(S, rep);
     saveLife(S);
-    $('game').hidden = true;
-    $('report').hidden = false;
+    showDeathCard(S, function () {
+      renderReport(S, rep);
+      $('game').hidden = true;
+      $('report').hidden = false;
+      $('report').scrollTop = 0;
+    });
+  }
+
+  function showDeathCard(S, next) {
+    const overlay = $('death');
+    if (!overlay) { next(); return; }
+    const reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const line = (S.log || []).slice().reverse().find(e => e && e.kind === 'death');
+
+    $('deathName').textContent = S.fullName || '';
+    $('deathMeta').textContent = TL.L`卒于 ${S.deathAge} 岁 · ${TL.causeName(S.deathCause, S.deathAge)}`;
+    $('deathLine').textContent = line ? line.text : '';
+    $('deathHint').textContent = reduce ? '' : '点击或按任意键继续';
+    // 过场期间不显示游戏内的提示条
+    clearTimeout(toastTimer);
+    $('toast').hidden = true;
+
+    overlay.hidden = false;
+    overlay.classList.remove('out');
+    let done = false, timer = null, hideTimer = null;
+
+    function finish() {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      if (document.removeEventListener) document.removeEventListener('keydown', onKey);
+      overlay.classList.add('out');
+      hideTimer = setTimeout(function () {
+        overlay.hidden = true;
+        overlay.classList.remove('out');
+        next();
+      }, reduce ? 0 : 420);
+    }
+    function onKey() { finish(); }
+
+    overlay.addEventListener('click', finish, { once: true });
+    if (!reduce && document.addEventListener) document.addEventListener('keydown', onKey);
+    timer = setTimeout(finish, reduce ? 1600 : 3200);
   }
 
   function renderReport(S, rep) {
@@ -202,7 +248,8 @@
     const deathMode = rep.deathTrigger === 'annual'
       ? TL.L`年度风险判定 ${TL.fmt.pct(rep.deathRisk || 0, 2)}`
       : TL.L`事件直接致死`;
-    $('rDead').innerHTML = TL.L`卒于 ${rep.age} 岁 · ${rep.causeName} · ${deathMode} · ${rep.nation} ${rep.city}
+    const placeAtDeath = rep.station ? rep.station : (rep.nation + ' ' + rep.city);
+    $('rDead').innerHTML = TL.L`卒于 ${rep.age} 岁 · ${rep.causeName} · ${deathMode} · ${placeAtDeath}
       <br><span style="color:var(--fg3);font-size:12px">同为${rep.nation}${rep.sex === 'M' ? '男' : '女'}性的模拟人生，平均活到 ${rep.lifeExp} 岁（四分位 ${rep.baseP25}–${rep.baseP75}）——你${rel} ${Math.abs(rep.delta).toFixed(1)} 年</span>
       <br><span style="color:var(--fg3);font-size:12px">该国的统计预期寿命为 ${rep.statLE} 岁</span>`;
 
@@ -211,7 +258,7 @@
       ['死因', rep.causeName, 'red'],
       ['种族', rep.race + (rep.court && rep.court !== '无王庭' ? '·' + rep.court : ''), ''],
       ['源石技艺', rep.artsRankName + ' (' + Math.round(rep.arts) + ')', ''],
-      ['最高职业', rep.apex.opClass ? (TL.opRankName(rep.apex.opRank) + '·' + TL.opClassName(rep.apex.opClass)) : TL.jobLabel(rep.apex.job), 'teal'],
+      ['最高职业', rep.apex.opClass ? (TL.operatorTitle ? TL.operatorTitle(rep.apex) : TL.opRankName(rep.apex.opRank) + '·' + TL.opClassName(rep.apex.opClass)) : TL.jobLabel(rep.apex.job), 'teal'],
       ['学历', TL.eduName(rep.apex.eduLevel), ''],
       ['终生平均·体质', rep.avg.hl, ''],
       ['终生平均·心境', rep.avg.h, ''],
@@ -231,6 +278,11 @@
         TL.organizationRouteName(h.organization, h.route) + ' · ' +
         TL.organizationRankName(h.organization, h.route, Math.max(...h.ranks)) +
         (h.reason ? '（' + h.reason + '）' : '')).join('<br>'), 'teal']);
+    }
+    if (rep.deployLog && rep.deployLog.length) {
+      cells.push(['外勤任务', rep.deployLog.map(d =>
+        d.year + ' · ' + escapeHtml(d.name) +
+        (d.short ? ' · ' + escapeHtml(TL.rhodesMissionName(d.mission)) : '')).join('<br>'), 'teal']);
     }
     const contacts = Object.values(rep.orgContacts || {});
     if (contacts.length) cells.push(['人物往来', contacts.map(c => c.name + ' · ' + c.count + ' 次').join('、'), '']);

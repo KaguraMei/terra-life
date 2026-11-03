@@ -83,6 +83,9 @@
       S.opClass = previousClass || TL.pick(classes).id;
       S.opRank = previousClass ? (S.opRank || 1) : 1;
       S.job = 'op_' + S.opClass;
+      // 每次入职重新选岗位方向；老履历不动。
+      S.rhodesTrack = null;
+      S.rhodesPost = null;
     }
     S.affiliation = id; S.orgRoute = routeId; S.orgRank = 0;
     S.orgService = 0; S.orgJoinedAt = S.age; S.orgLastServiceYear = S.year;
@@ -101,6 +104,8 @@
       promotions: [], serviceYears: 0, reason: null });
     TL.log(S, '你加入了' + TL.organizationName(id) + '，负责' + r.name + '。', 'org',
       { key: 'org_join_' + id, organization: id });
+    // 罗德岛先定岗位方向（外勤／内勤），再进入正常结算。
+    if (id === 'rhodes' && TL.queueEvent) TL.queueEvent(S, 0, 'dec', 'rhodes_track');
     TL.computeIncome(S);
     return true;
   };
@@ -130,7 +135,10 @@
     }
     delete S.flags['org_' + id];
     if (id === 'reunion') { S.flags.reunion = false; S.flags.reunionLeft = S.age; }
-    if (id === 'rhodes' && !options.preserveOperatorRank) { S.opClass = null; S.opRank = 0; }
+    if (id === 'rhodes' && !options.preserveOperatorRank) {
+      S.opClass = null; S.opRank = 0; S.rhodesTrack = null; S.rhodesPost = null;
+    }
+    if (id === 'rhodes') S.station = null;
     if (!options.keepJob && S.job === S.orgJob) {
       S.flags.lastJob = S.job; S.job = 'seeking';
     }
@@ -190,7 +198,10 @@
         !TL.isWorking(S) || S.flags.retired || S.orgTransition ||
         !TL.organizationState(S, S.affiliation).recruitment || !TL.organizationAvailable(S, S.affiliation)) return false;
     const next = r.ranks[(S.orgRank || 0) + 1];
-    return !!next && S.orgService >= next.needYears && S.orgLastPromotionYear !== S.year;
+    if (!next) return false;
+    // 有些职阶不是熬年头就能上：精英干员必须先通过考核。
+    if (next.assessment && !S.flags['assess_' + next.assessment]) return false;
+    return S.orgService >= next.needYears && S.orgLastPromotionYear !== S.year;
   };
   TL.promoteOrganization = function (S, options) {
     options = options || {};
@@ -213,6 +224,8 @@
         S.orgLastServiceYear >= S.year || S.orgTransition) return;
     S.orgLastServiceYear = S.year;
     S.orgService++;
+    // 任务期结束：津贴与履历在归来时结算。
+    if (S.station && S.station.kind === 'deploy' && S.year >= S.station.returnYear) TL.endRhodesDeployment(S);
     // OCR 中黑钢有新兵中心、装备技术部门和专门的矿石病/生化响应单位；
     // 按路线授予相应训练，装备只能降低暴露，不能给绝对免疫。
     if (S.affiliation === 'blacksteel') {
@@ -229,9 +242,14 @@
         S.flags.protectiveGear = TL.clamp((S.flags.protectiveGear || 0) + 0.06, 0, 0.25);
       }
     } else if (S.affiliation === 'rhodes') {
-      S.flags.protectionPractice = TL.clamp((S.flags.protectionPractice || 0) + 0.03, 0, 0.35);
-      // 外勤部负责能力评估与作战训练，适应性仍是先天值，成长的是具体方向熟练度。
-      if (TL.trainArts) TL.trainArts(S, S.artsProfile && S.artsProfile.primary, 1.1);
+      // 外勤：跟着行动队出舰，练的是技艺和现场处置；内勤：留在舰上，练的是业务与协作。
+      if (S.rhodesTrack === 'support') {
+        S.flags.protectionPractice = TL.clamp((S.flags.protectionPractice || 0) + 0.02, 0, 0.35);
+        if (TL.knowAdd) TL.knowAdd(S, 0.9);
+      } else {
+        S.flags.protectionPractice = TL.clamp((S.flags.protectionPractice || 0) + 0.04, 0, 0.35);
+        if (TL.trainArts) TL.trainArts(S, S.artsProfile && S.artsProfile.primary, 1.2);
+      }
     }
     const h = activeHistory(S);
     if (h) h.serviceYears = S.orgService;
@@ -239,6 +257,8 @@
   TL.organizationPayMultiplier = function (S) {
     if (TL.organizationUnpaid(S)) return 0;
     if (!S.affiliation || !TL.isWorking(S) || S.flags.retired || S.job !== S.orgJob) return 1;
+    // 外勤有出勤补贴；内勤略低，但风险和作息都更稳。
+    if (S.affiliation === 'rhodes' && S.rhodesTrack) return S.rhodesTrack === 'field' ? 1.16 : 1.06;
     const payroll = (TL.organizationEmploymentModel(S.affiliation) || {}).payroll || {};
     if (payroll.scale !== 'service-rank') return 1;
     const steps = Math.min(payroll.maxRankSteps || 0, Math.max(0, S.orgRank || 0));
@@ -249,6 +269,176 @@
     !S.school && !S.flags.retired && !S.serveLeft);
   TL.organizationSubsistence = S => TL.organizationUnpaid(S) ?
     TL.NATION_BY_ID[S.nation].ppp * (TL.organizationDef(S.affiliation).subsistence || 0) : 0;
+
+  /* ---------------------------------------------------------------------- */
+  /* 罗德岛：岗位方向（外勤／内勤）与精英考核                                  */
+  /* ---------------------------------------------------------------------- */
+  const RHODES_POSTS = {
+    field: '外勤', medical: '医疗与康复', engineering: '工程与设施', personnel: '人事与后勤'
+  };
+  TL.rhodesPostName = post => RHODES_POSTS[post] || '';
+  TL.rhodesTrackName = S => (S && S.rhodesTrack) ? (S.rhodesTrack === 'field' ? '外勤' : '内勤') : '';
+
+  /** 入职后的方向选择。field 保留战斗分支；support 留在舰上做部门工作。 */
+  TL.setRhodesTrack = function (S, track, post) {
+    if (!S || S.affiliation !== 'rhodes') return false;
+    S.rhodesTrack = track === 'support' ? 'support' : 'field';
+    S.rhodesPost = S.rhodesTrack === 'field' ? 'field' : (RHODES_POSTS[post] ? post : 'personnel');
+    // 内勤住舰上；外勤没有固定驻地，任务期之外住在自己的住处。
+    S.station = S.rhodesTrack === 'support'
+      ? { kind: 'ship', name: '罗德岛本舰', sinceYear: S.year }
+      : null;
+    S.flags.rhodesTrackDecided = S.age;
+    TL.log(S, S.rhodesTrack === 'field'
+      ? '你被编入外勤队，跟着行动小组出舰。'
+      : '你被编入' + TL.rhodesPostName(S.rhodesPost) + '，住进了舰上的铺位。', 'org',
+      { key: 'rhodes_track_' + S.rhodesPost });
+    return true;
+  };
+
+  /** 统一的干员头衔：外勤带战斗分支，内勤带部门。 */
+  TL.operatorTitle = function (o) {
+    if (!o || !o.opClass) return '';
+    const head = TL.opRankName(o.opRank);
+    if (!o.rhodesTrack) return head + ' · ' + TL.opClassName(o.opClass);
+    if (o.rhodesTrack === 'support') return head + ' · 内勤 · ' + TL.rhodesPostName(o.rhodesPost);
+    return head + ' · 外勤 · ' + TL.opClassName(o.opClass);
+  };
+
+  /** 精英考核是否可以申报：资深干员、服满年限、没考过也没放弃。 */
+  TL.rhodesEliteReviewReady = function (S) {
+    if (!S || S.affiliation !== 'rhodes' || S.phase !== 'life') return false;
+    if ((S.orgRank || 0) !== 2) return false;
+    if (S.flags.assess_rhodes_elite || S.flags.rhodesEliteDeclined) return false;
+    if ((S.flags.rhodesEliteCooldown || 0) > S.age) return false;
+    if (S.school || S.flags.retired || S.age >= 65 || S.serveLeft > 0 || S.orgTransition ||
+        !TL.isWorking(S) || !TL.organizationAvailable(S, 'rhodes')) return false;
+    const r = TL.organizationRouteDef('rhodes', S.orgRoute);
+    const next = r && r.ranks[(S.orgRank || 0) + 1];
+    if (!next || !next.assessment) return false;
+    return (S.orgService || 0) >= next.needYears;
+  };
+
+  /** 考核判定：外勤看实战，内勤看业务。成功只发资格，职级仍在年度评审兑现。 */
+  TL.rhodesEliteExam = function (S) {
+    const field = S.rhodesTrack !== 'support';
+    const p = field
+      ? TL.clamp(0.30 + (TL.combatValue(S) - 75) / 150 + (S.st.hl - 65) / 220 + (S.arts - 50) / 320, 0.12, 0.86)
+      : TL.clamp(0.32 + (S.st.sm - 65) / 150 + (S.st.so - 60) / 260 + (S.orgService || 0) / 160, 0.12, 0.88);
+    if (TL.chance(p)) {
+      S.flags.assess_rhodes_elite = S.year;
+      TL.eff(S, { h: 6, so: 4 });
+      return '你通过了考核。名单上，你的名字后面多了一个「精英」。';
+    }
+    S.flags.rhodesEliteCooldown = S.age + 2;
+    TL.eff(S, { h: -6 });
+    return field
+      ? '实战考核的最后一轮，你的判断慢了一拍。评语写着：下一轮再来。'
+      : '答辩时，有位评审问起你经手的一桩旧案。你答得含糊。';
+  };
+
+  /* ---------------------------------------------------------------------- */
+  /* 罗德岛：驻地与外勤部署                                                   */
+  /* ---------------------------------------------------------------------- */
+  /* 内勤常驻本舰；外勤平时住在自己的地方，接到任务才临时换驻地。
+     驻地只影响「此刻在哪里」，不搬家、不改户籍，也不动家人的位置。 */
+  const RHODES_MISSIONS = {
+    escort: { name: '护送物资' },
+    rescue: { name: '灾区救援' },
+    scout: { name: '前沿侦察' }
+  };
+  /* 驻扎类任务：时间更长、地点固定，日常也不同。风险与津贴都是玩法数值。 */
+  const RHODES_POSTINGS = {
+    liaison: { name: '联络处', risk: 1.12, pay: 1.0,
+      text: '一间临街的办公室，门口挂着不起眼的牌子。你要和地方的人打交道，也要把名单送回去。' },
+    safehouse: { name: '安全屋', risk: 1.32, pay: 1.6,
+      text: '一套不登记在任何人名下的公寓。接头、换证件、等消息，多数时候只能坐着。' },
+    outpost: { name: '前哨', risk: 1.52, pay: 2.0,
+      text: '城外的一处据点，补给靠车队，夜里要轮岗。这里离交火线比离城市近。' }
+  };
+  TL.rhodesMissionName = id => (RHODES_MISSIONS[id] || {}).name || '';
+  TL.rhodesPostingName = id => (RHODES_POSTINGS[id] || {}).name || '';
+  TL.stationNation = S => (S && S.station && S.station.kind === 'deploy' && S.station.nation) || null;
+  TL.isAwayFromHome = S => !!(S && S.station && (S.station.kind === 'deploy' || S.station.kind === 'ship'));
+  TL.rhodesStationLabel = function (S) {
+    const st = S && S.station;
+    if (!st) return '';
+    return st.kind === 'ship' ? '罗德岛本舰' : (st.name || '在外执行任务');
+  };
+  /** 外勤是否可以接新任务：入职满一年、没在任务中、冷却已过。 */
+  TL.rhodesDeployReady = function (S) {
+    if (!S || S.affiliation !== 'rhodes' || S.rhodesTrack !== 'field' || S.phase !== 'life') return false;
+    if (S.station || S.school || S.serveLeft > 0 || S.flags.retired || S.age >= 65 || S.orgTransition) return false;
+    if (!TL.isWorking(S) || !TL.organizationAvailable(S, 'rhodes')) return false;
+    if ((S.flags.deployCooldown || 0) > S.year) return false;
+    return (S.orgService || 0) >= 1;
+  };
+
+  /** 短期任务：不改驻地，当场结算。适合「今天出勤、明天回舰」的那一类。 */
+  TL.runRhodesShortMission = function (S) {
+    if (!TL.rhodesDeployReady(S)) return false;
+    const kind = TL.wpickArr([{ id: 'escort', w: 4 }, { id: 'rescue', w: 3 }, { id: 'scout', w: 2 }]).id;
+    const score = TL.combatValue(S) * 0.5 + S.st.hl * 0.3 + S.st.so * 0.2;
+    const ok = TL.chance(TL.clamp(0.35 + (score - 55) / 110, 0.15, 0.9));
+    S.flags.deployCooldown = S.year + 1;
+    S.flags.deployments = (S.flags.deployments || 0) + 1;
+    S.flags.deployLog = (S.flags.deployLog || []).concat([{
+      year: S.year, name: '短期任务', mission: kind, short: true
+    }]);
+    if (ok) {
+      S.money += Math.max(0, Number.isFinite(S.income) ? S.income : 0) * 0.8;
+      TL.eff(S, { so: 2, h: 1 });
+      TL.log(S, '你完成了一次短期任务（' + TL.rhodesMissionName(kind) + '），当天回到舰上。', 'org',
+        { key: 'rhodes_short_ok' });
+    } else {
+      TL.eff(S, { hl: -4, h: -2 });
+      TL.log(S, '短期任务出了岔子（' + TL.rhodesMissionName(kind) + '），你带着伤回到舰上。', 'org',
+        { key: 'rhodes_short_bad' });
+    }
+    return true;
+  };
+
+  /** 驻扎：联络处／安全屋／前哨，两年一期，驻地随任务地改变。 */
+  TL.startRhodesPosting = function (S, posting) {
+    if (!TL.rhodesDeployReady(S) || !RHODES_POSTINGS[posting]) return false;
+    const pool = TL.NATIONS.filter(x => x.id !== S.nation && !['AEG', 'DUR'].includes(x.id));
+    // 未来两年有大事的国家更容易被派去，驻扎期正好撞上。
+    const upcoming = (TL.TIMELINE || []).filter(e => !e.legend && e.year >= S.year && e.year <= S.year + 2);
+    const target = TL.wpickArr(pool.map(x => ({
+      x: x,
+      w: 0.6 + x.war * 2 + x.cat +
+        (upcoming.some(e => ((e.scope && e.scope.nations) || []).includes(x.id)) ? 3 : 0)
+    }))).x;
+    const place = TL.drawPlace(target.id, S.year, TL.rnd);
+    const def = RHODES_POSTINGS[posting];
+    S.station = {
+      kind: 'deploy', posting: posting, nation: target.id, placeId: place.id,
+      name: def.name + ' · ' + target.name + ' · ' + TL.placeName(place, S.year),
+      risk: def.risk, pay: def.pay, sinceYear: S.year, returnYear: S.year + 2
+    };
+    S.flags.deployments = (S.flags.deployments || 0) + 1;
+    S.flags.deployCooldown = S.year + 4;
+    S.flags.deployLog = (S.flags.deployLog || []).concat([{
+      year: S.year, name: S.station.name, mission: posting, posting: true
+    }]);
+    TL.log(S, '你被派往' + S.station.name + '，开始为期两年的驻扎。', 'org',
+      { key: 'rhodes_posting_start' });
+    return true;
+  };
+
+  /** 归来：结算津贴、记录履历，驻地回到自己的住处。 */
+  TL.endRhodesDeployment = function (S) {
+    const st = S.station;
+    if (!st || st.kind !== 'deploy') return false;
+    S.station = null;
+    // 驻扎之后有两三年的调整期，不会连着被派出。
+    S.flags.deployCooldown = S.year + 3;
+    const months = st.pay || 1.5;
+    S.money += Math.max(0, Number.isFinite(S.income) ? S.income : 0) * months;
+    TL.eff(S, { h: 2, so: 2 });
+    TL.log(S, '你在' + st.name + '的驻扎结束，回到罗德岛。', 'org', { key: 'rhodes_deploy_end' });
+    return true;
+  };
 
   TL.organizationContactEligible = function (S, id, c) {
     if (S.phase !== 'life' || S.school || S.age >= 65 || S.flags.retired || S.serveLeft > 0 || S.orgTransition ||

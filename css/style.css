@@ -489,6 +489,35 @@ body::before {
 .tagline { text-align: center; font-size: 13.5px; color: var(--fg2); margin-bottom: 4px; }
 .hint { text-align: center; font-size: 11.5px; color: var(--fg3); margin-bottom: 24px; }
 
+/* ---------------------------------------------------------------------- */
+/* 死亡过场：把「突然跳报告」换成一次收束                                    */
+/* ---------------------------------------------------------------------- */
+#death {
+  position: fixed; inset: 0; z-index: 58; display: flex; align-items: center; justify-content: center;
+  padding: 28px; text-align: center;
+  background: radial-gradient(120% 90% at 50% 42%, #101315 0%, #07090a 62%, #040506 100%);
+  animation: death-fade .7s ease-out both;
+}
+#death[hidden] { display: none; }
+#death.out { animation: death-out .45s ease-in both; }
+#deathCard { max-width: 34em; animation: death-rise .9s .25s cubic-bezier(.2,.7,.2,1) both; }
+#deathMark {
+  font-family: var(--serif); font-size: clamp(64px, 14vw, 112px); line-height: 1;
+  letter-spacing: .08em; color: #ded3bd; opacity: .9;
+}
+#deathName { margin-top: 24px; font-family: var(--serif); font-size: 18px; letter-spacing: .3em; color: #cfc4ae; }
+#deathMeta { margin-top: 10px; font-family: var(--mono); font-size: 11.5px; letter-spacing: .06em; color: #8d8271; }
+#deathLine { margin: 26px auto 0; max-width: 26em; font-size: 14px; line-height: 2; color: #b9ae99; }
+#deathHint { margin-top: 34px; font-size: 10.5px; letter-spacing: .28em; color: #5d5648; }
+@keyframes death-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes death-out { from { opacity: 1 } to { opacity: 0 } }
+@keyframes death-rise { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+@keyframes report-in { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+#report:not([hidden]) > .wrap { animation: report-in .5s .05s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  #death, #death.out, #deathCard, #report:not([hidden]) > .wrap { animation: none; }
+}
+
 .fieldset { margin-bottom: 20px; }
 .fieldset > label {
   display: block; font-family: var(--serif); font-size: 12.5px; font-weight: 700;

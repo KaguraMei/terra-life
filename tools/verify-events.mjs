@@ -64,6 +64,29 @@ for (const id of controlledIds) {
       S.ori = null; S.flags.postCatastrophe = 1; S.urban = false; S.stratum = 'wild';
     }
     if (id === 'organization_offer') { S.nation = 'CLB'; S.job = 'scholar'; }
+    const stationPrefix = ['rhodes_field_', 'rhodes_support_', 'rhodes_mission_',
+      'rhodes_liaison_', 'rhodes_safehouse_', 'rhodes_outpost_', 'rhodes_ship_'];
+    if (stationPrefix.some(p => id.startsWith(p)) || id.startsWith('away_')) {
+      // 罗德岛的方向、驻地与在途事件：先入职，再按事件类型布置状态。
+      S.nation = 'LAT'; S.year = 1100; S.bornYear = S.year - S.age;
+      S.race = 'sankta'; S.job = 'op_guard'; S.opClass = 'guard'; S.opRank = 1;
+      assert.ok(TL.joinOrganization(S, 'rhodes', 'operator'), id + ' fixture join');
+      const shipEvent = id.startsWith('rhodes_ship_');
+      if (id.startsWith('rhodes_support_') || shipEvent) {
+        const post = id.includes('ward') ? 'medical' : id.includes('refit') ? 'engineering'
+          : id.includes('roster') ? 'personnel' : 'medical';
+        TL.setRhodesTrack(S, 'support', post);
+      } else {
+        TL.setRhodesTrack(S, 'field');
+        const posting = id.startsWith('rhodes_liaison') ? 'liaison'
+          : id.startsWith('rhodes_outpost') ? 'outpost' : 'safehouse';
+        S.station = { kind: 'deploy', posting, nation: 'VIC', placeId: 'vic_city',
+          name: '安全屋 · 维多利亚 · 伦蒂尼姆', risk: 1.3, pay: 1.6,
+          sinceYear: S.year, returnYear: S.year + 2 };
+      }
+      S.orgRank = 1;
+      S.queue = [];
+    }
     if (id === 'organization_contact' || id.startsWith('org_')) {
       const org = id === 'organization_contact' ? 'lungmen_guard' : TL.EVMAP[id].organization;
       const def = TL.ORGANIZATIONS[org];

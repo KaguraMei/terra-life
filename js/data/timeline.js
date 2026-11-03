@@ -724,11 +724,26 @@
     return hit;
   }
 
-  /** 这一条对玩家来说是「亲历 / 邻国 / 远方」 */
+  /** 这一条对玩家来说是「亲历 / 邻国 / 远方」；驻外时按任务地判断。 */
   function levelOf(ev, S, n) {
-    if (ev.scope.nations && ev.scope.nations.indexOf(S.nation) >= 0) return 'here';
-    if (ev.scope.regions && ev.scope.regions.indexOf(n.reg) >= 0) return 'near';
+    const home = TL.stationNation ? (TL.stationNation(S) || S.nation) : S.nation;
+    if (ev.scope.nations && ev.scope.nations.indexOf(home) >= 0) return 'here';
+    const reg = (TL.NATION_BY_ID[home] || n).reg;
+    if (ev.scope.regions && ev.scope.regions.indexOf(reg) >= 0) return 'near';
     return 'far';
+  }
+
+  /** 驻扎点正好在大事件发生地时，补一句「你在现场」。 */
+  function stationLine(S, ev) {
+    const st = S.station;
+    if (!st || st.kind !== 'deploy') return '';
+    if (!(ev.scope && ev.scope.nations && ev.scope.nations.indexOf(st.nation) >= 0)) return '';
+    const byPosting = {
+      liaison: '联络处的窗外就是那条街。消息比公报早到半天，你把它写进报告，署了名。',
+      safehouse: '安全屋的窗帘一直拉着。你们把收音机的声音调小，等上面的通知。',
+      outpost: '前哨的探照灯整夜没停。交火线那边传来的声音，比新闻里更清楚。'
+    };
+    return byPosting[st.posting] || '你就在这座城市。事情发生时，你离得很近。';
   }
 
   /**
@@ -763,6 +778,8 @@
       /* --- ② 旁白 --- */
       const text = ev[lv] || ev.far;
       if (text) TL.log(S, text, 'tl', { key: ev.id, tag: ev.title });
+      const onStation = stationLine(S, ev);
+      if (onStation) TL.log(S, onStation, 'tl', { key: ev.id + '_station', tag: ev.title });
     }
 
     /* --- ③ 条件性的个人后果 --- */
