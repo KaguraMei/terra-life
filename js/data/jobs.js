@@ -153,8 +153,19 @@
 
   /** 干员阶级显示名 */
   TL.opRankName = function (rank) {
-    const r = TL.OP_RANKS[rank] || TL.OP_RANKS[0];
+    const r = TL.opRankDef(rank);
     return (TL.lang === 'en' && r.en) ? r.en : r.name;
+  };
+
+  /**
+   * 取一个干员阶级定义。
+   * 旧存档里可能带着已经不存在的阶数（例如以前的无门槛「王牌干员」），
+   * 一律按最高阶处理，不让编译器读到 undefined。
+   */
+  TL.opRankDef = function (rank) {
+    const r = Math.round(Number(rank) || 0);
+    const i = TL.clamp(r, 0, TL.OP_RANKS.length - 1);
+    return TL.OP_RANKS[i] || TL.OP_RANKS[0];
   };
 
   /** 干员分支显示名 */
@@ -176,13 +187,12 @@
     { id: 'specialist', name: '特种', en: 'Specialist', tag: '位移 · 控制' }
   ];
 
-  /** 干员阶级（干员路线的晋升台阶） */
+  /** 干员阶级（干员路线的晋升台阶；精英资格需要考核，不再有无门槛的头衔） */
   TL.OP_RANKS = [
     { id: 0, name: '实习干员', en: 'Trainee Operator', pay: 1.0, need: 0 },
     { id: 1, name: '正式干员', en: 'Official Operator', pay: 1.25, need: 6 },
     { id: 2, name: '资深干员', en: 'Senior Operator', pay: 1.6, need: 16 },
-    { id: 3, name: '精英干员', en: 'Elite Operator', pay: 2.1, need: 30 },
-    { id: 4, name: '王牌干员', en: 'Ace Operator', pay: 2.8, need: 48 }
+    { id: 3, name: '精英干员', en: 'Elite Operator', pay: 2.1, need: 30 }
   ];
 
 })(window.TL = window.TL || {});

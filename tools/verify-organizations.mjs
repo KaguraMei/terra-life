@@ -284,5 +284,151 @@ for (const [status,years] of [['rejected',3],['withdrawn',3],['waitlisted',1]]) 
   const T=join('reunion'); TL.leaveOrganization(T,'test'); TL.syncOrganization(T);
   assert.equal(T.affiliation,null); assert.equal(T.flags.reunion,false);
 }
+/* 罗德岛：岗位方向、精英考核与「王牌干员」的移除。 */
+{
+  // 职级上限：不再有王牌干员
+  assert.equal(TL.OP_RANKS.length, 4);
+  assert.ok(!TL.OP_RANKS.some(r => /王牌/.test(r.name)));
+  assert.ok(!TL.organizationDef('rhodes').routes.operator.ranks.some(r => /王牌/.test(r.name)));
+  assert.equal(TL.opRankName(4), '精英干员', 'stale rank clamps to the highest existing rank');
+
+  // 入职后排队选择外勤／内勤
+  const S = join('rhodes');
+  assert.equal(S.rhodesTrack, null);
+  assert.ok(S.queue.some(e => e.type === 'dec' && e.id === 'rhodes_track'), 'track decision queued');
+  TL.openDecision(S, 'rhodes_track');
+  assert.ok(S.pending && S.pending.id === 'rhodes_track');
+  const supportIdx = S.pending.options.findIndex(o => o.label.includes('医疗与康复'));
+  TL.choose(S, supportIdx);
+  assert.equal(S.rhodesTrack, 'support');
+  assert.equal(S.rhodesPost, 'medical');
+  assert.equal(TL.operatorTitle(S), '正式干员 · 内勤 · 医疗与康复');
+  TL.computeIncome(S);
+  const supportPay = S.income;
+
+  const F = join('rhodes', null, 700999);
+  TL.setRhodesTrack(F, 'field');
+  TL.computeIncome(F);
+  assert.ok(F.income > supportPay, 'field allowance pays more than support');
+  assert.equal(TL.organizationPayMultiplier(F), 1.16);
+  assert.equal(TL.organizationPayMultiplier(S), 1.06);
+  assert.equal(TL.operatorTitle(F), '正式干员 · 外勤 · ' + TL.opClassName(F.opClass));
+
+  // 方向专属日常事件
+  assert.equal(TL.EVMAP.rhodes_field_patrol.when(F), true);
+  assert.equal(TL.EVMAP.rhodes_support_ward.when(F), false);
+
+  // 精英职阶：没有考核资格就不晋升
+  const T = join('rhodes', null, 700998);
+  TL.setRhodesTrack(T, 'support', 'personnel');
+  T.orgRank = 2; T.opRank = 2; T.orgService = 16; T.orgLastPromotionYear = T.year - 1;
+  assert.equal(TL.organizationPromotionReady(T), false, 'elite rank requires assessment');
+  assert.equal(TL.promoteOrganization(T), false);
+  assert.equal(TL.rhodesEliteReviewReady(T), true);
+
+  const chance = TL.chance;
+  TL.chance = () => false;
+  TL.openDecision(T, 'rhodes_elite_review');
+  TL.choose(T, T.pending.options.findIndex(o => o.label.includes('参加考核')));
+  TL.chance = chance;
+  assert.equal(T.orgRank, 2);
+  assert.equal(T.flags.assess_rhodes_elite, undefined);
+  assert.ok(T.flags.rhodesEliteCooldown > T.age);
+  assert.equal(TL.rhodesEliteReviewReady(T), false, 'failed exam waits for cooldown');
+
+  T.flags.rhodesEliteCooldown = 0;
+  TL.chance = () => true;
+  TL.openDecision(T, 'rhodes_elite_review');
+  TL.choose(T, T.pending.options.findIndex(o => o.label.includes('参加考核')));
+  TL.chance = chance;
+  assert.ok(T.flags.assess_rhodes_elite);
+  assert.equal(T.orgRank, 2, 'exam only grants the qualification');
+  assert.ok(TL.promoteOrganization(T), 'annual review promotes after the exam');
+  assert.equal(T.orgRank, 3);
+  assert.equal(T.opRank, 3);
+  assert.equal(TL.operatorTitle(T), '精英干员 · 内勤 · 人事与后勤');
+
+  // 放弃资格后不再询问
+  const D = join('rhodes', null, 700997);
+  TL.setRhodesTrack(D, 'field');
+  D.orgRank = 2; D.opRank = 2; D.orgService = 20;
+  TL.openDecision(D, 'rhodes_elite_review');
+  TL.choose(D, D.pending.options.findIndex(o => o.label.includes('不再申报')));
+  assert.equal(D.flags.rhodesEliteDeclined, true);
+  assert.equal(TL.rhodesEliteReviewReady(D), false);
+
+  // 驻地：内勤住舰上；外勤平时住自己住处，任务期临时换驻地
+  const V = join('rhodes', null, 700995);
+  TL.setRhodesTrack(V, 'support', 'engineering');
+  assert.equal(V.station.kind, 'ship');
+  assert.equal(TL.rhodesStationLabel(V), '罗德岛本舰');
+
+  const W = join('rhodes', null, 700994);
+  TL.setRhodesTrack(W, 'field');
+  assert.equal(W.station, null);
+  assert.equal(TL.rhodesDeployReady(W), false, 'deployment needs one year of service');
+  W.orgService = 1; W.year = 1100; W.flags.deployCooldown = 0;
+  assert.equal(TL.rhodesDeployReady(W), true);
+  const moneyBefore = W.money;
+  // 短期任务：不改驻地
+  assert.ok(TL.runRhodesShortMission(W));
+  assert.equal(W.station, null, 'short mission keeps the residence');
+  assert.equal(W.flags.deployLog[0].short, true);
+
+  // 驻扎：改驻地，两年一期
+  W.flags.deployCooldown = 0;
+  assert.ok(TL.startRhodesPosting(W, 'safehouse'));
+  assert.equal(W.station.kind, 'deploy');
+  assert.equal(W.station.posting, 'safehouse');
+  assert.equal(W.station.returnYear, W.year + 2);
+  assert.ok(W.station.nation && W.station.name.includes('安全屋'), 'posting names a destination');
+  assert.equal(TL.isAwayFromHome(W), true);
+  assert.equal(TL.stationNation(W), W.station.nation);
+  assert.equal(W.flags.deployLog.length, 2);
+  assert.equal(TL.rhodesDeployReady(W), false, 'no new mission while posted');
+  // 驻扎结束：归来并结算津贴
+  const postingIncome = W.income;
+  W.year = W.station.returnYear;
+  W.orgLastServiceYear = W.year - 1;
+  TL.organizationYear(W);
+  assert.equal(W.station, null);
+  assert.ok(W.money > moneyBefore + postingIncome * 1.5, 'posting allowance paid');
+  assert.ok(W.flags.deployCooldown > W.year);
+
+  // 驻外年份：家里的日常事件被过滤，只留下「能带走的事」与组织任务
+  const A = join('rhodes', null, 700993);
+  TL.setRhodesTrack(A, 'field');
+  A.orgService = 3; A.year = 1100; A.flags.deployCooldown = 0;
+  assert.ok(TL.startRhodesPosting(A, 'outpost'));
+  A.queue = []; A.t = 0;
+  TL.scheduleEvents(A);
+  const queuedEv = A.queue.filter(e => e.type === 'ev').map(e => e.id);
+  const portable = new Set(['quiet_year', 'small_luck', 'mental_low', 'injury_accident', 'work_injury',
+    'work_overtime', 'work_colleague', 'kid_grow', 'old_parent', 'ori_pain', 'ori_kindness',
+    'ori_rhodes', 'away_road', 'away_letter', 'away_local']);
+  for (const id of queuedEv) {
+    assert.ok(portable.has(id) || id.startsWith('rhodes_') || id.startsWith('org_'),
+      'away year leaked a home-local event: ' + id);
+  }
+
+  // 大事件发生在驻扎国：追加一句「你在现场」
+  const tlEv = TL.TIMELINE.find(e => !e.legend && e.scope && e.scope.nations &&
+    e.scope.nations.length && !(e.at || []).length);
+  assert.ok(tlEv, 'has a narrated timeline event');
+  A.station.nation = tlEv.scope.nations[0];
+  TL.fireTimeline(A, tlEv);
+  assert.ok(A.log.some(x => x.key === tlEv.id + '_station'), 'station narration on timeline');
+
+  // 离职后方向清空；退休保留方向，但驻地交还
+  TL.leaveOrganization(S, 'test');
+  assert.equal(S.rhodesTrack, null);
+  const R = join('rhodes', null, 700996);
+  TL.setRhodesTrack(R, 'field');
+  R.station = { kind: 'deploy', nation: 'VIC', name: '维多利亚 · x', mission: 'escort', returnYear: R.year + 1 };
+  TL.leaveOrganization(R, '退休', { keepJob: true, retirement: true, preserveOperatorRank: true });
+  assert.equal(R.rhodesTrack, 'field');
+  assert.equal(R.station, null, 'retirement hands the post back');
+}
+
 assert.equal(errors.length,0,errors.join('\n'));
 console.log(`Organization checks passed: ${Object.keys(TL.ORGANIZATIONS).length} organizations, ${routeCount} routes, ${scheduledRoutes} scheduled recruitment routes; lifecycle/history/contact/interview boundaries passed.`);

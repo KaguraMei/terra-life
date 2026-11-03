@@ -84,7 +84,11 @@
     $('ageBig').textContent = S.report ? Math.round(S.age) : Math.floor(S.age);
     $('ageUnit').textContent = TL.t('ageWord') || '岁';
 
-    $('metaL1').textContent = TL.L`${S.year}${TL.t('yearWord')} · ${S.fullName} · ${TL.jobLabel(S.job)}`;
+    // 内勤的实际岗位是部门而不是战斗分支，顶栏按部门显示，避免「近卫干员在人事部」的错位。
+    const roleLabel = (S.rhodesTrack === 'support' && TL.rhodesPostName)
+      ? TL.rhodesPostName(S.rhodesPost)
+      : TL.jobLabel(S.job);
+    $('metaL1').textContent = TL.L`${S.year}${TL.t('yearWord')} · ${S.fullName} · ${roleLabel}`;
     const sec = Math.max(0.1, S.yearSec);
     $('metaL2').textContent = TL.L`${TL.nameOf(n)} · ${TL.nameOf(TL.stratum(S.stratum))} · ${TL.t('oneYear', { n: sec.toFixed(1) })}`;
 
@@ -110,7 +114,10 @@
     $('idCode').textContent = TL.L`${S.nation} · ${S.sex}${String(S.age).padStart(2, '0')} · ${TL.locale.curCode}`;
 
     $('idName').textContent = S.fullName;
-    $('idSub').textContent = TL.L`${TL.nameOf(n)} · ${S.city}`;
+    const station = TL.rhodesStationLabel ? TL.rhodesStationLabel(S) : '';
+    $('idSub').textContent = station
+      ? (S.station.kind === 'ship' ? '罗德岛 · 舰上' : station)
+      : TL.L`${TL.nameOf(n)} · ${S.city}`;
 
     /* --- 标签 --- */
     const tags = [];
@@ -125,7 +132,8 @@
       if (!S.ori.known) tags.push(`<span class="tag">身份未公开</span>`);
     }
     if (S.opClass) {
-      tags.push(`<span class="tag green">${esc(TL.opRankName(S.opRank))} · ${esc(TL.opClassName(S.opClass))}</span>`);
+      const title = TL.operatorTitle ? TL.operatorTitle(S) : (TL.opRankName(S.opRank) + ' · ' + TL.opClassName(S.opClass));
+      tags.push(`<span class="tag green">${esc(title)}</span>`);
     }
     if (S.affiliation && TL.organizationName) {
       const orgName = TL.organizationName(S.affiliation);
@@ -143,7 +151,7 @@
     const rows = [
       [TL.t('sex'), TL.t(S.sex === 'M' ? 'male' : 'female')],
       [TL.t('born'), TL.L`${S.bornYear || (S.year - Math.floor(S.age))}${TL.t('yearWord')}`],
-      [TL.t('residence'), esc(S.city)],
+      [TL.t('residence'), esc(station || S.city)],
       [TL.t('stratum'), esc(TL.nameOf(TL.stratum(S.stratum)))],
       [TL.t('familyTier'), famDots + ' <span style="color:var(--fg3);font-size:10px">' + fam.toFixed(1) + '/5</span>'],
       [TL.t('edu'), esc(TL.eduName(S.eduLevel))]
@@ -438,13 +446,15 @@
     const cv = $('sceneCanvas');
     if (!cv || !TL.drawScene) return;
     const stage = pixStage(S);
+    // 外勤在外时，场景跟着任务地走；内勤住舰上，仍用舰籍所在地的画面。
+    const sceneNation = S.station && S.station.kind === 'deploy' ? S.station.nation : S.nation;
     // 场景随「国家 + 阶层 + 阶段 + 是否天灾 + 是否感染」变化，换年不重画
-    const sig = [S.nation, S.stratum, stage, S.sex, S.flags.postCatastrophe ? 1 : 0,
+    const sig = [sceneNation, S.stratum, stage, S.sex, S.flags.postCatastrophe ? 1 : 0,
                  S.ori ? Math.min(3, S.ori.stage) : 0, S.sceneSeed || 0].join('|');
     if (sig !== UI.sceneSig) {
       UI.sceneSig = sig;
       TL.drawScene(cv, {
-        nation: S.nation, stratum: S.stratum, stage: stage, sex: S.sex,
+        nation: sceneNation, stratum: S.stratum, stage: stage, sex: S.sex,
         seed: S.sceneSeed || 0,
         cat: !!S.flags.postCatastrophe,
         ori: !!(S.ori && S.ori.stage > 0)
@@ -452,6 +462,12 @@
     }
     const n = TL.NATION_BY_ID[S.nation];
     const st = TL.stratum(S.stratum);
+    const station = TL.rhodesStationLabel ? TL.rhodesStationLabel(S) : '';
+    if (station) {
+      const ctx = S.station.kind === 'ship' ? ' · 舰上' : '';
+      $('sceneCap').innerHTML = TL.L`<b>${esc(station)}</b>${ctx} · ${TL.ageWord(S.age)}`;
+      return;
+    }
     $('sceneCap').innerHTML = TL.L`<b>${esc(S.city)}</b> · ${esc(TL.nameOf(n))} · ${esc(TL.shortOf(st))} · ${TL.ageWord(S.age)}`;
   };
 

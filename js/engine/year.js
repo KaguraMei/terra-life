@@ -441,6 +441,8 @@
     const kids = S.fam.kids.filter(k => k.alive && k.age < 18).length;
     cost *= 1 + kids * 0.22;
     if (S.fam.partner && S.fam.partner.alive && !S.working2) cost *= 1.35;
+    // 内勤住舰上，食宿由舰上承担；外勤在任务期另有野外补给。
+    if (S.affiliation === 'rhodes' && S.rhodesTrack === 'support' && TL.isWorking(S)) cost *= 0.82;
     // 感染者治疗费
     if (S.ori && S.ori.treated) cost += n.ppp * (S.ori.provider === 'rhodes' ? 2.2 : 1.0);
     // 慢性病
@@ -664,6 +666,8 @@
       nation: n.name,
       nationId: n.id,
       city: S.city,
+      station: TL.rhodesStationLabel ? (TL.rhodesStationLabel(S) || null) : null,
+      deployLog: (S.flags.deployLog || []).slice(),
       upbringing: TL.upbringingReport ? TL.upbringingReport(S) : null,
       race: r.name,
       raceId: r.id,
@@ -686,6 +690,8 @@
         jobName: (TL.JOBS[S.flags.lastJob || S.job] || {}).name || '无',
         opClass: S.opClass,
         opRank: S.opRank,
+        rhodesTrack: S.rhodesTrack || null,
+        rhodesPost: S.rhodesPost || null,
         eduLevel: S.eduLevel
       },
       orgHistory: (S.orgHistory || []).map(h => JSON.parse(JSON.stringify(h))),

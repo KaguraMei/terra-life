@@ -103,6 +103,13 @@
       again: '再随机一次', sameSeed: '同种子再来', backToStart: '回到开局设置',
       /* 开局 */
       startTitle: '泰拉人生模拟', startBtn: '开 始 出 生',
+      /* 首页通讯板 */
+      noticeTitle: '通讯板',
+      noticeLead: '这个模拟还在不断调整，每次改动都记在这里。点开任意一条，就能看到具体改了什么。',
+      noticeAll: '全部 {n} 条 →', noticeNew: '新', noticeBack: '返回全部记录',
+      noticeAllTitle: '全部更新记录', noticeCount: '共 {n} 条记录',
+      noticePosition: '第 {i} 条 / 共 {n} 条', noticeHint: '点开任意一条查看详情',
+      noticeScope: '只列出玩家能看见的改动；没有可见变化的版本未收录。',
       /* 其他 */
       dead: '已故', unknown: '未知'
     },
@@ -130,6 +137,12 @@
       vsNational: 'vs. national average', yearsMore: '{n} yr', yearsLess: '{n} yr',
       again: 'Random again', sameSeed: 'Same seed', backToStart: 'Back to setup',
       startTitle: 'Terra Life Simulator', startBtn: 'B E G I N',
+      noticeTitle: 'Comms board',
+      noticeLead: 'This simulation is still being adjusted, and every change is logged here. Open any entry to see what was updated.',
+      noticeAll: 'All {n} updates →', noticeNew: 'New', noticeBack: 'Back to all updates',
+      noticeAllTitle: 'All updates', noticeCount: '{n} entries',
+      noticePosition: 'Entry {i} of {n}', noticeHint: 'Open any entry for details',
+      noticeScope: 'Only player-visible changes are listed; versions without visible changes are omitted.',
       dead: 'Deceased', unknown: 'Unknown'
     },
     ja: null,   // 暂未翻译 → 回落 zh

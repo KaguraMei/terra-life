@@ -436,7 +436,7 @@
     const ar = TL.artRank(S);
     let v = ar * 22 + S.st.hl * 0.35 + S.st.sm * 0.15;
     if (S.ori && S.ori.stage > 0) v += S.ori.stage * 9;
-    if (S.opRank) v += TL.OP_RANKS[S.opRank].need * 1.2;
+    if (S.opRank) v += (TL.opRankDef ? TL.opRankDef(S.opRank).need : TL.OP_RANKS[S.opRank].need) * 1.2;
     if (TL.growthSkill) v += Math.min(5, (TL.growthSkill(S, 'shooting') + TL.growthSkill(S, 'launcher')) * 0.12);
     return Math.round(v);
   };
